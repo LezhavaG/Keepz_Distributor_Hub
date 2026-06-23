@@ -1,0 +1,46 @@
+# Claude Code Ignore File
+# Files and directories listed here will not be read by Claude Code
+
+# Dependencies
+node_modules/
+package-lock.json
+
+# Test outputs
+test-results/
+playwright-report/
+*.png
+*.jpg
+*.webp
+
+# Logs
+*.log
+npm-debug.log*
+
+# Environment files (may contain secrets)
+.env
+.env.local
+.env.*.local
+
+# Build outputs
+dist/
+build/
+.cache/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Sensitive data (credentials)
+**/credentials.json
+**/secrets.json
+**/*-credentials.ts
+**/*-secrets.ts
+
+# Large files
+*.zip
+*.tar.gz
+*.7z

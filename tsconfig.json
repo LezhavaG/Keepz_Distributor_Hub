@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "node16",
+    "moduleResolution": "node16",
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "strict": false,
+    "types": ["node", "@playwright/test"],
+    "lib": ["ESNext"]
+  },
+  "include": ["tests/**/*", "pages/**/*"],
+  "exclude": ["node_modules"]
+}
