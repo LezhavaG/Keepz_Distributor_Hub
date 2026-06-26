@@ -19,8 +19,8 @@ export default defineConfig({
   /* Retry on CI only */
   retries: 0,
 
-  /* Reporter to use */
-  reporter: 'html',
+  /* Reporter to use - Disabled, using custom HTML reports */
+  reporter: [],
 
   /* Shared settings for all the projects below */
   use: {

@@ -10,12 +10,14 @@
   "type": "commonjs",
   "devDependencies": {
     "@playwright/test": "^1.61.0",
-    "@types/node": "^25.9.4"
+    "@types/node": "^25.9.4",
+    "@types/uuid": "^10.0.0"
   },
   "dependencies": {
     "dotenv": "^17.4.2",
     "imap-simple": "^5.1.0",
     "mailparser": "^3.9.11",
-    "puppeteer": "^25.1.0"
+    "puppeteer": "^25.1.0",
+    "uuid": "^14.0.1"
   }
 }

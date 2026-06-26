@@ -3,7 +3,7 @@
 
 # Playwright
 node_modules/
-/test-results/
+/distributor-report/
 /playwright-report/
 /blob-report/
 /playwright/.cache/
