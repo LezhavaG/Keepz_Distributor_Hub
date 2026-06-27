@@ -1,0 +1,1916 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Distributor HUB Test Report</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 40px 20px;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      overflow: hidden;
+    }
+
+    .header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 40px;
+      text-align: center;
+    }
+
+    .header h1 {
+      font-size: 28px;
+      margin-bottom: 8px;
+    }
+
+    .header p {
+      font-size: 14px;
+      opacity: 0.9;
+    }
+
+    .content {
+      padding: 40px;
+    }
+
+    button {
+      transition: all 0.3s ease;
+    }
+
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .status-section {
+      border-radius: 6px;
+      overflow: hidden;
+    }
+
+    .test-case-row {
+      border-bottom: 1px solid #e0e0e0;
+      background: white;
+    }
+
+    .test-case-header {
+      padding: 16px;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #fafafa;
+      border-bottom: 1px solid #e0e0e0;
+    }
+
+    .test-case-header:hover {
+      background: #f0f0f0;
+    }
+
+    .test-case-content {
+      display: none;
+      padding: 16px;
+      background: white;
+    }
+
+    .test-case-content.expanded {
+      display: block;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    thead {
+      background: #f5f5f5;
+    }
+
+    th {
+      padding: 12px 16px;
+      text-align: left;
+      font-weight: 600;
+      color: #333;
+      border-bottom: 2px solid #e0e0e0;
+      font-size: 13px;
+    }
+
+    td {
+      padding: 12px 16px;
+      border-bottom: 1px solid #e0e0e0;
+    }
+
+    tbody tr:hover {
+      background-color: #fafafa;
+    }
+
+    .footer {
+      padding: 20px 40px;
+      background: #f9f9f9;
+      border-top: 1px solid #e0e0e0;
+      text-align: center;
+      color: #666;
+      font-size: 12px;
+    }
+
+    .error-detail {
+      display: none;
+      padding: 12px 16px;
+      background-color: #ffe6e6;
+      border-top: 1px solid #ffcccc;
+      color: #cc0000;
+      font-size: 12px;
+      font-family: monospace;
+    }
+  </style>
+  <script>
+    function toggleSection(button) {
+      const section = button.nextElementSibling;
+      const arrow = button.querySelector('span:last-child');
+
+      if (section.style.display === 'none') {
+        section.style.display = 'block';
+        arrow.style.transform = 'rotate(0deg)';
+      } else {
+        section.style.display = 'none';
+        arrow.style.transform = 'rotate(-90deg)';
+      }
+    }
+
+    function toggleTestCase(element) {
+      const content = element.nextElementSibling;
+      const arrow = element.querySelector('.arrow');
+      content.classList.toggle('expanded');
+      arrow.style.transform = content.classList.contains('expanded') ? 'rotate(0deg)' : 'rotate(-90deg)';
+    }
+
+    function toggleError(button) {
+      const errorDetail = button.parentElement.querySelector('.error-detail');
+      const arrow = button.querySelector('span:last-child');
+      const isHidden = window.getComputedStyle(errorDetail).display === 'none';
+
+      if (isHidden) {
+        errorDetail.style.display = 'block';
+        arrow.style.transform = 'rotate(0deg)';
+      } else {
+        errorDetail.style.display = 'none';
+        arrow.style.transform = 'rotate(-90deg)';
+      }
+    }
+
+    function toggleCategory(button) {
+      const categorySection = button.nextElementSibling;
+      const arrow = button.querySelector('span:last-child');
+      const isHidden = window.getComputedStyle(categorySection).display === 'none';
+
+      if (isHidden) {
+        categorySection.style.display = 'block';
+        arrow.style.transform = 'rotate(0deg)';
+      } else {
+        categorySection.style.display = 'none';
+        arrow.style.transform = 'rotate(-90deg)';
+      }
+    }
+  </script>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Distributor HUB Test Report</h1>
+      <p>Distributor HUB - Negative Tests</p>
+    </div>
+
+    <div class="content">
+      <div style="margin-bottom: 24px;">
+        <a href="./index.html" style="display: inline-block; padding: 10px 16px; background: #667eea; color: white; text-decoration: none; border-radius: 6px; font-weight: 500; transition: background 0.2s;">
+          ← Back to Portal
+        </a>
+      </div>
+      
+      <div style="margin-bottom: 32px;">
+        <h2 style="font-size: 20px; font-weight: 600; color: #333; margin-bottom: 16px;">Test Case Summary - (Negative Cases)</h2>
+        <div style="padding: 16px; background: #f5f5f5; border-radius: 8px; border-left: 4px solid #667eea; margin-bottom: 24px;">
+          <div style="font-size: 14px; color: #666;">
+            <strong>Total Test Cases:</strong> <span style="font-weight: 600; color: #333;">51</span>
+            <span style="margin: 0 8px;">|</span>
+            <strong>Passed:</strong> <span style="font-weight: 600; color: #2e7d32;">51</span>
+            <span style="margin: 0 8px;">|</span>
+            <strong>Failed:</strong> <span style="font-weight: 600; color: #c62828;">0</span>
+            <span style="margin: 0 8px;">|</span>
+            <strong>Success Rate:</strong> <span style="font-weight: 600; color: #333;">100%</span>
+          </div>
+        </div>
+        
+        <div style="margin-bottom: 24px;">
+          <button type="button" onclick="toggleSection(this)" style="width: 100%; padding: 16px; background-color: #d4edda; border: none; cursor: pointer; border-radius: 6px; font-weight: 600; text-align: left; font-size: 16px; display: flex; justify-content: space-between; align-items: center;">
+            <span>✓ Passed Cases (51)</span>
+            <span style="font-size: 20px;">▼</span>
+          </button>
+          <div class="status-section" style="display: none; margin-top: 12px;">
+            <div style="background: white; border-radius: 6px; overflow: hidden;">
+              
+      <div style="margin-bottom: 16px;">
+        <button type="button" onclick="toggleCategory(this)" style="width: 100%; padding: 12px 16px; background: #f5f5f5; border: none; cursor: pointer; border-left: 4px solid #667eea; font-weight: 500; font-size: 14px; color: #333; display: flex; justify-content: space-between; align-items: center; text-align: left;">
+          <span>📁 Authentication Cases</span>
+          <span style="font-size: 16px; transition: transform 0.3s; transform: rotate(-90deg);">▼</span>
+        </button>
+        <div class="category-section" style="display: none; background: white; border-radius: 0 0 6px 6px; overflow: hidden;">
+          
+      <div class="test-case-row">
+        <div class="test-case-header" onclick="toggleTestCase(this)">
+          <div style="font-weight: 500; color: #333;">No Token (Authentication Failure)</div>
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <span style="background-color: #d4edda; padding: 4px 12px; border-radius: 4px; font-size: 12px; font-weight: 500;">
+              Passed ✓
+            </span>
+            <span class="arrow" style="font-size: 18px; transition: transform 0.3s; transform: rotate(-90deg);">▼</span>
+          </div>
+        </div>
+        <div class="test-case-content">
+          
+          <div style="padding: 16px;">
+            <button type="button" onclick="toggleError(this)" style="width: 100%; padding: 12px 16px; background: none; border: none; cursor: pointer; text-align: left; font-size: 13px; color: #cc0000; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #e0e0e0; margin-top: -16px; margin-left: -16px; margin-right: -16px; margin-bottom: 0;">
+              <span>📋 Response</span>
+              <span style="font-size: 16px;">▼</span>
+            </button>
+            <div class="error-detail" style="background-color: #ffe6e6; color: #cc0000; ">
+              
+              Status: 401
+
+{
+  "application_name": null,
+  "method_name": null,
+  "exception_name": null,
+  "status": null,
+  "message": "Authentication failed",
+  "timestamp": null
+}
+            </div>
+          </div>
+        
+        </div>
+      </div>
+    
+      <div class="test-case-row">
+        <div class="test-case-header" onclick="toggleTestCase(this)">
+          <div style="font-weight: 500; color: #333;">Invalid Credentials (Authentication)</div>
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <span style="background-color: #d4edda; padding: 4px 12px; border-radius: 4px; font-size: 12px; font-weight: 500;">
+              Passed ✓
+            </span>
+            <span class="arrow" style="font-size: 18px; transition: transform 0.3s; transform: rotate(-90deg);">▼</span>
+          </div>
+        </div>
+        <div class="test-case-content">
+          
+          <div style="padding: 16px;">
+            <button type="button" onclick="toggleError(this)" style="width: 100%; padding: 12px 16px; background: none; border: none; cursor: pointer; text-align: left; font-size: 13px; color: #cc0000; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #e0e0e0; margin-top: -16px; margin-left: -16px; margin-right: -16px; margin-bottom: 0;">
+              <span>📋 Response</span>
+              <span style="font-size: 16px;">▼</span>
+            </button>
+            <div class="error-detail" style="background-color: #ffe6e6; color: #cc0000; ">
+              
+              Status: 400
+
+{
+  "message": "Incorrect credentials",
+  "statusCode": 5021,
+  "exceptionGroup": 3
+}
+            </div>
+          </div>
+        
+        </div>
+      </div>
+    
+      <div class="test-case-row">
+        <div class="test-case-header" onclick="toggleTestCase(this)">
+          <div style="font-weight: 500; color: #333;">Incorrect Client ID (Authentication)</div>
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <span style="background-color: #d4edda; padding: 4px 12px; border-radius: 4px; font-size: 12px; font-weight: 500;">
+              Passed ✓
+            </span>
+            <span class="arrow" style="font-size: 18px; transition: transform 0.3s; transform: rotate(-90deg);">▼</span>
+          </div>
+        </div>
+        <div class="test-case-content">
+          
+          <div style="padding: 16px;">
+            <button type="button" onclick="toggleError(this)" style="width: 100%; padding: 12px 16px; background: none; border: none; cursor: pointer; text-align: left; font-size: 13px; color: #cc0000; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #e0e0e0; margin-top: -16px; margin-left: -16px; margin-right: -16px; margin-bottom: 0;">
+              <span>📋 Response</span>
+              <span style="font-size: 16px;">▼</span>
+            </button>
+            <div class="error-detail" style="background-color: #ffe6e6; color: #cc0000; ">
+              
+              Status: 400
+
+{
+  "message": "Client not found for given id.",
+  "statusCode": 5003,
+  "exceptionGroup": 5
+}
+            </div>
+          </div>
+        
+        </div>
+      </div>
+    
+        </div>
+      </div>
+    
+      <div style="margin-bottom: 16px;">
+        <button type="button" onclick="toggleCategory(this)" style="width: 100%; padding: 12px 16px; background: #f5f5f5; border: none; cursor: pointer; border-left: 4px solid #667eea; font-weight: 500; font-size: 14px; color: #333; display: flex; justify-content: space-between; align-items: center; text-align: left;">
+          <span>📁 Invalid IBAN Cases</span>
+          <span style="font-size: 16px; transition: transform 0.3s; transform: rotate(-90deg);">▼</span>
+        </button>
+        <div class="category-section" style="display: none; background: white; border-radius: 0 0 6px 6px; overflow: hidden;">
+          
+      <div class="test-case-row">
+        <div class="test-case-header" onclick="toggleTestCase(this)">
+          <div style="font-weight: 500; color: #333;">Distributor BOG (GEL) - Invalid IBAN</div>
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <span style="background-color: #d4edda; padding: 4px 12px; border-radius: 4px; font-size: 12px; font-weight: 500;">
+              Passed ✓
+            </span>
+            <span class="arrow" style="font-size: 18px; transition: transform 0.3s; transform: rotate(-90deg);">▼</span>
+          </div>
+        </div>
+        <div class="test-case-content">
+          
+          <div style="padding: 16px;">
+            <button type="button" onclick="toggleError(this)" style="width: 100%; padding: 12px 16px; background: none; border: none; cursor: pointer; text-align: left; font-size: 13px; color: #cc0000; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #e0e0e0; margin-top: -16px; margin-left: -16px; margin-right: -16px; margin-bottom: 0;">
+              <span>📋 Response</span>
+              <span style="font-size: 16px;">▼</span>
+            </button>
+            <div class="error-detail" style="background-color: #ffe6e6; color: #cc0000; ">
+              <div style="margin-bottom: 12px; padding: 12px; background: #f0f0f0; border-radius: 4px; border-left: 3px solid #667eea;"><strong style="color: #333;">Unique ID:</strong> <code style="color: #0066cc; font-family: monospace; word-break: break-all; font-size: 12px;">fc1da3b0-7ce6-4223-86b5-fabe4a353f7d</code></div>
+              Status: 400
+
+{
+  "message": "To iban has invalid format, ",
+  "statusCode": 5023,
+  "exceptionGroup": 1
+}
+            </div>
+          </div>
+        
+        </div>
+      </div>
+    
+      <div class="test-case-row">
+        <div class="test-case-header" onclick="toggleTestCase(this)">
+          <div style="font-weight: 500; color: #333;">Distributor BOG (USD) - Invalid IBAN</div>
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <span style="background-color: #d4edda; padding: 4px 12px; border-radius: 4px; font-size: 12px; font-weight: 500;">
+              Passed ✓
+            </span>
+            <span class="arrow" style="font-size: 18px; transition: transform 0.3s; transform: rotate(-90deg);">▼</span>
+          </div>
+        </div>
+        <div class="test-case-content">
+          
+          <div style="padding: 16px;">
+            <button type="button" onclick="toggleError(this)" style="width: 100%; padding: 12px 16px; background: none; border: none; cursor: pointer; text-align: left; font-size: 13px; color: #cc0000; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #e0e0e0; margin-top: -16px; margin-left: -16px; margin-right: -16px; margin-bottom: 0;">
+              <span>📋 Response</span>
+              <span style="font-size: 16px;">▼</span>
+            </button>
+            <div class="error-detail" style="background-color: #ffe6e6; color: #cc0000; ">
+              <div style="margin-bottom: 12px; padding: 12px; background: #f0f0f0; border-radius: 4px; border-left: 3px solid #667eea;"><strong style="color: #333;">Unique ID:</strong> <code style="color: #0066cc; font-family: monospace; word-break: break-all; font-size: 12px;">c572854d-9c0f-4b0f-84ed-b3b075d15334</code></div>
+              Status: 400
+
+{
+  "message": "To iban has invalid format, ",
+  "statusCode": 5023,
+  "exceptionGroup": 1
+}
+            </div>
+          </div>
+        
+        </div>
+      </div>
+    
+      <div class="test-case-row">
+        <div class="test-case-header" onclick="toggleTestCase(this)">
+          <div style="font-weight: 500; color: #333;">Distributor BOG (EUR) - Invalid IBAN</div>
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <span style="background-color: #d4edda; padding: 4px 12px; border-radius: 4px; font-size: 12px; font-weight: 500;">
+              Passed ✓
+            </span>
+            <span class="arrow" style="font-size: 18px; transition: transform 0.3s; transform: rotate(-90deg);">▼</span>
+          </div>
+        </div>
+        <div class="test-case-content">
+          
+          <div style="padding: 16px;">
+            <button type="button" onclick="toggleError(this)" style="width: 100%; padding: 12px 16px; background: none; border: none; cursor: pointer; text-align: left; font-size: 13px; color: #cc0000; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #e0e0e0; margin-top: -16px; margin-left: -16px; margin-right: -16px; margin-bottom: 0;">
+              <span>📋 Response</span>
+              <span style="font-size: 16px;">▼</span>
+            </button>
+            <div class="error-detail" style="background-color: #ffe6e6; color: #cc0000; ">
+              <div style="margin-bottom: 12px; padding: 12px; background: #f0f0f0; border-radius: 4px; border-left: 3px solid #667eea;"><strong style="color: #333;">Unique ID:</strong> <code style="color: #0066cc; font-family: monospace; word-break: break-all; font-size: 12px;">90cadccc-1495-478f-b8b6-2441f6800fbd</code></div>
+              Status: 400
+
+{
+  "message": "To iban has invalid format, ",
+  "statusCode": 5023,
+  "exceptionGroup": 1
+}
+            </div>
+          </div>
+        
+        </div>
+      </div>
+    
+      <div class="test-case-row">
+        <div class="test-case-header" onclick="toggleTestCase(this)">
+          <div style="font-weight: 500; color: #333;">Distributor TBC (GEL) - Invalid IBAN</div>
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <span style="background-color: #d4edda; padding: 4px 12px; border-radius: 4px; font-size: 12px; font-weight: 500;">
+              Passed ✓
+            </span>
+            <span class="arrow" style="font-size: 18px; transition: transform 0.3s; transform: rotate(-90deg);">▼</span>
+          </div>
+        </div>
+        <div class="test-case-content">
+          
+          <div style="padding: 16px;">
+            <button type="button" onclick="toggleError(this)" style="width: 100%; padding: 12px 16px; background: none; border: none; cursor: pointer; text-align: left; font-size: 13px; color: #cc0000; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #e0e0e0; margin-top: -16px; margin-left: -16px; margin-right: -16px; margin-bottom: 0;">
+              <span>📋 Response</span>
+              <span style="font-size: 16px;">▼</span>
+            </button>
+            <div class="error-detail" style="background-color: #ffe6e6; color: #cc0000; ">
+              <div style="margin-bottom: 12px; padding: 12px; background: #f0f0f0; border-radius: 4px; border-left: 3px solid #667eea;"><strong style="color: #333;">Unique ID:</strong> <code style="color: #0066cc; font-family: monospace; word-break: break-all; font-size: 12px;">a9fecb4b-f749-4319-ba2b-2b5eabc39242</code></div>
+              Status: 400
+
+{
+  "message": "To iban has invalid format, ",
+  "statusCode": 5023,
+  "exceptionGroup": 1
+}
+            </div>
+          </div>
+        
+        </div>
+      </div>
+    
+      <div class="test-case-row">
+        <div class="test-case-header" onclick="toggleTestCase(this)">
+          <div style="font-weight: 500; color: #333;">Distributor TBC (USD) - Invalid IBAN</div>
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <span style="background-color: #d4edda; padding: 4px 12px; border-radius: 4px; font-size: 12px; font-weight: 500;">
+              Passed ✓
+            </span>
+            <span class="arrow" style="font-size: 18px; transition: transform 0.3s; transform: rotate(-90deg);">▼</span>
+          </div>
+        </div>
+        <div class="test-case-content">
+          
+          <div style="padding: 16px;">
+            <button type="button" onclick="toggleError(this)" style="width: 100%; padding: 12px 16px; background: none; border: none; cursor: pointer; text-align: left; font-size: 13px; color: #cc0000; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #e0e0e0; margin-top: -16px; margin-left: -16px; margin-right: -16px; margin-bottom: 0;">
+              <span>📋 Response</span>
+              <span style="font-size: 16px;">▼</span>
+            </button>
+            <div class="error-detail" style="background-color: #ffe6e6; color: #cc0000; ">
+              <div style="margin-bottom: 12px; padding: 12px; background: #f0f0f0; border-radius: 4px; border-left: 3px solid #667eea;"><strong style="color: #333;">Unique ID:</strong> <code style="color: #0066cc; font-family: monospace; word-break: break-all; font-size: 12px;">6fcc99d1-f312-4561-a5aa-daa86ec5c675</code></div>
+              Status: 400
+
+{
+  "message": "To iban has invalid format, ",
+  "statusCode": 5023,
+  "exceptionGroup": 1
+}
+            </div>
+          </div>
+        
+        </div>
+      </div>
+    
+      <div class="test-case-row">
+        <div class="test-case-header" onclick="toggleTestCase(this)">
+          <div style="font-weight: 500; color: #333;">Distributor TBC (EUR) - Invalid IBAN</div>
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <span style="background-color: #d4edda; padding: 4px 12px; border-radius: 4px; font-size: 12px; font-weight: 500;">
+              Passed ✓
+            </span>
+            <span class="arrow" style="font-size: 18px; transition: transform 0.3s; transform: rotate(-90deg);">▼</span>
+          </div>
+        </div>
+        <div class="test-case-content">
+          
+          <div style="padding: 16px;">
+            <button type="button" onclick="toggleError(this)" style="width: 100%; padding: 12px 16px; background: none; border: none; cursor: pointer; text-align: left; font-size: 13px; color: #cc0000; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #e0e0e0; margin-top: -16px; margin-left: -16px; margin-right: -16px; margin-bottom: 0;">
+              <span>📋 Response</span>
+              <span style="font-size: 16px;">▼</span>
+            </button>
+            <div class="error-detail" style="background-color: #ffe6e6; color: #cc0000; ">
+              <div style="margin-bottom: 12px; padding: 12px; background: #f0f0f0; border-radius: 4px; border-left: 3px solid #667eea;"><strong style="color: #333;">Unique ID:</strong> <code style="color: #0066cc; font-family: monospace; word-break: break-all; font-size: 12px;">2b67ae8e-097a-446e-a404-f9deed71e2b0</code></div>
+              Status: 400
+
+{
+  "message": "To iban has invalid format, ",
+  "statusCode": 5023,
+  "exceptionGroup": 1
+}
+            </div>
+          </div>
+        
+        </div>
+      </div>
+    
+      <div class="test-case-row">
+        <div class="test-case-header" onclick="toggleTestCase(this)">
+          <div style="font-weight: 500; color: #333;">Distributor Liberty (GEL) - Invalid IBAN</div>
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <span style="background-color: #d4edda; padding: 4px 12px; border-radius: 4px; font-size: 12px; font-weight: 500;">
+              Passed ✓
+            </span>
+            <span class="arrow" style="font-size: 18px; transition: transform 0.3s; transform: rotate(-90deg);">▼</span>
+          </div>
+        </div>
+        <div class="test-case-content">
+          
+          <div style="padding: 16px;">
+            <button type="button" onclick="toggleError(this)" style="width: 100%; padding: 12px 16px; background: none; border: none; cursor: pointer; text-align: left; font-size: 13px; color: #cc0000; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #e0e0e0; margin-top: -16px; margin-left: -16px; margin-right: -16px; margin-bottom: 0;">
+              <span>📋 Response</span>
+              <span style="font-size: 16px;">▼</span>
+            </button>
+            <div class="error-detail" style="background-color: #ffe6e6; color: #cc0000; ">
+              <div style="margin-bottom: 12px; padding: 12px; background: #f0f0f0; border-radius: 4px; border-left: 3px solid #667eea;"><strong style="color: #333;">Unique ID:</strong> <code style="color: #0066cc; font-family: monospace; word-break: break-all; font-size: 12px;">3516635f-14ca-4e7b-8df8-38b733cb7c8a</code></div>
+              Status: 400
+
+{
+  "message": "To iban has invalid format, ",
+  "statusCode": 5023,
+  "exceptionGroup": 1
+}
+            </div>
+          </div>
+        
+        </div>
+      </div>
+    
+      <div class="test-case-row">
+        <div class="test-case-header" onclick="toggleTestCase(this)">
+          <div style="font-weight: 500; color: #333;">Distributor Liberty (USD) - Invalid IBAN</div>
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <span style="background-color: #d4edda; padding: 4px 12px; border-radius: 4px; font-size: 12px; font-weight: 500;">
+              Passed ✓
+            </span>
+            <span class="arrow" style="font-size: 18px; transition: transform 0.3s; transform: rotate(-90deg);">▼</span>
+          </div>
+        </div>
+        <div class="test-case-content">
+          
+          <div style="padding: 16px;">
+            <button type="button" onclick="toggleError(this)" style="width: 100%; padding: 12px 16px; background: none; border: none; cursor: pointer; text-align: left; font-size: 13px; color: #cc0000; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #e0e0e0; margin-top: -16px; margin-left: -16px; margin-right: -16px; margin-bottom: 0;">
+              <span>📋 Response</span>
+              <span style="font-size: 16px;">▼</span>
+            </button>
+            <div class="error-detail" style="background-color: #ffe6e6; color: #cc0000; ">
+              <div style="margin-bottom: 12px; padding: 12px; background: #f0f0f0; border-radius: 4px; border-left: 3px solid #667eea;"><strong style="color: #333;">Unique ID:</strong> <code style="color: #0066cc; font-family: monospace; word-break: break-all; font-size: 12px;">b36ec4af-fa6d-4dc3-8959-7f95c01e54dd</code></div>
+              Status: 400
+
+{
+  "message": "To iban has invalid format, ",
+  "statusCode": 5023,
+  "exceptionGroup": 1
+}
+            </div>
+          </div>
+        
+        </div>
+      </div>
+    
+      <div class="test-case-row">
+        <div class="test-case-header" onclick="toggleTestCase(this)">
+          <div style="font-weight: 500; color: #333;">Distributor Liberty (EUR) - Invalid IBAN</div>
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <span style="background-color: #d4edda; padding: 4px 12px; border-radius: 4px; font-size: 12px; font-weight: 500;">
+              Passed ✓
+            </span>
+            <span class="arrow" style="font-size: 18px; transition: transform 0.3s; transform: rotate(-90deg);">▼</span>
+          </div>
+        </div>
+        <div class="test-case-content">
+          
+          <div style="padding: 16px;">
+            <button type="button" onclick="toggleError(this)" style="width: 100%; padding: 12px 16px; background: none; border: none; cursor: pointer; text-align: left; font-size: 13px; color: #cc0000; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #e0e0e0; margin-top: -16px; margin-left: -16px; margin-right: -16px; margin-bottom: 0;">
+              <span>📋 Response</span>
+              <span style="font-size: 16px;">▼</span>
+            </button>
+            <div class="error-detail" style="background-color: #ffe6e6; color: #cc0000; ">
+              <div style="margin-bottom: 12px; padding: 12px; background: #f0f0f0; border-radius: 4px; border-left: 3px solid #667eea;"><strong style="color: #333;">Unique ID:</strong> <code style="color: #0066cc; font-family: monospace; word-break: break-all; font-size: 12px;">34e2ccbc-864c-47ab-980f-e080922fd397</code></div>
+              Status: 400
+
+{
+  "message": "To iban has invalid format, ",
+  "statusCode": 5023,
+  "exceptionGroup": 1
+}
+            </div>
+          </div>
+        
+        </div>
+      </div>
+    
+      <div class="test-case-row">
+        <div class="test-case-header" onclick="toggleTestCase(this)">
+          <div style="font-weight: 500; color: #333;">Distributor CREDO (GEL) - Invalid IBAN</div>
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <span style="background-color: #d4edda; padding: 4px 12px; border-radius: 4px; font-size: 12px; font-weight: 500;">
+              Passed ✓
+            </span>
+            <span class="arrow" style="font-size: 18px; transition: transform 0.3s; transform: rotate(-90deg);">▼</span>
+          </div>
+        </div>
+        <div class="test-case-content">
+          
+          <div style="padding: 16px;">
+            <button type="button" onclick="toggleError(this)" style="width: 100%; padding: 12px 16px; background: none; border: none; cursor: pointer; text-align: left; font-size: 13px; color: #cc0000; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #e0e0e0; margin-top: -16px; margin-left: -16px; margin-right: -16px; margin-bottom: 0;">
+              <span>📋 Response</span>
+              <span style="font-size: 16px;">▼</span>
+            </button>
+            <div class="error-detail" style="background-color: #ffe6e6; color: #cc0000; ">
+              <div style="margin-bottom: 12px; padding: 12px; background: #f0f0f0; border-radius: 4px; border-left: 3px solid #667eea;"><strong style="color: #333;">Unique ID:</strong> <code style="color: #0066cc; font-family: monospace; word-break: break-all; font-size: 12px;">e295881a-4b42-4510-b60a-2fd63ff17623</code></div>
+              Status: 400
+
+{
+  "message": "To iban has invalid format, ",
+  "statusCode": 5023,
+  "exceptionGroup": 1
+}
+            </div>
+          </div>
+        
+        </div>
+      </div>
+    
+      <div class="test-case-row">
+        <div class="test-case-header" onclick="toggleTestCase(this)">
+          <div style="font-weight: 500; color: #333;">Distributor CREDO (USD) - Invalid IBAN</div>
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <span style="background-color: #d4edda; padding: 4px 12px; border-radius: 4px; font-size: 12px; font-weight: 500;">
+              Passed ✓
+            </span>
+            <span class="arrow" style="font-size: 18px; transition: transform 0.3s; transform: rotate(-90deg);">▼</span>
+          </div>
+        </div>
+        <div class="test-case-content">
+          
+          <div style="padding: 16px;">
+            <button type="button" onclick="toggleError(this)" style="width: 100%; padding: 12px 16px; background: none; border: none; cursor: pointer; text-align: left; font-size: 13px; color: #cc0000; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #e0e0e0; margin-top: -16px; margin-left: -16px; margin-right: -16px; margin-bottom: 0;">
+              <span>📋 Response</span>
+              <span style="font-size: 16px;">▼</span>
+            </button>
+            <div class="error-detail" style="background-color: #ffe6e6; color: #cc0000; ">
+              <div style="margin-bottom: 12px; padding: 12px; background: #f0f0f0; border-radius: 4px; border-left: 3px solid #667eea;"><strong style="color: #333;">Unique ID:</strong> <code style="color: #0066cc; font-family: monospace; word-break: break-all; font-size: 12px;">561b1490-27de-4c4e-964a-e7cce479bc28</code></div>
+              Status: 400
+
+{
+  "message": "To iban has invalid format, ",
+  "statusCode": 5023,
+  "exceptionGroup": 1
+}
+            </div>
+          </div>
+        
+        </div>
+      </div>
+    
+      <div class="test-case-row">
+        <div class="test-case-header" onclick="toggleTestCase(this)">
+          <div style="font-weight: 500; color: #333;">Distributor CREDO (EUR) - Invalid IBAN</div>
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <span style="background-color: #d4edda; padding: 4px 12px; border-radius: 4px; font-size: 12px; font-weight: 500;">
+              Passed ✓
+            </span>
+            <span class="arrow" style="font-size: 18px; transition: transform 0.3s; transform: rotate(-90deg);">▼</span>
+          </div>
+        </div>
+        <div class="test-case-content">
+          
+          <div style="padding: 16px;">
+            <button type="button" onclick="toggleError(this)" style="width: 100%; padding: 12px 16px; background: none; border: none; cursor: pointer; text-align: left; font-size: 13px; color: #cc0000; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #e0e0e0; margin-top: -16px; margin-left: -16px; margin-right: -16px; margin-bottom: 0;">
+              <span>📋 Response</span>
+              <span style="font-size: 16px;">▼</span>
+            </button>
+            <div class="error-detail" style="background-color: #ffe6e6; color: #cc0000; ">
+              <div style="margin-bottom: 12px; padding: 12px; background: #f0f0f0; border-radius: 4px; border-left: 3px solid #667eea;"><strong style="color: #333;">Unique ID:</strong> <code style="color: #0066cc; font-family: monospace; word-break: break-all; font-size: 12px;">a036bd28-e716-449d-9480-2e83952dafd6</code></div>
+              Status: 400
+
+{
+  "message": "To iban has invalid format, ",
+  "statusCode": 5023,
+  "exceptionGroup": 1
+}
+            </div>
+          </div>
+        
+        </div>
+      </div>
+    
+        </div>
+      </div>
+    
+      <div style="margin-bottom: 16px;">
+        <button type="button" onclick="toggleCategory(this)" style="width: 100%; padding: 12px 16px; background: #f5f5f5; border: none; cursor: pointer; border-left: 4px solid #667eea; font-weight: 500; font-size: 14px; color: #333; display: flex; justify-content: space-between; align-items: center; text-align: left;">
+          <span>📁 Insufficient Balance Cases</span>
+          <span style="font-size: 16px; transition: transform 0.3s; transform: rotate(-90deg);">▼</span>
+        </button>
+        <div class="category-section" style="display: none; background: white; border-radius: 0 0 6px 6px; overflow: hidden;">
+          
+      <div class="test-case-row">
+        <div class="test-case-header" onclick="toggleTestCase(this)">
+          <div style="font-weight: 500; color: #333;">Distributor BOG (GEL) - Insufficient Balance</div>
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <span style="background-color: #d4edda; padding: 4px 12px; border-radius: 4px; font-size: 12px; font-weight: 500;">
+              Passed ✓
+            </span>
+            <span class="arrow" style="font-size: 18px; transition: transform 0.3s; transform: rotate(-90deg);">▼</span>
+          </div>
+        </div>
+        <div class="test-case-content">
+          
+          <div style="padding: 16px;">
+            <button type="button" onclick="toggleError(this)" style="width: 100%; padding: 12px 16px; background: none; border: none; cursor: pointer; text-align: left; font-size: 13px; color: #cc0000; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #e0e0e0; margin-top: -16px; margin-left: -16px; margin-right: -16px; margin-bottom: 0;">
+              <span>📋 Response</span>
+              <span style="font-size: 16px;">▼</span>
+            </button>
+            <div class="error-detail" style="background-color: #ffe6e6; color: #cc0000; ">
+              <div style="margin-bottom: 12px; padding: 12px; background: #f0f0f0; border-radius: 4px; border-left: 3px solid #667eea;"><strong style="color: #333;">Unique ID:</strong> <code style="color: #0066cc; font-family: monospace; word-break: break-all; font-size: 12px;">2c97d630-053b-4f0c-952f-8b6bea7c2afc</code></div>
+              Status: 400
+
+{
+  "message": "Couldn't make transaction. Insufficient balance amount",
+  "statusCode": 5038,
+  "exceptionGroup": 1
+}
+            </div>
+          </div>
+        
+        </div>
+      </div>
+    
+      <div class="test-case-row">
+        <div class="test-case-header" onclick="toggleTestCase(this)">
+          <div style="font-weight: 500; color: #333;">Distributor BOG (USD) - Insufficient Balance</div>
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <span style="background-color: #d4edda; padding: 4px 12px; border-radius: 4px; font-size: 12px; font-weight: 500;">
+              Passed ✓
+            </span>
+            <span class="arrow" style="font-size: 18px; transition: transform 0.3s; transform: rotate(-90deg);">▼</span>
+          </div>
+        </div>
+        <div class="test-case-content">
+          
+          <div style="padding: 16px;">
+            <button type="button" onclick="toggleError(this)" style="width: 100%; padding: 12px 16px; background: none; border: none; cursor: pointer; text-align: left; font-size: 13px; color: #cc0000; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #e0e0e0; margin-top: -16px; margin-left: -16px; margin-right: -16px; margin-bottom: 0;">
+              <span>📋 Response</span>
+              <span style="font-size: 16px;">▼</span>
+            </button>
+            <div class="error-detail" style="background-color: #ffe6e6; color: #cc0000; ">
+              <div style="margin-bottom: 12px; padding: 12px; background: #f0f0f0; border-radius: 4px; border-left: 3px solid #667eea;"><strong style="color: #333;">Unique ID:</strong> <code style="color: #0066cc; font-family: monospace; word-break: break-all; font-size: 12px;">9c4160e3-a973-4834-9344-3650ae2a4f9d</code></div>
+              Status: 400
+
+{
+  "message": "Couldn't make transaction. Insufficient balance amount",
+  "statusCode": 5038,
+  "exceptionGroup": 1
+}
+            </div>
+          </div>
+        
+        </div>
+      </div>
+    
+      <div class="test-case-row">
+        <div class="test-case-header" onclick="toggleTestCase(this)">
+          <div style="font-weight: 500; color: #333;">Distributor BOG (EUR) - Insufficient Balance</div>
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <span style="background-color: #d4edda; padding: 4px 12px; border-radius: 4px; font-size: 12px; font-weight: 500;">
+              Passed ✓
+            </span>
+            <span class="arrow" style="font-size: 18px; transition: transform 0.3s; transform: rotate(-90deg);">▼</span>
+          </div>
+        </div>
+        <div class="test-case-content">
+          
+          <div style="padding: 16px;">
+            <button type="button" onclick="toggleError(this)" style="width: 100%; padding: 12px 16px; background: none; border: none; cursor: pointer; text-align: left; font-size: 13px; color: #cc0000; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #e0e0e0; margin-top: -16px; margin-left: -16px; margin-right: -16px; margin-bottom: 0;">
+              <span>📋 Response</span>
+              <span style="font-size: 16px;">▼</span>
+            </button>
+            <div class="error-detail" style="background-color: #ffe6e6; color: #cc0000; ">
+              <div style="margin-bottom: 12px; padding: 12px; background: #f0f0f0; border-radius: 4px; border-left: 3px solid #667eea;"><strong style="color: #333;">Unique ID:</strong> <code style="color: #0066cc; font-family: monospace; word-break: break-all; font-size: 12px;">ca9238d9-1d2c-4d06-a045-afe5a215e596</code></div>
+              Status: 400
+
+{
+  "message": "Couldn't make transaction. Insufficient balance amount",
+  "statusCode": 5038,
+  "exceptionGroup": 1
+}
+            </div>
+          </div>
+        
+        </div>
+      </div>
+    
+      <div class="test-case-row">
+        <div class="test-case-header" onclick="toggleTestCase(this)">
+          <div style="font-weight: 500; color: #333;">Distributor TBC (GEL) - Insufficient Balance</div>
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <span style="background-color: #d4edda; padding: 4px 12px; border-radius: 4px; font-size: 12px; font-weight: 500;">
+              Passed ✓
+            </span>
+            <span class="arrow" style="font-size: 18px; transition: transform 0.3s; transform: rotate(-90deg);">▼</span>
+          </div>
+        </div>
+        <div class="test-case-content">
+          
+          <div style="padding: 16px;">
+            <button type="button" onclick="toggleError(this)" style="width: 100%; padding: 12px 16px; background: none; border: none; cursor: pointer; text-align: left; font-size: 13px; color: #cc0000; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #e0e0e0; margin-top: -16px; margin-left: -16px; margin-right: -16px; margin-bottom: 0;">
+              <span>📋 Response</span>
+              <span style="font-size: 16px;">▼</span>
+            </button>
+            <div class="error-detail" style="background-color: #ffe6e6; color: #cc0000; ">
+              <div style="margin-bottom: 12px; padding: 12px; background: #f0f0f0; border-radius: 4px; border-left: 3px solid #667eea;"><strong style="color: #333;">Unique ID:</strong> <code style="color: #0066cc; font-family: monospace; word-break: break-all; font-size: 12px;">05825177-e245-4d69-98cc-aad4d7d540a0</code></div>
+              Status: 400
+
+{
+  "message": "Couldn't make transaction. Insufficient balance amount",
+  "statusCode": 5038,
+  "exceptionGroup": 1
+}
+            </div>
+          </div>
+        
+        </div>
+      </div>
+    
+      <div class="test-case-row">
+        <div class="test-case-header" onclick="toggleTestCase(this)">
+          <div style="font-weight: 500; color: #333;">Distributor TBC (USD) - Insufficient Balance</div>
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <span style="background-color: #d4edda; padding: 4px 12px; border-radius: 4px; font-size: 12px; font-weight: 500;">
+              Passed ✓
+            </span>
+            <span class="arrow" style="font-size: 18px; transition: transform 0.3s; transform: rotate(-90deg);">▼</span>
+          </div>
+        </div>
+        <div class="test-case-content">
+          
+          <div style="padding: 16px;">
+            <button type="button" onclick="toggleError(this)" style="width: 100%; padding: 12px 16px; background: none; border: none; cursor: pointer; text-align: left; font-size: 13px; color: #cc0000; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #e0e0e0; margin-top: -16px; margin-left: -16px; margin-right: -16px; margin-bottom: 0;">
+              <span>📋 Response</span>
+              <span style="font-size: 16px;">▼</span>
+            </button>
+            <div class="error-detail" style="background-color: #ffe6e6; color: #cc0000; ">
+              <div style="margin-bottom: 12px; padding: 12px; background: #f0f0f0; border-radius: 4px; border-left: 3px solid #667eea;"><strong style="color: #333;">Unique ID:</strong> <code style="color: #0066cc; font-family: monospace; word-break: break-all; font-size: 12px;">6f26be73-4ec4-467e-874c-17621aa20cf3</code></div>
+              Status: 400
+
+{
+  "message": "Couldn't make transaction. Insufficient balance amount",
+  "statusCode": 5038,
+  "exceptionGroup": 1
+}
+            </div>
+          </div>
+        
+        </div>
+      </div>
+    
+      <div class="test-case-row">
+        <div class="test-case-header" onclick="toggleTestCase(this)">
+          <div style="font-weight: 500; color: #333;">Distributor TBC (EUR) - Insufficient Balance</div>
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <span style="background-color: #d4edda; padding: 4px 12px; border-radius: 4px; font-size: 12px; font-weight: 500;">
+              Passed ✓
+            </span>
+            <span class="arrow" style="font-size: 18px; transition: transform 0.3s; transform: rotate(-90deg);">▼</span>
+          </div>
+        </div>
+        <div class="test-case-content">
+          
+          <div style="padding: 16px;">
+            <button type="button" onclick="toggleError(this)" style="width: 100%; padding: 12px 16px; background: none; border: none; cursor: pointer; text-align: left; font-size: 13px; color: #cc0000; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #e0e0e0; margin-top: -16px; margin-left: -16px; margin-right: -16px; margin-bottom: 0;">
+              <span>📋 Response</span>
+              <span style="font-size: 16px;">▼</span>
+            </button>
+            <div class="error-detail" style="background-color: #ffe6e6; color: #cc0000; ">
+              <div style="margin-bottom: 12px; padding: 12px; background: #f0f0f0; border-radius: 4px; border-left: 3px solid #667eea;"><strong style="color: #333;">Unique ID:</strong> <code style="color: #0066cc; font-family: monospace; word-break: break-all; font-size: 12px;">3190bd4d-1532-4a64-9279-8caebf6193b0</code></div>
+              Status: 400
+
+{
+  "message": "Couldn't make transaction. Insufficient balance amount",
+  "statusCode": 5038,
+  "exceptionGroup": 1
+}
+            </div>
+          </div>
+        
+        </div>
+      </div>
+    
+      <div class="test-case-row">
+        <div class="test-case-header" onclick="toggleTestCase(this)">
+          <div style="font-weight: 500; color: #333;">Distributor Liberty (GEL) - Insufficient Balance</div>
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <span style="background-color: #d4edda; padding: 4px 12px; border-radius: 4px; font-size: 12px; font-weight: 500;">
+              Passed ✓
+            </span>
+            <span class="arrow" style="font-size: 18px; transition: transform 0.3s; transform: rotate(-90deg);">▼</span>
+          </div>
+        </div>
+        <div class="test-case-content">
+          
+          <div style="padding: 16px;">
+            <button type="button" onclick="toggleError(this)" style="width: 100%; padding: 12px 16px; background: none; border: none; cursor: pointer; text-align: left; font-size: 13px; color: #cc0000; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #e0e0e0; margin-top: -16px; margin-left: -16px; margin-right: -16px; margin-bottom: 0;">
+              <span>📋 Response</span>
+              <span style="font-size: 16px;">▼</span>
+            </button>
+            <div class="error-detail" style="background-color: #ffe6e6; color: #cc0000; ">
+              <div style="margin-bottom: 12px; padding: 12px; background: #f0f0f0; border-radius: 4px; border-left: 3px solid #667eea;"><strong style="color: #333;">Unique ID:</strong> <code style="color: #0066cc; font-family: monospace; word-break: break-all; font-size: 12px;">411ca632-f11f-49a8-8c6c-64bf95e5846b</code></div>
+              Status: 400
+
+{
+  "message": "Couldn't make transaction. Insufficient balance amount",
+  "statusCode": 5038,
+  "exceptionGroup": 1
+}
+            </div>
+          </div>
+        
+        </div>
+      </div>
+    
+      <div class="test-case-row">
+        <div class="test-case-header" onclick="toggleTestCase(this)">
+          <div style="font-weight: 500; color: #333;">Distributor Liberty (USD) - Insufficient Balance</div>
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <span style="background-color: #d4edda; padding: 4px 12px; border-radius: 4px; font-size: 12px; font-weight: 500;">
+              Passed ✓
+            </span>
+            <span class="arrow" style="font-size: 18px; transition: transform 0.3s; transform: rotate(-90deg);">▼</span>
+          </div>
+        </div>
+        <div class="test-case-content">
+          
+          <div style="padding: 16px;">
+            <button type="button" onclick="toggleError(this)" style="width: 100%; padding: 12px 16px; background: none; border: none; cursor: pointer; text-align: left; font-size: 13px; color: #cc0000; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #e0e0e0; margin-top: -16px; margin-left: -16px; margin-right: -16px; margin-bottom: 0;">
+              <span>📋 Response</span>
+              <span style="font-size: 16px;">▼</span>
+            </button>
+            <div class="error-detail" style="background-color: #ffe6e6; color: #cc0000; ">
+              <div style="margin-bottom: 12px; padding: 12px; background: #f0f0f0; border-radius: 4px; border-left: 3px solid #667eea;"><strong style="color: #333;">Unique ID:</strong> <code style="color: #0066cc; font-family: monospace; word-break: break-all; font-size: 12px;">e1d594a2-fb7f-4c39-80e1-4f6bceadfea5</code></div>
+              Status: 400
+
+{
+  "message": "Couldn't make transaction. Insufficient balance amount",
+  "statusCode": 5038,
+  "exceptionGroup": 1
+}
+            </div>
+          </div>
+        
+        </div>
+      </div>
+    
+      <div class="test-case-row">
+        <div class="test-case-header" onclick="toggleTestCase(this)">
+          <div style="font-weight: 500; color: #333;">Distributor Liberty (EUR) - Insufficient Balance</div>
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <span style="background-color: #d4edda; padding: 4px 12px; border-radius: 4px; font-size: 12px; font-weight: 500;">
+              Passed ✓
+            </span>
+            <span class="arrow" style="font-size: 18px; transition: transform 0.3s; transform: rotate(-90deg);">▼</span>
+          </div>
+        </div>
+        <div class="test-case-content">
+          
+          <div style="padding: 16px;">
+            <button type="button" onclick="toggleError(this)" style="width: 100%; padding: 12px 16px; background: none; border: none; cursor: pointer; text-align: left; font-size: 13px; color: #cc0000; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #e0e0e0; margin-top: -16px; margin-left: -16px; margin-right: -16px; margin-bottom: 0;">
+              <span>📋 Response</span>
+              <span style="font-size: 16px;">▼</span>
+            </button>
+            <div class="error-detail" style="background-color: #ffe6e6; color: #cc0000; ">
+              <div style="margin-bottom: 12px; padding: 12px; background: #f0f0f0; border-radius: 4px; border-left: 3px solid #667eea;"><strong style="color: #333;">Unique ID:</strong> <code style="color: #0066cc; font-family: monospace; word-break: break-all; font-size: 12px;">a757f41a-e7fd-473b-b231-38546f60647b</code></div>
+              Status: 400
+
+{
+  "message": "Couldn't make transaction. Insufficient balance amount",
+  "statusCode": 5038,
+  "exceptionGroup": 1
+}
+            </div>
+          </div>
+        
+        </div>
+      </div>
+    
+      <div class="test-case-row">
+        <div class="test-case-header" onclick="toggleTestCase(this)">
+          <div style="font-weight: 500; color: #333;">Distributor CREDO (GEL) - Insufficient Balance</div>
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <span style="background-color: #d4edda; padding: 4px 12px; border-radius: 4px; font-size: 12px; font-weight: 500;">
+              Passed ✓
+            </span>
+            <span class="arrow" style="font-size: 18px; transition: transform 0.3s; transform: rotate(-90deg);">▼</span>
+          </div>
+        </div>
+        <div class="test-case-content">
+          
+          <div style="padding: 16px;">
+            <button type="button" onclick="toggleError(this)" style="width: 100%; padding: 12px 16px; background: none; border: none; cursor: pointer; text-align: left; font-size: 13px; color: #cc0000; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #e0e0e0; margin-top: -16px; margin-left: -16px; margin-right: -16px; margin-bottom: 0;">
+              <span>📋 Response</span>
+              <span style="font-size: 16px;">▼</span>
+            </button>
+            <div class="error-detail" style="background-color: #ffe6e6; color: #cc0000; ">
+              <div style="margin-bottom: 12px; padding: 12px; background: #f0f0f0; border-radius: 4px; border-left: 3px solid #667eea;"><strong style="color: #333;">Unique ID:</strong> <code style="color: #0066cc; font-family: monospace; word-break: break-all; font-size: 12px;">beb44f5b-fcf2-43c6-9032-4fba20c94e52</code></div>
+              Status: 400
+
+{
+  "message": "Couldn't make transaction. Insufficient balance amount",
+  "statusCode": 5038,
+  "exceptionGroup": 1
+}
+            </div>
+          </div>
+        
+        </div>
+      </div>
+    
+      <div class="test-case-row">
+        <div class="test-case-header" onclick="toggleTestCase(this)">
+          <div style="font-weight: 500; color: #333;">Distributor CREDO (USD) - Insufficient Balance</div>
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <span style="background-color: #d4edda; padding: 4px 12px; border-radius: 4px; font-size: 12px; font-weight: 500;">
+              Passed ✓
+            </span>
+            <span class="arrow" style="font-size: 18px; transition: transform 0.3s; transform: rotate(-90deg);">▼</span>
+          </div>
+        </div>
+        <div class="test-case-content">
+          
+          <div style="padding: 16px;">
+            <button type="button" onclick="toggleError(this)" style="width: 100%; padding: 12px 16px; background: none; border: none; cursor: pointer; text-align: left; font-size: 13px; color: #cc0000; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #e0e0e0; margin-top: -16px; margin-left: -16px; margin-right: -16px; margin-bottom: 0;">
+              <span>📋 Response</span>
+              <span style="font-size: 16px;">▼</span>
+            </button>
+            <div class="error-detail" style="background-color: #ffe6e6; color: #cc0000; ">
+              <div style="margin-bottom: 12px; padding: 12px; background: #f0f0f0; border-radius: 4px; border-left: 3px solid #667eea;"><strong style="color: #333;">Unique ID:</strong> <code style="color: #0066cc; font-family: monospace; word-break: break-all; font-size: 12px;">e903c0a1-637e-4d57-92e5-196722d2cc6d</code></div>
+              Status: 400
+
+{
+  "message": "Couldn't make transaction. Insufficient balance amount",
+  "statusCode": 5038,
+  "exceptionGroup": 1
+}
+            </div>
+          </div>
+        
+        </div>
+      </div>
+    
+      <div class="test-case-row">
+        <div class="test-case-header" onclick="toggleTestCase(this)">
+          <div style="font-weight: 500; color: #333;">Distributor CREDO (EUR) - Insufficient Balance</div>
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <span style="background-color: #d4edda; padding: 4px 12px; border-radius: 4px; font-size: 12px; font-weight: 500;">
+              Passed ✓
+            </span>
+            <span class="arrow" style="font-size: 18px; transition: transform 0.3s; transform: rotate(-90deg);">▼</span>
+          </div>
+        </div>
+        <div class="test-case-content">
+          
+          <div style="padding: 16px;">
+            <button type="button" onclick="toggleError(this)" style="width: 100%; padding: 12px 16px; background: none; border: none; cursor: pointer; text-align: left; font-size: 13px; color: #cc0000; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #e0e0e0; margin-top: -16px; margin-left: -16px; margin-right: -16px; margin-bottom: 0;">
+              <span>📋 Response</span>
+              <span style="font-size: 16px;">▼</span>
+            </button>
+            <div class="error-detail" style="background-color: #ffe6e6; color: #cc0000; ">
+              <div style="margin-bottom: 12px; padding: 12px; background: #f0f0f0; border-radius: 4px; border-left: 3px solid #667eea;"><strong style="color: #333;">Unique ID:</strong> <code style="color: #0066cc; font-family: monospace; word-break: break-all; font-size: 12px;">e1bbd148-c0b3-488e-a615-1b3a39006a32</code></div>
+              Status: 400
+
+{
+  "message": "Couldn't make transaction. Insufficient balance amount",
+  "statusCode": 5038,
+  "exceptionGroup": 1
+}
+            </div>
+          </div>
+        
+        </div>
+      </div>
+    
+        </div>
+      </div>
+    
+      <div style="margin-bottom: 16px;">
+        <button type="button" onclick="toggleCategory(this)" style="width: 100%; padding: 12px 16px; background: #f5f5f5; border: none; cursor: pointer; border-left: 4px solid #667eea; font-weight: 500; font-size: 14px; color: #333; display: flex; justify-content: space-between; align-items: center; text-align: left;">
+          <span>📁 Amount Validation Cases</span>
+          <span style="font-size: 16px; transition: transform 0.3s; transform: rotate(-90deg);">▼</span>
+        </button>
+        <div class="category-section" style="display: none; background: white; border-radius: 0 0 6px 6px; overflow: hidden;">
+          
+      <div class="test-case-row">
+        <div class="test-case-header" onclick="toggleTestCase(this)">
+          <div style="font-weight: 500; color: #333;">Distributor BOG (GEL) - Above Maximum Amount</div>
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <span style="background-color: #d4edda; padding: 4px 12px; border-radius: 4px; font-size: 12px; font-weight: 500;">
+              Passed ✓
+            </span>
+            <span class="arrow" style="font-size: 18px; transition: transform 0.3s; transform: rotate(-90deg);">▼</span>
+          </div>
+        </div>
+        <div class="test-case-content">
+          
+          <div style="padding: 16px;">
+            <button type="button" onclick="toggleError(this)" style="width: 100%; padding: 12px 16px; background: none; border: none; cursor: pointer; text-align: left; font-size: 13px; color: #cc0000; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #e0e0e0; margin-top: -16px; margin-left: -16px; margin-right: -16px; margin-bottom: 0;">
+              <span>📋 Response</span>
+              <span style="font-size: 16px;">▼</span>
+            </button>
+            <div class="error-detail" style="background-color: #ffe6e6; color: #cc0000; ">
+              <div style="margin-bottom: 12px; padding: 12px; background: #f0f0f0; border-radius: 4px; border-left: 3px solid #667eea;"><strong style="color: #333;">Unique ID:</strong> <code style="color: #0066cc; font-family: monospace; word-break: break-all; font-size: 12px;">4a1c2cf2-322d-4a8d-98ea-1b7451b22599</code></div>
+              Status: 400
+
+{
+  "message": "Amount above maximum transaction amount.",
+  "statusCode": 5046,
+  "exceptionGroup": 1
+}
+            </div>
+          </div>
+        
+        </div>
+      </div>
+    
+      <div class="test-case-row">
+        <div class="test-case-header" onclick="toggleTestCase(this)">
+          <div style="font-weight: 500; color: #333;">Distributor BOG (USD) - Above Maximum Amount</div>
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <span style="background-color: #d4edda; padding: 4px 12px; border-radius: 4px; font-size: 12px; font-weight: 500;">
+              Passed ✓
+            </span>
+            <span class="arrow" style="font-size: 18px; transition: transform 0.3s; transform: rotate(-90deg);">▼</span>
+          </div>
+        </div>
+        <div class="test-case-content">
+          
+          <div style="padding: 16px;">
+            <button type="button" onclick="toggleError(this)" style="width: 100%; padding: 12px 16px; background: none; border: none; cursor: pointer; text-align: left; font-size: 13px; color: #cc0000; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #e0e0e0; margin-top: -16px; margin-left: -16px; margin-right: -16px; margin-bottom: 0;">
+              <span>📋 Response</span>
+              <span style="font-size: 16px;">▼</span>
+            </button>
+            <div class="error-detail" style="background-color: #ffe6e6; color: #cc0000; ">
+              <div style="margin-bottom: 12px; padding: 12px; background: #f0f0f0; border-radius: 4px; border-left: 3px solid #667eea;"><strong style="color: #333;">Unique ID:</strong> <code style="color: #0066cc; font-family: monospace; word-break: break-all; font-size: 12px;">761cb7dc-436d-41dc-af7c-84dbe95fd23f</code></div>
+              Status: 400
+
+{
+  "message": "Amount above maximum transaction amount.",
+  "statusCode": 5046,
+  "exceptionGroup": 1
+}
+            </div>
+          </div>
+        
+        </div>
+      </div>
+    
+      <div class="test-case-row">
+        <div class="test-case-header" onclick="toggleTestCase(this)">
+          <div style="font-weight: 500; color: #333;">Distributor BOG (EUR) - Above Maximum Amount</div>
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <span style="background-color: #d4edda; padding: 4px 12px; border-radius: 4px; font-size: 12px; font-weight: 500;">
+              Passed ✓
+            </span>
+            <span class="arrow" style="font-size: 18px; transition: transform 0.3s; transform: rotate(-90deg);">▼</span>
+          </div>
+        </div>
+        <div class="test-case-content">
+          
+          <div style="padding: 16px;">
+            <button type="button" onclick="toggleError(this)" style="width: 100%; padding: 12px 16px; background: none; border: none; cursor: pointer; text-align: left; font-size: 13px; color: #cc0000; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #e0e0e0; margin-top: -16px; margin-left: -16px; margin-right: -16px; margin-bottom: 0;">
+              <span>📋 Response</span>
+              <span style="font-size: 16px;">▼</span>
+            </button>
+            <div class="error-detail" style="background-color: #ffe6e6; color: #cc0000; ">
+              <div style="margin-bottom: 12px; padding: 12px; background: #f0f0f0; border-radius: 4px; border-left: 3px solid #667eea;"><strong style="color: #333;">Unique ID:</strong> <code style="color: #0066cc; font-family: monospace; word-break: break-all; font-size: 12px;">a498468c-5c2b-4544-9610-c6976f6fc6ab</code></div>
+              Status: 400
+
+{
+  "message": "Amount above maximum transaction amount.",
+  "statusCode": 5046,
+  "exceptionGroup": 1
+}
+            </div>
+          </div>
+        
+        </div>
+      </div>
+    
+      <div class="test-case-row">
+        <div class="test-case-header" onclick="toggleTestCase(this)">
+          <div style="font-weight: 500; color: #333;">Distributor TBC (GEL) - Above Maximum Amount</div>
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <span style="background-color: #d4edda; padding: 4px 12px; border-radius: 4px; font-size: 12px; font-weight: 500;">
+              Passed ✓
+            </span>
+            <span class="arrow" style="font-size: 18px; transition: transform 0.3s; transform: rotate(-90deg);">▼</span>
+          </div>
+        </div>
+        <div class="test-case-content">
+          
+          <div style="padding: 16px;">
+            <button type="button" onclick="toggleError(this)" style="width: 100%; padding: 12px 16px; background: none; border: none; cursor: pointer; text-align: left; font-size: 13px; color: #cc0000; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #e0e0e0; margin-top: -16px; margin-left: -16px; margin-right: -16px; margin-bottom: 0;">
+              <span>📋 Response</span>
+              <span style="font-size: 16px;">▼</span>
+            </button>
+            <div class="error-detail" style="background-color: #ffe6e6; color: #cc0000; ">
+              <div style="margin-bottom: 12px; padding: 12px; background: #f0f0f0; border-radius: 4px; border-left: 3px solid #667eea;"><strong style="color: #333;">Unique ID:</strong> <code style="color: #0066cc; font-family: monospace; word-break: break-all; font-size: 12px;">a841e203-5496-4bc9-a037-96608c5148ad</code></div>
+              Status: 400
+
+{
+  "message": "Amount above maximum transaction amount.",
+  "statusCode": 5046,
+  "exceptionGroup": 1
+}
+            </div>
+          </div>
+        
+        </div>
+      </div>
+    
+      <div class="test-case-row">
+        <div class="test-case-header" onclick="toggleTestCase(this)">
+          <div style="font-weight: 500; color: #333;">Distributor TBC (USD) - Above Maximum Amount</div>
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <span style="background-color: #d4edda; padding: 4px 12px; border-radius: 4px; font-size: 12px; font-weight: 500;">
+              Passed ✓
+            </span>
+            <span class="arrow" style="font-size: 18px; transition: transform 0.3s; transform: rotate(-90deg);">▼</span>
+          </div>
+        </div>
+        <div class="test-case-content">
+          
+          <div style="padding: 16px;">
+            <button type="button" onclick="toggleError(this)" style="width: 100%; padding: 12px 16px; background: none; border: none; cursor: pointer; text-align: left; font-size: 13px; color: #cc0000; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #e0e0e0; margin-top: -16px; margin-left: -16px; margin-right: -16px; margin-bottom: 0;">
+              <span>📋 Response</span>
+              <span style="font-size: 16px;">▼</span>
+            </button>
+            <div class="error-detail" style="background-color: #ffe6e6; color: #cc0000; ">
+              <div style="margin-bottom: 12px; padding: 12px; background: #f0f0f0; border-radius: 4px; border-left: 3px solid #667eea;"><strong style="color: #333;">Unique ID:</strong> <code style="color: #0066cc; font-family: monospace; word-break: break-all; font-size: 12px;">d81c9ddc-2ac6-4425-bc94-26cad1b5c280</code></div>
+              Status: 400
+
+{
+  "message": "Amount above maximum transaction amount.",
+  "statusCode": 5046,
+  "exceptionGroup": 1
+}
+            </div>
+          </div>
+        
+        </div>
+      </div>
+    
+      <div class="test-case-row">
+        <div class="test-case-header" onclick="toggleTestCase(this)">
+          <div style="font-weight: 500; color: #333;">Distributor TBC (EUR) - Above Maximum Amount</div>
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <span style="background-color: #d4edda; padding: 4px 12px; border-radius: 4px; font-size: 12px; font-weight: 500;">
+              Passed ✓
+            </span>
+            <span class="arrow" style="font-size: 18px; transition: transform 0.3s; transform: rotate(-90deg);">▼</span>
+          </div>
+        </div>
+        <div class="test-case-content">
+          
+          <div style="padding: 16px;">
+            <button type="button" onclick="toggleError(this)" style="width: 100%; padding: 12px 16px; background: none; border: none; cursor: pointer; text-align: left; font-size: 13px; color: #cc0000; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #e0e0e0; margin-top: -16px; margin-left: -16px; margin-right: -16px; margin-bottom: 0;">
+              <span>📋 Response</span>
+              <span style="font-size: 16px;">▼</span>
+            </button>
+            <div class="error-detail" style="background-color: #ffe6e6; color: #cc0000; ">
+              <div style="margin-bottom: 12px; padding: 12px; background: #f0f0f0; border-radius: 4px; border-left: 3px solid #667eea;"><strong style="color: #333;">Unique ID:</strong> <code style="color: #0066cc; font-family: monospace; word-break: break-all; font-size: 12px;">d015bebd-91d1-4238-af34-bc322d44838b</code></div>
+              Status: 400
+
+{
+  "message": "Amount above maximum transaction amount.",
+  "statusCode": 5046,
+  "exceptionGroup": 1
+}
+            </div>
+          </div>
+        
+        </div>
+      </div>
+    
+      <div class="test-case-row">
+        <div class="test-case-header" onclick="toggleTestCase(this)">
+          <div style="font-weight: 500; color: #333;">Distributor Liberty (GEL) - Above Maximum Amount</div>
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <span style="background-color: #d4edda; padding: 4px 12px; border-radius: 4px; font-size: 12px; font-weight: 500;">
+              Passed ✓
+            </span>
+            <span class="arrow" style="font-size: 18px; transition: transform 0.3s; transform: rotate(-90deg);">▼</span>
+          </div>
+        </div>
+        <div class="test-case-content">
+          
+          <div style="padding: 16px;">
+            <button type="button" onclick="toggleError(this)" style="width: 100%; padding: 12px 16px; background: none; border: none; cursor: pointer; text-align: left; font-size: 13px; color: #cc0000; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #e0e0e0; margin-top: -16px; margin-left: -16px; margin-right: -16px; margin-bottom: 0;">
+              <span>📋 Response</span>
+              <span style="font-size: 16px;">▼</span>
+            </button>
+            <div class="error-detail" style="background-color: #ffe6e6; color: #cc0000; ">
+              <div style="margin-bottom: 12px; padding: 12px; background: #f0f0f0; border-radius: 4px; border-left: 3px solid #667eea;"><strong style="color: #333;">Unique ID:</strong> <code style="color: #0066cc; font-family: monospace; word-break: break-all; font-size: 12px;">45c01bfb-66b6-4ad9-a1f6-810b648c1390</code></div>
+              Status: 400
+
+{
+  "message": "Amount above maximum transaction amount.",
+  "statusCode": 5046,
+  "exceptionGroup": 1
+}
+            </div>
+          </div>
+        
+        </div>
+      </div>
+    
+      <div class="test-case-row">
+        <div class="test-case-header" onclick="toggleTestCase(this)">
+          <div style="font-weight: 500; color: #333;">Distributor Liberty (USD) - Above Maximum Amount</div>
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <span style="background-color: #d4edda; padding: 4px 12px; border-radius: 4px; font-size: 12px; font-weight: 500;">
+              Passed ✓
+            </span>
+            <span class="arrow" style="font-size: 18px; transition: transform 0.3s; transform: rotate(-90deg);">▼</span>
+          </div>
+        </div>
+        <div class="test-case-content">
+          
+          <div style="padding: 16px;">
+            <button type="button" onclick="toggleError(this)" style="width: 100%; padding: 12px 16px; background: none; border: none; cursor: pointer; text-align: left; font-size: 13px; color: #cc0000; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #e0e0e0; margin-top: -16px; margin-left: -16px; margin-right: -16px; margin-bottom: 0;">
+              <span>📋 Response</span>
+              <span style="font-size: 16px;">▼</span>
+            </button>
+            <div class="error-detail" style="background-color: #ffe6e6; color: #cc0000; ">
+              <div style="margin-bottom: 12px; padding: 12px; background: #f0f0f0; border-radius: 4px; border-left: 3px solid #667eea;"><strong style="color: #333;">Unique ID:</strong> <code style="color: #0066cc; font-family: monospace; word-break: break-all; font-size: 12px;">38775fd2-3fb5-4a5f-9131-d9bcf3c92396</code></div>
+              Status: 400
+
+{
+  "message": "Amount above maximum transaction amount.",
+  "statusCode": 5046,
+  "exceptionGroup": 1
+}
+            </div>
+          </div>
+        
+        </div>
+      </div>
+    
+      <div class="test-case-row">
+        <div class="test-case-header" onclick="toggleTestCase(this)">
+          <div style="font-weight: 500; color: #333;">Distributor Liberty (EUR) - Above Maximum Amount</div>
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <span style="background-color: #d4edda; padding: 4px 12px; border-radius: 4px; font-size: 12px; font-weight: 500;">
+              Passed ✓
+            </span>
+            <span class="arrow" style="font-size: 18px; transition: transform 0.3s; transform: rotate(-90deg);">▼</span>
+          </div>
+        </div>
+        <div class="test-case-content">
+          
+          <div style="padding: 16px;">
+            <button type="button" onclick="toggleError(this)" style="width: 100%; padding: 12px 16px; background: none; border: none; cursor: pointer; text-align: left; font-size: 13px; color: #cc0000; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #e0e0e0; margin-top: -16px; margin-left: -16px; margin-right: -16px; margin-bottom: 0;">
+              <span>📋 Response</span>
+              <span style="font-size: 16px;">▼</span>
+            </button>
+            <div class="error-detail" style="background-color: #ffe6e6; color: #cc0000; ">
+              <div style="margin-bottom: 12px; padding: 12px; background: #f0f0f0; border-radius: 4px; border-left: 3px solid #667eea;"><strong style="color: #333;">Unique ID:</strong> <code style="color: #0066cc; font-family: monospace; word-break: break-all; font-size: 12px;">02ab100b-fe3a-4d7b-8724-cf61038e6e1b</code></div>
+              Status: 400
+
+{
+  "message": "Amount above maximum transaction amount.",
+  "statusCode": 5046,
+  "exceptionGroup": 1
+}
+            </div>
+          </div>
+        
+        </div>
+      </div>
+    
+      <div class="test-case-row">
+        <div class="test-case-header" onclick="toggleTestCase(this)">
+          <div style="font-weight: 500; color: #333;">Distributor CREDO (GEL) - Above Maximum Amount</div>
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <span style="background-color: #d4edda; padding: 4px 12px; border-radius: 4px; font-size: 12px; font-weight: 500;">
+              Passed ✓
+            </span>
+            <span class="arrow" style="font-size: 18px; transition: transform 0.3s; transform: rotate(-90deg);">▼</span>
+          </div>
+        </div>
+        <div class="test-case-content">
+          
+          <div style="padding: 16px;">
+            <button type="button" onclick="toggleError(this)" style="width: 100%; padding: 12px 16px; background: none; border: none; cursor: pointer; text-align: left; font-size: 13px; color: #cc0000; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #e0e0e0; margin-top: -16px; margin-left: -16px; margin-right: -16px; margin-bottom: 0;">
+              <span>📋 Response</span>
+              <span style="font-size: 16px;">▼</span>
+            </button>
+            <div class="error-detail" style="background-color: #ffe6e6; color: #cc0000; ">
+              <div style="margin-bottom: 12px; padding: 12px; background: #f0f0f0; border-radius: 4px; border-left: 3px solid #667eea;"><strong style="color: #333;">Unique ID:</strong> <code style="color: #0066cc; font-family: monospace; word-break: break-all; font-size: 12px;">39f470be-bae3-4409-915b-1ac272272cc9</code></div>
+              Status: 400
+
+{
+  "message": "Amount above maximum transaction amount.",
+  "statusCode": 5046,
+  "exceptionGroup": 1
+}
+            </div>
+          </div>
+        
+        </div>
+      </div>
+    
+      <div class="test-case-row">
+        <div class="test-case-header" onclick="toggleTestCase(this)">
+          <div style="font-weight: 500; color: #333;">Distributor CREDO (USD) - Above Maximum Amount</div>
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <span style="background-color: #d4edda; padding: 4px 12px; border-radius: 4px; font-size: 12px; font-weight: 500;">
+              Passed ✓
+            </span>
+            <span class="arrow" style="font-size: 18px; transition: transform 0.3s; transform: rotate(-90deg);">▼</span>
+          </div>
+        </div>
+        <div class="test-case-content">
+          
+          <div style="padding: 16px;">
+            <button type="button" onclick="toggleError(this)" style="width: 100%; padding: 12px 16px; background: none; border: none; cursor: pointer; text-align: left; font-size: 13px; color: #cc0000; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #e0e0e0; margin-top: -16px; margin-left: -16px; margin-right: -16px; margin-bottom: 0;">
+              <span>📋 Response</span>
+              <span style="font-size: 16px;">▼</span>
+            </button>
+            <div class="error-detail" style="background-color: #ffe6e6; color: #cc0000; ">
+              <div style="margin-bottom: 12px; padding: 12px; background: #f0f0f0; border-radius: 4px; border-left: 3px solid #667eea;"><strong style="color: #333;">Unique ID:</strong> <code style="color: #0066cc; font-family: monospace; word-break: break-all; font-size: 12px;">a1f1efd9-46bc-4ad4-8b68-303f2b96f2ab</code></div>
+              Status: 400
+
+{
+  "message": "Amount above maximum transaction amount.",
+  "statusCode": 5046,
+  "exceptionGroup": 1
+}
+            </div>
+          </div>
+        
+        </div>
+      </div>
+    
+      <div class="test-case-row">
+        <div class="test-case-header" onclick="toggleTestCase(this)">
+          <div style="font-weight: 500; color: #333;">Distributor CREDO (EUR) - Above Maximum Amount</div>
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <span style="background-color: #d4edda; padding: 4px 12px; border-radius: 4px; font-size: 12px; font-weight: 500;">
+              Passed ✓
+            </span>
+            <span class="arrow" style="font-size: 18px; transition: transform 0.3s; transform: rotate(-90deg);">▼</span>
+          </div>
+        </div>
+        <div class="test-case-content">
+          
+          <div style="padding: 16px;">
+            <button type="button" onclick="toggleError(this)" style="width: 100%; padding: 12px 16px; background: none; border: none; cursor: pointer; text-align: left; font-size: 13px; color: #cc0000; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #e0e0e0; margin-top: -16px; margin-left: -16px; margin-right: -16px; margin-bottom: 0;">
+              <span>📋 Response</span>
+              <span style="font-size: 16px;">▼</span>
+            </button>
+            <div class="error-detail" style="background-color: #ffe6e6; color: #cc0000; ">
+              <div style="margin-bottom: 12px; padding: 12px; background: #f0f0f0; border-radius: 4px; border-left: 3px solid #667eea;"><strong style="color: #333;">Unique ID:</strong> <code style="color: #0066cc; font-family: monospace; word-break: break-all; font-size: 12px;">545ddb96-cdeb-44a3-973c-0abe53d2d209</code></div>
+              Status: 400
+
+{
+  "message": "Amount above maximum transaction amount.",
+  "statusCode": 5046,
+  "exceptionGroup": 1
+}
+            </div>
+          </div>
+        
+        </div>
+      </div>
+    
+      <div class="test-case-row">
+        <div class="test-case-header" onclick="toggleTestCase(this)">
+          <div style="font-weight: 500; color: #333;">Distributor BOG (GEL) - Below Minimum Amount</div>
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <span style="background-color: #d4edda; padding: 4px 12px; border-radius: 4px; font-size: 12px; font-weight: 500;">
+              Passed ✓
+            </span>
+            <span class="arrow" style="font-size: 18px; transition: transform 0.3s; transform: rotate(-90deg);">▼</span>
+          </div>
+        </div>
+        <div class="test-case-content">
+          
+          <div style="padding: 16px;">
+            <button type="button" onclick="toggleError(this)" style="width: 100%; padding: 12px 16px; background: none; border: none; cursor: pointer; text-align: left; font-size: 13px; color: #cc0000; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #e0e0e0; margin-top: -16px; margin-left: -16px; margin-right: -16px; margin-bottom: 0;">
+              <span>📋 Response</span>
+              <span style="font-size: 16px;">▼</span>
+            </button>
+            <div class="error-detail" style="background-color: #ffe6e6; color: #cc0000; ">
+              <div style="margin-bottom: 12px; padding: 12px; background: #f0f0f0; border-radius: 4px; border-left: 3px solid #667eea;"><strong style="color: #333;">Unique ID:</strong> <code style="color: #0066cc; font-family: monospace; word-break: break-all; font-size: 12px;">8e83b388-5374-4167-815e-df38963deedc</code></div>
+              Status: 400
+
+{
+  "message": "Amount below minimum transaction amount.",
+  "statusCode": 5045,
+  "exceptionGroup": 1
+}
+            </div>
+          </div>
+        
+        </div>
+      </div>
+    
+      <div class="test-case-row">
+        <div class="test-case-header" onclick="toggleTestCase(this)">
+          <div style="font-weight: 500; color: #333;">Distributor BOG (USD) - Below Minimum Amount</div>
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <span style="background-color: #d4edda; padding: 4px 12px; border-radius: 4px; font-size: 12px; font-weight: 500;">
+              Passed ✓
+            </span>
+            <span class="arrow" style="font-size: 18px; transition: transform 0.3s; transform: rotate(-90deg);">▼</span>
+          </div>
+        </div>
+        <div class="test-case-content">
+          
+          <div style="padding: 16px;">
+            <button type="button" onclick="toggleError(this)" style="width: 100%; padding: 12px 16px; background: none; border: none; cursor: pointer; text-align: left; font-size: 13px; color: #cc0000; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #e0e0e0; margin-top: -16px; margin-left: -16px; margin-right: -16px; margin-bottom: 0;">
+              <span>📋 Response</span>
+              <span style="font-size: 16px;">▼</span>
+            </button>
+            <div class="error-detail" style="background-color: #ffe6e6; color: #cc0000; ">
+              <div style="margin-bottom: 12px; padding: 12px; background: #f0f0f0; border-radius: 4px; border-left: 3px solid #667eea;"><strong style="color: #333;">Unique ID:</strong> <code style="color: #0066cc; font-family: monospace; word-break: break-all; font-size: 12px;">af10f9df-61fc-4839-9c3e-1f92e6b309c5</code></div>
+              Status: 400
+
+{
+  "message": "Amount below minimum transaction amount.",
+  "statusCode": 5045,
+  "exceptionGroup": 1
+}
+            </div>
+          </div>
+        
+        </div>
+      </div>
+    
+      <div class="test-case-row">
+        <div class="test-case-header" onclick="toggleTestCase(this)">
+          <div style="font-weight: 500; color: #333;">Distributor BOG (EUR) - Below Minimum Amount</div>
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <span style="background-color: #d4edda; padding: 4px 12px; border-radius: 4px; font-size: 12px; font-weight: 500;">
+              Passed ✓
+            </span>
+            <span class="arrow" style="font-size: 18px; transition: transform 0.3s; transform: rotate(-90deg);">▼</span>
+          </div>
+        </div>
+        <div class="test-case-content">
+          
+          <div style="padding: 16px;">
+            <button type="button" onclick="toggleError(this)" style="width: 100%; padding: 12px 16px; background: none; border: none; cursor: pointer; text-align: left; font-size: 13px; color: #cc0000; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #e0e0e0; margin-top: -16px; margin-left: -16px; margin-right: -16px; margin-bottom: 0;">
+              <span>📋 Response</span>
+              <span style="font-size: 16px;">▼</span>
+            </button>
+            <div class="error-detail" style="background-color: #ffe6e6; color: #cc0000; ">
+              <div style="margin-bottom: 12px; padding: 12px; background: #f0f0f0; border-radius: 4px; border-left: 3px solid #667eea;"><strong style="color: #333;">Unique ID:</strong> <code style="color: #0066cc; font-family: monospace; word-break: break-all; font-size: 12px;">6e5636fe-d8d2-433d-a608-f044f1a6b8e1</code></div>
+              Status: 400
+
+{
+  "message": "Amount below minimum transaction amount.",
+  "statusCode": 5045,
+  "exceptionGroup": 1
+}
+            </div>
+          </div>
+        
+        </div>
+      </div>
+    
+      <div class="test-case-row">
+        <div class="test-case-header" onclick="toggleTestCase(this)">
+          <div style="font-weight: 500; color: #333;">Distributor TBC (GEL) - Below Minimum Amount</div>
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <span style="background-color: #d4edda; padding: 4px 12px; border-radius: 4px; font-size: 12px; font-weight: 500;">
+              Passed ✓
+            </span>
+            <span class="arrow" style="font-size: 18px; transition: transform 0.3s; transform: rotate(-90deg);">▼</span>
+          </div>
+        </div>
+        <div class="test-case-content">
+          
+          <div style="padding: 16px;">
+            <button type="button" onclick="toggleError(this)" style="width: 100%; padding: 12px 16px; background: none; border: none; cursor: pointer; text-align: left; font-size: 13px; color: #cc0000; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #e0e0e0; margin-top: -16px; margin-left: -16px; margin-right: -16px; margin-bottom: 0;">
+              <span>📋 Response</span>
+              <span style="font-size: 16px;">▼</span>
+            </button>
+            <div class="error-detail" style="background-color: #ffe6e6; color: #cc0000; ">
+              <div style="margin-bottom: 12px; padding: 12px; background: #f0f0f0; border-radius: 4px; border-left: 3px solid #667eea;"><strong style="color: #333;">Unique ID:</strong> <code style="color: #0066cc; font-family: monospace; word-break: break-all; font-size: 12px;">303fead0-2bb5-4218-a40c-38dee71ad715</code></div>
+              Status: 400
+
+{
+  "message": "Amount below minimum transaction amount.",
+  "statusCode": 5045,
+  "exceptionGroup": 1
+}
+            </div>
+          </div>
+        
+        </div>
+      </div>
+    
+      <div class="test-case-row">
+        <div class="test-case-header" onclick="toggleTestCase(this)">
+          <div style="font-weight: 500; color: #333;">Distributor TBC (USD) - Below Minimum Amount</div>
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <span style="background-color: #d4edda; padding: 4px 12px; border-radius: 4px; font-size: 12px; font-weight: 500;">
+              Passed ✓
+            </span>
+            <span class="arrow" style="font-size: 18px; transition: transform 0.3s; transform: rotate(-90deg);">▼</span>
+          </div>
+        </div>
+        <div class="test-case-content">
+          
+          <div style="padding: 16px;">
+            <button type="button" onclick="toggleError(this)" style="width: 100%; padding: 12px 16px; background: none; border: none; cursor: pointer; text-align: left; font-size: 13px; color: #cc0000; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #e0e0e0; margin-top: -16px; margin-left: -16px; margin-right: -16px; margin-bottom: 0;">
+              <span>📋 Response</span>
+              <span style="font-size: 16px;">▼</span>
+            </button>
+            <div class="error-detail" style="background-color: #ffe6e6; color: #cc0000; ">
+              <div style="margin-bottom: 12px; padding: 12px; background: #f0f0f0; border-radius: 4px; border-left: 3px solid #667eea;"><strong style="color: #333;">Unique ID:</strong> <code style="color: #0066cc; font-family: monospace; word-break: break-all; font-size: 12px;">78284e6a-f92e-4b06-b505-867c1ab4606e</code></div>
+              Status: 400
+
+{
+  "message": "Amount below minimum transaction amount.",
+  "statusCode": 5045,
+  "exceptionGroup": 1
+}
+            </div>
+          </div>
+        
+        </div>
+      </div>
+    
+      <div class="test-case-row">
+        <div class="test-case-header" onclick="toggleTestCase(this)">
+          <div style="font-weight: 500; color: #333;">Distributor TBC (EUR) - Below Minimum Amount</div>
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <span style="background-color: #d4edda; padding: 4px 12px; border-radius: 4px; font-size: 12px; font-weight: 500;">
+              Passed ✓
+            </span>
+            <span class="arrow" style="font-size: 18px; transition: transform 0.3s; transform: rotate(-90deg);">▼</span>
+          </div>
+        </div>
+        <div class="test-case-content">
+          
+          <div style="padding: 16px;">
+            <button type="button" onclick="toggleError(this)" style="width: 100%; padding: 12px 16px; background: none; border: none; cursor: pointer; text-align: left; font-size: 13px; color: #cc0000; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #e0e0e0; margin-top: -16px; margin-left: -16px; margin-right: -16px; margin-bottom: 0;">
+              <span>📋 Response</span>
+              <span style="font-size: 16px;">▼</span>
+            </button>
+            <div class="error-detail" style="background-color: #ffe6e6; color: #cc0000; ">
+              <div style="margin-bottom: 12px; padding: 12px; background: #f0f0f0; border-radius: 4px; border-left: 3px solid #667eea;"><strong style="color: #333;">Unique ID:</strong> <code style="color: #0066cc; font-family: monospace; word-break: break-all; font-size: 12px;">f299aa6f-0259-4a2c-a65e-633f8f8ee328</code></div>
+              Status: 400
+
+{
+  "message": "Amount below minimum transaction amount.",
+  "statusCode": 5045,
+  "exceptionGroup": 1
+}
+            </div>
+          </div>
+        
+        </div>
+      </div>
+    
+      <div class="test-case-row">
+        <div class="test-case-header" onclick="toggleTestCase(this)">
+          <div style="font-weight: 500; color: #333;">Distributor Liberty (GEL) - Below Minimum Amount</div>
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <span style="background-color: #d4edda; padding: 4px 12px; border-radius: 4px; font-size: 12px; font-weight: 500;">
+              Passed ✓
+            </span>
+            <span class="arrow" style="font-size: 18px; transition: transform 0.3s; transform: rotate(-90deg);">▼</span>
+          </div>
+        </div>
+        <div class="test-case-content">
+          
+          <div style="padding: 16px;">
+            <button type="button" onclick="toggleError(this)" style="width: 100%; padding: 12px 16px; background: none; border: none; cursor: pointer; text-align: left; font-size: 13px; color: #cc0000; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #e0e0e0; margin-top: -16px; margin-left: -16px; margin-right: -16px; margin-bottom: 0;">
+              <span>📋 Response</span>
+              <span style="font-size: 16px;">▼</span>
+            </button>
+            <div class="error-detail" style="background-color: #ffe6e6; color: #cc0000; ">
+              <div style="margin-bottom: 12px; padding: 12px; background: #f0f0f0; border-radius: 4px; border-left: 3px solid #667eea;"><strong style="color: #333;">Unique ID:</strong> <code style="color: #0066cc; font-family: monospace; word-break: break-all; font-size: 12px;">b0d520b9-949c-421c-b6a5-7b5953236ae8</code></div>
+              Status: 400
+
+{
+  "message": "Amount below minimum transaction amount.",
+  "statusCode": 5045,
+  "exceptionGroup": 1
+}
+            </div>
+          </div>
+        
+        </div>
+      </div>
+    
+      <div class="test-case-row">
+        <div class="test-case-header" onclick="toggleTestCase(this)">
+          <div style="font-weight: 500; color: #333;">Distributor Liberty (USD) - Below Minimum Amount</div>
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <span style="background-color: #d4edda; padding: 4px 12px; border-radius: 4px; font-size: 12px; font-weight: 500;">
+              Passed ✓
+            </span>
+            <span class="arrow" style="font-size: 18px; transition: transform 0.3s; transform: rotate(-90deg);">▼</span>
+          </div>
+        </div>
+        <div class="test-case-content">
+          
+          <div style="padding: 16px;">
+            <button type="button" onclick="toggleError(this)" style="width: 100%; padding: 12px 16px; background: none; border: none; cursor: pointer; text-align: left; font-size: 13px; color: #cc0000; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #e0e0e0; margin-top: -16px; margin-left: -16px; margin-right: -16px; margin-bottom: 0;">
+              <span>📋 Response</span>
+              <span style="font-size: 16px;">▼</span>
+            </button>
+            <div class="error-detail" style="background-color: #ffe6e6; color: #cc0000; ">
+              <div style="margin-bottom: 12px; padding: 12px; background: #f0f0f0; border-radius: 4px; border-left: 3px solid #667eea;"><strong style="color: #333;">Unique ID:</strong> <code style="color: #0066cc; font-family: monospace; word-break: break-all; font-size: 12px;">64ab90f5-4324-44ad-8c12-81bc1b6b5a1d</code></div>
+              Status: 400
+
+{
+  "message": "Amount below minimum transaction amount.",
+  "statusCode": 5045,
+  "exceptionGroup": 1
+}
+            </div>
+          </div>
+        
+        </div>
+      </div>
+    
+      <div class="test-case-row">
+        <div class="test-case-header" onclick="toggleTestCase(this)">
+          <div style="font-weight: 500; color: #333;">Distributor Liberty (EUR) - Below Minimum Amount</div>
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <span style="background-color: #d4edda; padding: 4px 12px; border-radius: 4px; font-size: 12px; font-weight: 500;">
+              Passed ✓
+            </span>
+            <span class="arrow" style="font-size: 18px; transition: transform 0.3s; transform: rotate(-90deg);">▼</span>
+          </div>
+        </div>
+        <div class="test-case-content">
+          
+          <div style="padding: 16px;">
+            <button type="button" onclick="toggleError(this)" style="width: 100%; padding: 12px 16px; background: none; border: none; cursor: pointer; text-align: left; font-size: 13px; color: #cc0000; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #e0e0e0; margin-top: -16px; margin-left: -16px; margin-right: -16px; margin-bottom: 0;">
+              <span>📋 Response</span>
+              <span style="font-size: 16px;">▼</span>
+            </button>
+            <div class="error-detail" style="background-color: #ffe6e6; color: #cc0000; ">
+              <div style="margin-bottom: 12px; padding: 12px; background: #f0f0f0; border-radius: 4px; border-left: 3px solid #667eea;"><strong style="color: #333;">Unique ID:</strong> <code style="color: #0066cc; font-family: monospace; word-break: break-all; font-size: 12px;">7fe2e536-eda7-40f0-bd01-88fd2ecf970d</code></div>
+              Status: 400
+
+{
+  "message": "Amount below minimum transaction amount.",
+  "statusCode": 5045,
+  "exceptionGroup": 1
+}
+            </div>
+          </div>
+        
+        </div>
+      </div>
+    
+      <div class="test-case-row">
+        <div class="test-case-header" onclick="toggleTestCase(this)">
+          <div style="font-weight: 500; color: #333;">Distributor CREDO (GEL) - Below Minimum Amount</div>
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <span style="background-color: #d4edda; padding: 4px 12px; border-radius: 4px; font-size: 12px; font-weight: 500;">
+              Passed ✓
+            </span>
+            <span class="arrow" style="font-size: 18px; transition: transform 0.3s; transform: rotate(-90deg);">▼</span>
+          </div>
+        </div>
+        <div class="test-case-content">
+          
+          <div style="padding: 16px;">
+            <button type="button" onclick="toggleError(this)" style="width: 100%; padding: 12px 16px; background: none; border: none; cursor: pointer; text-align: left; font-size: 13px; color: #cc0000; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #e0e0e0; margin-top: -16px; margin-left: -16px; margin-right: -16px; margin-bottom: 0;">
+              <span>📋 Response</span>
+              <span style="font-size: 16px;">▼</span>
+            </button>
+            <div class="error-detail" style="background-color: #ffe6e6; color: #cc0000; ">
+              <div style="margin-bottom: 12px; padding: 12px; background: #f0f0f0; border-radius: 4px; border-left: 3px solid #667eea;"><strong style="color: #333;">Unique ID:</strong> <code style="color: #0066cc; font-family: monospace; word-break: break-all; font-size: 12px;">d6be615a-4c3e-47d5-a9d3-5b28867b2807</code></div>
+              Status: 400
+
+{
+  "message": "Amount below minimum transaction amount.",
+  "statusCode": 5045,
+  "exceptionGroup": 1
+}
+            </div>
+          </div>
+        
+        </div>
+      </div>
+    
+      <div class="test-case-row">
+        <div class="test-case-header" onclick="toggleTestCase(this)">
+          <div style="font-weight: 500; color: #333;">Distributor CREDO (USD) - Below Minimum Amount</div>
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <span style="background-color: #d4edda; padding: 4px 12px; border-radius: 4px; font-size: 12px; font-weight: 500;">
+              Passed ✓
+            </span>
+            <span class="arrow" style="font-size: 18px; transition: transform 0.3s; transform: rotate(-90deg);">▼</span>
+          </div>
+        </div>
+        <div class="test-case-content">
+          
+          <div style="padding: 16px;">
+            <button type="button" onclick="toggleError(this)" style="width: 100%; padding: 12px 16px; background: none; border: none; cursor: pointer; text-align: left; font-size: 13px; color: #cc0000; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #e0e0e0; margin-top: -16px; margin-left: -16px; margin-right: -16px; margin-bottom: 0;">
+              <span>📋 Response</span>
+              <span style="font-size: 16px;">▼</span>
+            </button>
+            <div class="error-detail" style="background-color: #ffe6e6; color: #cc0000; ">
+              <div style="margin-bottom: 12px; padding: 12px; background: #f0f0f0; border-radius: 4px; border-left: 3px solid #667eea;"><strong style="color: #333;">Unique ID:</strong> <code style="color: #0066cc; font-family: monospace; word-break: break-all; font-size: 12px;">9a01ba7d-5ee8-477b-a3b7-2671337a066a</code></div>
+              Status: 400
+
+{
+  "message": "Amount below minimum transaction amount.",
+  "statusCode": 5045,
+  "exceptionGroup": 1
+}
+            </div>
+          </div>
+        
+        </div>
+      </div>
+    
+      <div class="test-case-row">
+        <div class="test-case-header" onclick="toggleTestCase(this)">
+          <div style="font-weight: 500; color: #333;">Distributor CREDO (EUR) - Below Minimum Amount</div>
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <span style="background-color: #d4edda; padding: 4px 12px; border-radius: 4px; font-size: 12px; font-weight: 500;">
+              Passed ✓
+            </span>
+            <span class="arrow" style="font-size: 18px; transition: transform 0.3s; transform: rotate(-90deg);">▼</span>
+          </div>
+        </div>
+        <div class="test-case-content">
+          
+          <div style="padding: 16px;">
+            <button type="button" onclick="toggleError(this)" style="width: 100%; padding: 12px 16px; background: none; border: none; cursor: pointer; text-align: left; font-size: 13px; color: #cc0000; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #e0e0e0; margin-top: -16px; margin-left: -16px; margin-right: -16px; margin-bottom: 0;">
+              <span>📋 Response</span>
+              <span style="font-size: 16px;">▼</span>
+            </button>
+            <div class="error-detail" style="background-color: #ffe6e6; color: #cc0000; ">
+              <div style="margin-bottom: 12px; padding: 12px; background: #f0f0f0; border-radius: 4px; border-left: 3px solid #667eea;"><strong style="color: #333;">Unique ID:</strong> <code style="color: #0066cc; font-family: monospace; word-break: break-all; font-size: 12px;">0a647100-08ae-4bd7-90bb-cce411a90997</code></div>
+              Status: 400
+
+{
+  "message": "Amount below minimum transaction amount.",
+  "statusCode": 5045,
+  "exceptionGroup": 1
+}
+            </div>
+          </div>
+        
+        </div>
+      </div>
+    
+        </div>
+      </div>
+    
+            </div>
+          </div>
+        </div>
+      
+      </div>
+    
+    </div>
+
+    <div class="footer">
+      Generated on 6/26/2026, 8:30:50 PM
+    </div>
+  </div>
+</body>
+</html>
+    
