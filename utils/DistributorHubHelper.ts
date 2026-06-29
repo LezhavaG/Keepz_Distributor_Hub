@@ -241,7 +241,7 @@ export class DistributorHubHelper {
       url: url,
       method: 'GET',
       statusCode: response.status(),
-      expectedResult: { paymentDescription: 'string', status: 'string' },
+      expectedResult: { transactionId: transactionId, status: 'string' },
       actualResult: data.value,
     });
 
@@ -272,9 +272,8 @@ export class DistributorHubHelper {
           name: 'Get Transaction Details',
           url: url,
           method: 'GET',
-          requestBody: 'N/A (GET request - no body)',
           statusCode: response.status(),
-          expectedResult: { transactionId: 'number', status: 'COMPLETED|SUCCESS' },
+          expectedResult: { transactionId: transactionId, status: 'COMPLETED|SUCCESS' },
           actualResult: details,
         });
 

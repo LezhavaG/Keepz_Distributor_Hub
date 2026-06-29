@@ -244,8 +244,11 @@ export async function runHappyPathTest(request: any, banksToTest: typeof ALL_BAN
           (c) => c.name === 'Get Transaction Details' && c.actualResult?.transactionId === tx.id
         );
         if (detailsCall) {
-          detailsCall.expectedResult = { transactionId: 'number', status: 'COMPLETED|SUCCESS' };
-          detailsCall.passed = succeeded;
+          // Returned transactionId must equal the requested transaction_id
+          detailsCall.expectedResult = { transactionId: tx.id, status: 'COMPLETED|SUCCESS' };
+          const idMatches = detailsCall.actualResult?.transactionId === tx.id;
+          detailsCall.passed = succeeded && idMatches;
+          if (!idMatches) allSucceeded = false;
           caseApiCalls.push(detailsCall);
         }
       }
@@ -868,10 +871,12 @@ export async function runPaymentDescriptionTest(
       if (call.name.startsWith('Create Order')) {
         call.passed = call.statusCode === 200 || call.statusCode === 201;
       } else if (call.name === 'Get Transaction Details') {
-        // Show the expected paymentDescription and pass/fail on the match
-        call.expectedResult = { paymentDescription: expectedPaymentDescription };
+        // Returned transactionId must equal the requested transaction_id (from the URL)
+        const reqId = Number((call.url.split('transaction_id=')[1] || '').split('&')[0]);
+        call.expectedResult = { transactionId: reqId, paymentDescription: expectedPaymentDescription };
         const pd = call.actualResult?.paymentDescription || '';
-        call.passed = pd === expectedPaymentDescription;
+        const idMatches = call.actualResult?.transactionId === reqId;
+        call.passed = pd === expectedPaymentDescription && idMatches;
       }
     });
 
