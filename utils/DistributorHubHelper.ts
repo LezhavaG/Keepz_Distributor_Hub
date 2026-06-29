@@ -41,16 +41,27 @@ export interface TransactionDetailsResponse {
   commissionAmount: number;
 }
 
+export interface ApiCall {
+  name: string;
+  url: string;
+  method: string;
+  statusCode: number;
+  expectedResult: any;
+  actualResult: any;
+}
+
 export class DistributorHubHelper {
   private baseUrl = 'https://distributor.dev.keepz.me';
   private clientId = process.env.DISTRIBUTOR_CLIENT_ID!;
   private clientSecret = process.env.DISTRIBUTOR_CLIENT_SECRET!;
   private accessToken: string = '';
+  apiCalls: ApiCall[] = [];
 
   constructor(private request: APIRequestContext) {}
 
   async authenticate(): Promise<string> {
-    const response = await this.request.post(`${this.baseUrl}/api/auth`, {
+    const url = `${this.baseUrl}/api/auth`;
+    const response = await this.request.post(url, {
       data: {
         client_id: this.clientId,
         client_secret: this.clientSecret,
@@ -60,20 +71,38 @@ export class DistributorHubHelper {
 
     const data = await response.json();
     this.accessToken = data.value.access_token;
+
+    this.apiCalls.push({
+      name: 'Get Token',
+      url: url,
+      method: 'POST',
+      statusCode: response.status(),
+      expectedResult: { access_token: '***' },
+      actualResult: data,
+    });
+
     return this.accessToken;
   }
 
   async getBalance(currency: string = 'GEL'): Promise<BalanceResponse> {
-    const response = await this.request.get(
-      `${this.baseUrl}/api/distributor/balance/check?currency=${currency}`,
-      {
-        headers: {
-          Authorization: `Bearer ${this.accessToken}`,
-        },
-      }
-    );
+    const url = `${this.baseUrl}/api/distributor/balance/check?currency=${currency}`;
+    const response = await this.request.get(url, {
+      headers: {
+        Authorization: `Bearer ${this.accessToken}`,
+      },
+    });
 
     const data = await response.json();
+
+    this.apiCalls.push({
+      name: `Get Balance (${currency})`,
+      url: url,
+      method: 'GET',
+      statusCode: response.status(),
+      expectedResult: { amount: 'number', currency: currency },
+      actualResult: data.value,
+    });
+
     return data.value;
   }
 
@@ -110,7 +139,8 @@ export class DistributorHubHelper {
       requestBody.birthDate = payload.birthDate;
     }
 
-    const response = await this.request.post(`${this.baseUrl}/api/distributor`, {
+    const url = `${this.baseUrl}/api/distributor`;
+    const response = await this.request.post(url, {
       headers: {
         Authorization: `Bearer ${this.accessToken}`,
       },
@@ -118,6 +148,16 @@ export class DistributorHubHelper {
     });
 
     const data = await response.json();
+
+    this.apiCalls.push({
+      name: 'Create Order',
+      url: url,
+      method: 'POST',
+      statusCode: response.status(),
+      expectedResult: { transactionId: 'number', status: 'string' },
+      actualResult: data,
+    });
+
     if (data.value) {
       return data.value;
     }
@@ -128,17 +168,27 @@ export class DistributorHubHelper {
   }
 
   async getTransactionDetails(transactionId: number): Promise<TransactionDetailsResponse> {
-    const response = await this.request.get(
-      `${this.baseUrl}/api/distributor/details?transaction_id=${transactionId}`,
-      {
-        headers: {
-          Authorization: `Bearer ${this.accessToken}`,
-        },
-      }
-    );
+    const url = `${this.baseUrl}/api/distributor/details?transaction_id=${transactionId}`;
+    const response = await this.request.get(url, {
+      headers: {
+        Authorization: `Bearer ${this.accessToken}`,
+      },
+    });
 
     const data = await response.json();
     return data.value;
+  }
+
+  private trackTransactionDetailsCall(transactionId: number, data: any, statusCode: number): void {
+    const url = `${this.baseUrl}/api/distributor/details?transaction_id=${transactionId}`;
+    this.apiCalls.push({
+      name: 'Get Transaction Details',
+      url: url,
+      method: 'GET',
+      statusCode: statusCode,
+      expectedResult: { transactionId: 'number', status: 'COMPLETED|SUCCESS' },
+      actualResult: data,
+    });
   }
 
   async waitForTransactionCompletion(
@@ -150,9 +200,26 @@ export class DistributorHubHelper {
     const finalStatuses = ['COMPLETED', 'SUCCESS', 'FAILED', 'REJECTED', 'CANCELLED'];
 
     while (attempts < maxRetries) {
-      const details = await this.getTransactionDetails(transactionId);
+      const url = `${this.baseUrl}/api/distributor/details?transaction_id=${transactionId}`;
+      const response = await this.request.get(url, {
+        headers: {
+          Authorization: `Bearer ${this.accessToken}`,
+        },
+      });
+      const data = await response.json();
+      const details = data.value;
 
       if (finalStatuses.includes(details.status)) {
+        // Track the final API call
+        this.apiCalls.push({
+          name: 'Get Transaction Details',
+          url: url,
+          method: 'GET',
+          statusCode: response.status(),
+          expectedResult: { transactionId: 'number', status: 'COMPLETED|SUCCESS' },
+          actualResult: details,
+        });
+
         if (details.status === 'FAILED') {
           throw new Error(`❌ Transaction FAILED! ID: ${transactionId}, Description: ${details.statusDescription}`);
         }

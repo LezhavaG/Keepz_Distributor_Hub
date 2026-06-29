@@ -277,10 +277,14 @@ export async function runHappyPathTest(request: any, banksToTest: typeof ALL_BAN
     category: 'Balance Check',
   });
 
-  const tableData = [...transactionTestCases, ...balanceCheckTestCases];
+  // Attach API calls to each test case
+  const tableDataWithApiCalls = [...transactionTestCases, ...balanceCheckTestCases].map(testCase => ({
+    ...testCase,
+    apiCalls: hub.apiCalls,
+  }));
 
   // Return test data (report will be generated after all tests)
-  return { tableData, balanceSummary: [] };
+  return { tableData: tableDataWithApiCalls, balanceSummary: [] };
 }
 
 export async function runIncorrectClientIdTest(request: any) {
@@ -566,6 +570,7 @@ export async function runInsufficientBalanceTest(
       skipTransactionTable: true,
       category: 'Insufficient Balance Cases',
       uniqueId: tx.uniqueId,
+      apiCalls: hub.apiCalls,
     };
   });
 
@@ -670,6 +675,7 @@ export async function runAboveMaximumAmountTest(
       skipTransactionTable: true,
       category: 'Amount Validation Cases',
       uniqueId: tx.uniqueId,
+      apiCalls: hub.apiCalls,
     };
   });
 
@@ -774,6 +780,7 @@ export async function runBelowMinimumAmountTest(
       skipTransactionTable: true,
       category: 'Amount Validation Cases',
       uniqueId: tx.uniqueId,
+      apiCalls: hub.apiCalls,
     };
   });
 
@@ -888,6 +895,7 @@ export async function runNegativeTest(
       skipTransactionTable: true,
       category: 'Invalid IBAN Cases',
       uniqueId: tx.uniqueId,
+      apiCalls: hub.apiCalls,
     };
   });
 

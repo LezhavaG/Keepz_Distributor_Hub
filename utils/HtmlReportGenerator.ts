@@ -1,6 +1,15 @@
 import * as fs from 'fs';
 import * as path from 'path';
 
+export interface ApiCall {
+  name: string;
+  url: string;
+  method: string;
+  statusCode: number;
+  expectedResult: any;
+  actualResult: any;
+}
+
 export interface TransactionRow {
   transactionId: number;
   bank: string;
@@ -13,6 +22,7 @@ export interface TransactionRow {
   skipTransactionTable?: boolean;
   category?: string;
   uniqueId?: string;
+  apiCalls?: ApiCall[];
 }
 
 export interface BalanceSummary {
@@ -310,6 +320,34 @@ export class HtmlReportGenerator {
         arrow.style.transform = 'rotate(-90deg)';
       }
     }
+
+    function toggleDetails(button) {
+      const detailsSection = button.parentElement.querySelector('.details-section');
+      const arrow = button.querySelector('.details-arrow');
+      const isHidden = window.getComputedStyle(detailsSection).display === 'none';
+
+      if (isHidden) {
+        detailsSection.style.display = 'block';
+        arrow.style.transform = 'rotate(0deg)';
+      } else {
+        detailsSection.style.display = 'none';
+        arrow.style.transform = 'rotate(-90deg)';
+      }
+    }
+
+    function toggleApiDetails(button) {
+      const apiDetails = button.parentElement.querySelector('.api-details');
+      const arrow = button.querySelector('.api-arrow');
+      const isHidden = window.getComputedStyle(apiDetails).display === 'none';
+
+      if (isHidden) {
+        apiDetails.style.display = 'block';
+        arrow.style.transform = 'rotate(0deg)';
+      } else {
+        apiDetails.style.display = 'none';
+        arrow.style.transform = 'rotate(-90deg)';
+      }
+    }
   </script>
 </head>
 <body>
@@ -387,6 +425,49 @@ export class HtmlReportGenerator {
 
     let contentHTML = '';
 
+    // Build Details section with API calls
+    let detailsHTML = '';
+    if (tx.apiCalls && tx.apiCalls.length > 0) {
+      const apiCallsHTML = tx.apiCalls
+        .map((call, idx) => `
+          <div style="margin-bottom: 16px; padding: 12px; background: white; border: 1px solid #e0e0e0; border-radius: 4px;">
+            <div style="font-weight: 600; color: #333; margin-bottom: 12px;">API Call ${idx + 1}: ${call.name}</div>
+            <div style="font-size: 13px; color: #666; margin-bottom: 8px;">
+              <div style="margin-bottom: 4px;"><strong>Request URL:</strong> <code style="color: #0066cc; word-break: break-all;">${call.url}</code></div>
+              <div style="margin-bottom: 4px;"><strong>Request Method:</strong> <span style="font-weight: 500;">${call.method}</span></div>
+              <div style="margin-bottom: 8px;"><strong>Status Code:</strong> <span style="background: #f0f0f0; padding: 2px 8px; border-radius: 3px; font-family: monospace;">${call.statusCode}</span></div>
+            </div>
+            <button type="button" onclick="toggleApiDetails(this)" style="width: 100%; padding: 8px 12px; background: #f5f5f5; border: 1px solid #e0e0e0; cursor: pointer; border-radius: 4px; font-size: 12px; color: #333; display: flex; justify-content: space-between; align-items: center;">
+              <span>Expected vs Actual Response</span>
+              <span class="api-arrow" style="font-size: 14px; transition: transform 0.3s; transform: rotate(-90deg);">▼</span>
+            </button>
+            <div class="api-details" style="display: none; margin-top: 12px; padding: 12px; background: #f9f9f9; border-radius: 4px; border-left: 3px solid #667eea; font-family: monospace; font-size: 12px; line-height: 1.5; max-height: 400px; overflow-y: auto;">
+              <div style="margin-bottom: 12px;">
+                <strong style="color: #333;">Expected Result:</strong>
+                <pre style="margin: 8px 0 0 0; background: white; padding: 8px; border-radius: 3px; overflow-x: auto; color: #0066cc;">${JSON.stringify(call.expectedResult, null, 2)}</pre>
+              </div>
+              <div>
+                <strong style="color: #333;">Actual Result:</strong>
+                <pre style="margin: 8px 0 0 0; background: white; padding: 8px; border-radius: 3px; overflow-x: auto; color: #066600;">${JSON.stringify(call.actualResult, null, 2)}</pre>
+              </div>
+            </div>
+          </div>
+        `)
+        .join('');
+
+      detailsHTML = `
+        <div style="margin-bottom: 16px; padding: 12px; background: #f9f9f9; border-radius: 4px; border-left: 3px solid #667eea;">
+          <button type="button" onclick="toggleDetails(this)" style="width: 100%; padding: 12px; background: none; border: none; cursor: pointer; text-align: left; font-size: 13px; font-weight: 500; color: #333; display: flex; justify-content: space-between; align-items: center;">
+            <span>📡 Details (${tx.apiCalls.length} API calls)</span>
+            <span class="details-arrow" style="font-size: 16px; transition: transform 0.3s; transform: rotate(-90deg);">▼</span>
+          </button>
+          <div class="details-section" style="display: none; margin-top: 12px;">
+            ${apiCallsHTML}
+          </div>
+        </div>
+      `;
+    }
+
     if (tx.skipTransactionTable) {
       // Show response (success or error), no transaction table
       if (tx.errorMessage) {
@@ -420,6 +501,7 @@ export class HtmlReportGenerator {
 
         contentHTML = `
           <div style="padding: 16px;">
+            ${detailsHTML}
             <button type="button" onclick="toggleError(this)" style="width: 100%; padding: 12px 16px; background: none; border: none; cursor: pointer; text-align: left; font-size: 13px; color: ${textColor}; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #e0e0e0; margin-top: -16px; margin-left: -16px; margin-right: -16px; margin-bottom: 0;">
               <span>📋 ${isBalanceCheck ? 'Balance Details' : 'Response'}</span>
               <span style="font-size: 16px;">▼</span>
@@ -434,6 +516,7 @@ export class HtmlReportGenerator {
     } else {
       // Show full transaction table with optional error details
       let transactionDetailsHTML = `
+        ${detailsHTML}
         <table style="margin-top: 12px;">
           <thead>
             <tr>
