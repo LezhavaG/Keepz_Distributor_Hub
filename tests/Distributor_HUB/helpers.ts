@@ -313,7 +313,6 @@ export async function runIncorrectClientIdTest(request: any) {
 
     const statusCode = response.status();
     const responseBody = await response.json();
-    const responseJson = JSON.stringify(responseBody, null, 2);
     const responseMessage = responseBody.message || responseBody.error || '';
     const isExpectedError = statusCode === 400 && responseMessage.includes('Client not found for given id.');
 
@@ -330,11 +329,21 @@ export async function runIncorrectClientIdTest(request: any) {
         amount: TRANSACTION_AMOUNT,
         currency: 'GEL',
         status: 'Failed' as const,
-        errorMessage: `Status: ${statusCode}\n\n${responseJson}`,
         isExpectedError: isExpectedError,
         testCaseName: 'Incorrect Client ID (Authentication)',
         skipTransactionTable: true,
         category: 'Authentication Cases',
+        apiCalls: [
+          {
+            name: 'Get Token',
+            url: 'https://distributor.dev.keepz.me/api/auth',
+            method: 'POST',
+            requestBody: { ...payload, client_secret: '***' },
+            statusCode: statusCode,
+            expectedResult: { message: 'Client not found for given id.' },
+            actualResult: responseBody,
+          },
+        ],
       },
     ];
   } catch (error) {
@@ -373,7 +382,6 @@ export async function runIncorrectCredentialsTest(request: any) {
 
     const statusCode = response.status();
     const responseBody = await response.json();
-    const responseJson = JSON.stringify(responseBody, null, 2);
     const responseMessage = responseBody.message || responseBody.error || '';
     const isExpectedError = statusCode === 400 && responseMessage.includes('Incorrect credentials');
 
@@ -390,11 +398,21 @@ export async function runIncorrectCredentialsTest(request: any) {
         amount: TRANSACTION_AMOUNT,
         currency: 'GEL',
         status: 'Failed' as const,
-        errorMessage: `Status: ${statusCode}\n\n${responseJson}`,
         isExpectedError: isExpectedError,
         testCaseName: 'Invalid Credentials (Authentication)',
         skipTransactionTable: true,
         category: 'Authentication Cases',
+        apiCalls: [
+          {
+            name: 'Get Token',
+            url: 'https://distributor.dev.keepz.me/api/auth',
+            method: 'POST',
+            requestBody: { ...payload, client_secret: '***' },
+            statusCode: statusCode,
+            expectedResult: { message: 'Incorrect credentials' },
+            actualResult: responseBody,
+          },
+        ],
       },
     ];
   } catch (error) {
@@ -426,29 +444,26 @@ export async function runAuthenticationFailureTest(request: any) {
     toIban: process.env.BOG_IBAN!,
   };
 
+  const url = 'https://distributor.dev.keepz.me/api/v1/transaction/create';
   let result = {
     statusCode: 0,
-    responseMessage: '',
+    responseBody: {} as any,
     isExpectedError: false,
   };
 
   try {
     // Try to make API call without token
-    const response = await request.post(
-      'https://distributor.dev.keepz.me/api/v1/transaction/create',
-      {
-        data: payload,
-        headers: {
-          'Content-Type': 'application/json',
-          // No Authorization header
-        },
-      }
-    );
+    const response = await request.post(url, {
+      data: payload,
+      headers: {
+        'Content-Type': 'application/json',
+        // No Authorization header
+      },
+    });
 
     result.statusCode = response.status();
-    const responseBody = await response.json();
-    result.responseMessage = JSON.stringify(responseBody, null, 2);
-    const message = responseBody.message || responseBody.error || '';
+    result.responseBody = await response.json();
+    const message = result.responseBody.message || result.responseBody.error || '';
 
     if (result.statusCode === 401 && message.includes('Authentication failed')) {
       console.log(`✅ Got expected 401 error\n`);
@@ -461,7 +476,7 @@ export async function runAuthenticationFailureTest(request: any) {
     const errorMsg = error instanceof Error ? error.message : String(error);
     console.log(`❌ Unexpected error: ${errorMsg}\n`);
     result.statusCode = 0;
-    result.responseMessage = errorMsg;
+    result.responseBody = { error: errorMsg };
     result.isExpectedError = false;
   }
 
@@ -473,11 +488,21 @@ export async function runAuthenticationFailureTest(request: any) {
       amount: TRANSACTION_AMOUNT,
       currency: 'GEL',
       status: 'Failed' as const,
-      errorMessage: `Status: ${result.statusCode}\n\n${result.responseMessage}`,
       isExpectedError: result.isExpectedError,
       testCaseName: 'No Token (Authentication Failure)',
       skipTransactionTable: true,
       category: 'Authentication Cases',
+      apiCalls: [
+        {
+          name: 'Create Order (No Token)',
+          url: url,
+          method: 'POST',
+          requestBody: payload,
+          statusCode: result.statusCode,
+          expectedResult: { message: 'Authentication failed' },
+          actualResult: result.responseBody,
+        },
+      ],
     },
   ];
 }
