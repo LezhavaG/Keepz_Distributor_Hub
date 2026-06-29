@@ -1,6 +1,6 @@
 import { test } from '@playwright/test';
 import * as dotenv from 'dotenv';
-import { runHappyPathTest, BOG_BANK, TBC_BANK, LIBERTY_BANK, CREDO_BANK, runAuthenticationSuccessTest, runBalanceUpdateTest, runPaymentDescriptionTest } from '../helpers';
+import { runHappyPathTest, BOG_BANK, TBC_BANK, LIBERTY_BANK, CREDO_BANK, runAuthenticationSuccessTest, runBalanceUpdateTest, runPaymentDescriptionTest, BALANCE_UPDATE_AMOUNT } from '../helpers';
 import { HtmlReportGenerator } from '../../../utils/HtmlReportGenerator';
 
 dotenv.config();
@@ -40,17 +40,17 @@ test.describe('Distributor HUB - Positive Tests (Individual Banks)', () => {
 
   // Balance Update - per currency
   test('Positive - Balance Update - GEL', async ({ request }) => {
-    const result = await runBalanceUpdateTest(request, 0.22, ['GEL']);
+    const result = await runBalanceUpdateTest(request, BALANCE_UPDATE_AMOUNT, ['GEL']);
     allTestResults.push(...result.tableData);
   });
 
   test('Positive - Balance Update - USD', async ({ request }) => {
-    const result = await runBalanceUpdateTest(request, 0.22, ['USD']);
+    const result = await runBalanceUpdateTest(request, BALANCE_UPDATE_AMOUNT, ['USD']);
     allTestResults.push(...result.tableData);
   });
 
   test('Positive - Balance Update - EUR', async ({ request }) => {
-    const result = await runBalanceUpdateTest(request, 0.22, ['EUR']);
+    const result = await runBalanceUpdateTest(request, BALANCE_UPDATE_AMOUNT, ['EUR']);
     allTestResults.push(...result.tableData);
   });
 

@@ -34,6 +34,7 @@ export const PAYER_DEBTOR_IBAN = process.env.PAYER_DEBTOR_IBAN || 'GE42CD0360000
 export const PAYER_DEBTOR_IDENTITY = process.env.PAYER_DEBTOR_IDENTITY || '98809409129';
 export const PAYER_DESCRIPTION = process.env.PAYER_DESCRIPTION || 'Test Payment';
 export const PAYER_TEST_AMOUNT = parseFloat(process.env.PAYER_TEST_AMOUNT || '0.02');
+export const BALANCE_UPDATE_AMOUNT = parseFloat(process.env.BALANCE_UPDATE_AMOUNT || '0.22');
 export const BENEFICIARY_NAME = process.env.BENEFICIARY_NAME || 'Giorgi Lezhava';
 export const BENEFICIARY_IDENTITY = process.env.BENEFICIARY_IDENTITY || '01024085016';
 export const BENEFICIARY_ADDRESS = process.env.BENEFICIARY_ADDRESS || 'Tbilisi, Georgia';
@@ -707,7 +708,7 @@ async function runBankGroupedNegativeTest(
  * One test case per currency. Details shows: Get Token + Get Balance (initial)
  * + Update Balance + Get Balance (final).
  */
-export async function runBalanceUpdateTest(request: any, amountToAdd: number = 0.22, currenciesToTest: string[] = CURRENCIES) {
+export async function runBalanceUpdateTest(request: any, amountToAdd: number = BALANCE_UPDATE_AMOUNT, currenciesToTest: string[] = CURRENCIES) {
   const hub = new DistributorHubHelper(request);
 
   await hub.authenticate();
