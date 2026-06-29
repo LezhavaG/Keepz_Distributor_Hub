@@ -137,6 +137,16 @@ Authorization: Bearer <access_token>
   - `debtorIban` (string)
   - `debtorIdentityNumber` (string)
 
+> **Note — Payer details handling:** When payer (debtor) details are provided, the back-end does **not** store them as separate fields. Instead it **prepends** them to the description, comma-separated, in this exact order:
+> ```
+> {debtorName}, {debtorIban}, {debtorIdentityNumber}, {description}
+> ```
+> The combined value is returned as `paymentDescription` in the order details response (`GET /api/distributor/details`).
+>
+> **Example:**
+> - Request: `description: "დანიშნულება"`, `debtorName: "შპს ტესტი"`, `debtorIban: "GE42CD0360000062461306"`, `debtorIdentityNumber: "98809409129"`
+> - Resulting `paymentDescription`: `"შპს ტესტი, GE42CD0360000062461306, 98809409129, დანიშნულება"`
+
 **Example Request:**
 ```json
 {
