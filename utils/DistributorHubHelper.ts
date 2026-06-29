@@ -111,6 +111,49 @@ export class DistributorHubHelper {
     return data.value;
   }
 
+  /**
+   * Update (top up) the integrator balance for a currency.
+   * This endpoint returns NO response body - only a status code (200 = success).
+   * Uses clientId + secret directly in the body (not the Bearer token).
+   */
+  async updateBalance(amount: number, currency: string = 'GEL'): Promise<number> {
+    const url = `${this.baseUrl}/api/distributor/balance/update`;
+    const requestBody = {
+      amount: amount,
+      clientId: this.clientId,
+      // Balance update uses a SEPARATE secret, not the OAuth client_secret
+      secret: process.env.DISTRIBUTOR_BALANCE_SECRET!,
+      currency: currency,
+    };
+
+    const response = await this.request.put(url, {
+      data: requestBody,
+    });
+
+    const statusCode = response.status();
+
+    // No response body for this endpoint - capture whatever comes back (if any)
+    let actualBody: any;
+    try {
+      const text = await response.text();
+      actualBody = text ? JSON.parse(text) : { statusCode };
+    } catch {
+      actualBody = { statusCode };
+    }
+
+    this.apiCalls.push({
+      name: `Update Balance (${currency})`,
+      url: url,
+      method: 'PUT',
+      requestBody: { ...requestBody, secret: '***' },
+      statusCode: statusCode,
+      expectedResult: { statusCode: 200 },
+      actualResult: actualBody,
+    });
+
+    return statusCode;
+  }
+
   async createTransaction(payload: TransactionPayload): Promise<TransactionResponse> {
     const requestBody: any = {
       amount: payload.amount,

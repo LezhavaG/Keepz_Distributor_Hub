@@ -688,3 +688,71 @@ async function runBankGroupedNegativeTest(
 
   return { tableData, balanceSummary: [] };
 }
+
+/**
+ * Balance Update test (positive flow).
+ * For each currency: check balance -> update balance -> check balance again ->
+ * verify the balance increased by the expected amount.
+ * One test case per currency. Details shows: Get Token + Get Balance (initial)
+ * + Update Balance + Get Balance (final).
+ */
+export async function runBalanceUpdateTest(request: any, amountToAdd: number = 0.22) {
+  const hub = new DistributorHubHelper(request);
+
+  await hub.authenticate();
+  console.log('✅ Token successfully taken\n');
+
+  const tokenCall = hub.apiCalls.find((c) => c.name === 'Get Token');
+  if (tokenCall) {
+    tokenCall.passed = tokenCall.statusCode === 200;
+  }
+
+  const tableData: any[] = [];
+
+  for (const currency of CURRENCIES) {
+    const startIdx = hub.apiCalls.length;
+
+    // 1. Check initial balance
+    const initial = await hub.getBalance(currency);
+    // 2. Update (top up) balance
+    const updateStatus = await hub.updateBalance(amountToAdd, currency);
+    // 3. Check balance again
+    const final = await hub.getBalance(currency);
+
+    const expectedFinal = initial.amount + amountToAdd;
+    const updateOk = updateStatus === 200;
+    const correctlyUpdated = Math.abs(final.amount - expectedFinal) < 0.001;
+    const passed = updateOk && correctlyUpdated;
+
+    if (passed) {
+      console.log(`✅ Balance updated correctly ${currency}: ${initial.amount.toFixed(2)} + ${amountToAdd} = ${final.amount.toFixed(2)}`);
+    } else {
+      console.log(`❌ Balance update issue ${currency}: expected ${expectedFinal.toFixed(2)}, got ${final.amount.toFixed(2)} (update status ${updateStatus})`);
+    }
+
+    // Per-call pass/fail badges
+    const currencyCalls = hub.apiCalls.slice(startIdx); // [initial balance, update, final balance]
+    if (currencyCalls[0]) currencyCalls[0].passed = currencyCalls[0].statusCode === 200;
+    if (currencyCalls[1]) currencyCalls[1].passed = updateOk;
+    if (currencyCalls[2]) currencyCalls[2].passed = correctlyUpdated;
+
+    const caseApiCalls = [tokenCall, ...currencyCalls];
+
+    const summary = `${currency} balance updated: ${initial.amount.toFixed(2)} + ${amountToAdd.toFixed(2)} = ${final.amount.toFixed(2)} (Expected: ${expectedFinal.toFixed(2)})`;
+
+    tableData.push({
+      transactionId: 0,
+      bank: 'N/A',
+      amount: amountToAdd,
+      currency: currency,
+      status: passed ? ('Succeeded' as const) : ('Failed' as const),
+      errorMessage: summary,
+      testCaseName: `Balance Update - ${currency}`,
+      skipTransactionTable: true,
+      category: 'Balance Update Cases',
+      apiCalls: caseApiCalls,
+    });
+  }
+
+  return { tableData, balanceSummary: [] };
+}

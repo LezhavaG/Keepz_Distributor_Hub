@@ -104,7 +104,53 @@ Authorization: Bearer {access_token}
 
 ---
 
-## 3. Create Order (Create Transaction)
+## 3. Update Balance (Top Up)
+
+**Endpoint:** `PUT https://distributor.dev.keepz.me/api/distributor/balance/update`
+
+Updates (tops up) the integrator balance for a given currency.
+
+⚠️ **Important notes:**
+- Authentication is done **inside the request body** (`clientId` + `secret`), NOT via a Bearer token.
+- The `secret` here is a **SEPARATE credential** from the OAuth `client_secret`. It is stored in `.env` as `DISTRIBUTOR_BALANCE_SECRET`.
+- This endpoint returns **NO response body on success** — only a status code (`200 OK`).
+
+**Request:**
+```json
+{
+  "amount": 0.22,
+  "clientId": "fb769cdd-7e9d-4355-a331-43028700ca3a",
+  "secret": "***",
+  "currency": "GEL"
+}
+```
+
+### Success Response (200 OK)
+```
+(No response body — success is indicated by status code 200)
+```
+
+### Error Response - Incorrect Credential (400 Bad Request)
+Returned when the `secret` is wrong (e.g. using the OAuth client_secret instead of the balance secret):
+```json
+{
+  "success": false,
+  "message": "Incorrect credential!",
+  "statusCode": 5036,
+  "exceptionGroup": 1
+}
+```
+
+### Verification Flow (how it's tested)
+For each currency (GEL, USD, EUR):
+1. **Get Balance** (initial)
+2. **Update Balance** (PUT with amount)
+3. **Get Balance** (final)
+4. Verify: `final == initial + amount`
+
+---
+
+## 4. Create Order (Create Transaction)
 
 **Endpoint:** `POST https://distributor.dev.keepz.me/api/distributor`
 
@@ -192,7 +238,7 @@ Content-Type: application/json
 
 ---
 
-## 4. Get Transaction Details
+## 5. Get Transaction Details
 
 **Endpoint:** `GET https://distributor.dev.keepz.me/api/distributor/details?transaction_id=12345`
 
