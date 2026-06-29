@@ -277,10 +277,20 @@ export async function runHappyPathTest(request: any, banksToTest: typeof ALL_BAN
     category: 'Balance Check',
   });
 
-  // Attach API calls to each test case
+  // Attach API calls to each test case with corrected expected results for positive tests
+  const apiCallsWithCorrectExpectations = hub.apiCalls.map(call => {
+    if (call.name === 'Create Order') {
+      return {
+        ...call,
+        expectedResult: { transactionId: 'number', status: 'INITIAL|PENDING' },
+      };
+    }
+    return call;
+  });
+
   const tableDataWithApiCalls = [...transactionTestCases, ...balanceCheckTestCases].map(testCase => ({
     ...testCase,
-    apiCalls: hub.apiCalls,
+    apiCalls: apiCallsWithCorrectExpectations,
   }));
 
   // Return test data (report will be generated after all tests)
@@ -557,6 +567,8 @@ export async function runInsufficientBalanceTest(
   }
 
   // Step 3: Generate report
+  const correctedApiCalls = fixNegativeTestExpectedResults(hub.apiCalls, expectedErrorMessage);
+
   const tableData = transactions.map((tx) => {
     return {
       transactionId: 0,
@@ -570,7 +582,7 @@ export async function runInsufficientBalanceTest(
       skipTransactionTable: true,
       category: 'Insufficient Balance Cases',
       uniqueId: tx.uniqueId,
-      apiCalls: hub.apiCalls,
+      apiCalls: correctedApiCalls,
     };
   });
 
@@ -662,6 +674,8 @@ export async function runAboveMaximumAmountTest(
   }
 
   // Step 3: Generate report
+  const correctedApiCalls = fixNegativeTestExpectedResults(hub.apiCalls, expectedErrorMessage);
+
   const tableData = transactions.map((tx) => {
     return {
       transactionId: 0,
@@ -675,7 +689,7 @@ export async function runAboveMaximumAmountTest(
       skipTransactionTable: true,
       category: 'Amount Validation Cases',
       uniqueId: tx.uniqueId,
-      apiCalls: hub.apiCalls,
+      apiCalls: correctedApiCalls,
     };
   });
 
@@ -767,6 +781,8 @@ export async function runBelowMinimumAmountTest(
   }
 
   // Step 3: Generate report
+  const correctedApiCalls = fixNegativeTestExpectedResults(hub.apiCalls, expectedErrorMessage);
+
   const tableData = transactions.map((tx) => {
     return {
       transactionId: 0,
@@ -780,7 +796,7 @@ export async function runBelowMinimumAmountTest(
       skipTransactionTable: true,
       category: 'Amount Validation Cases',
       uniqueId: tx.uniqueId,
-      apiCalls: hub.apiCalls,
+      apiCalls: correctedApiCalls,
     };
   });
 
@@ -882,6 +898,8 @@ export async function runNegativeTest(
   const finalBalanceEUR = await hub.getBalance('EUR');
 
   // Step 5: Return test data and balance summary (report will be generated after all tests)
+  const correctedApiCalls = fixNegativeTestExpectedResults(hub.apiCalls, expectedErrorMessage);
+
   const tableData = transactions.map((tx) => {
     return {
       transactionId: 0,
@@ -895,7 +913,7 @@ export async function runNegativeTest(
       skipTransactionTable: true,
       category: 'Invalid IBAN Cases',
       uniqueId: tx.uniqueId,
-      apiCalls: hub.apiCalls,
+      apiCalls: correctedApiCalls,
     };
   });
 
@@ -924,4 +942,17 @@ export async function runNegativeTest(
   ];
 
   return { tableData, balanceSummary };
+}
+
+// Helper function to fix expected results for negative test API calls
+export function fixNegativeTestExpectedResults(apiCalls: any[], errorMessage: string): any[] {
+  return apiCalls.map(call => {
+    if (call.name === 'Create Order') {
+      return {
+        ...call,
+        expectedResult: { message: errorMessage, statusCode: 'number' },
+      };
+    }
+    return call;
+  });
 }
