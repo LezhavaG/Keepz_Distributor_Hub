@@ -444,7 +444,9 @@ export async function runAuthenticationFailureTest(request: any) {
     toIban: process.env.BOG_IBAN!,
   };
 
-  const url = 'https://distributor.dev.keepz.me/api/v1/transaction/create';
+  // Use the REAL Create Order endpoint (same as createTransaction) so we
+  // actually verify that endpoint requires authentication.
+  const url = 'https://distributor.dev.keepz.me/api/distributor';
   let result = {
     statusCode: 0,
     responseBody: {} as any,
