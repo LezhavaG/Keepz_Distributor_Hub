@@ -20,7 +20,7 @@ export const INVALID_IBANS = [
   { name: 'CREDO', iban: process.env.CREDO_INVALID_IBAN! },
 ];
 
-export const TRANSACTION_AMOUNT = 0.1;
+export const TRANSACTION_AMOUNT = parseFloat(process.env.TRANSACTION_AMOUNT || '0.02');
 export const MIN_ALLOWED_AMOUNT = parseFloat(process.env.MIN_ALLOWED_AMOUNT || '0.02');
 export const MAX_TRANSACTION_AMOUNT = parseFloat(process.env.MAX_TRANSACTION_AMOUNT || '100000');
 export const BELOW_MIN_AMOUNT = parseFloat(process.env.BELOW_MIN_AMOUNT || '0.01');
@@ -33,7 +33,6 @@ export const PAYER_DEBTOR_NAME = process.env.PAYER_DEBTOR_NAME || 'შპს ტ
 export const PAYER_DEBTOR_IBAN = process.env.PAYER_DEBTOR_IBAN || 'GE42CD0360000062461306';
 export const PAYER_DEBTOR_IDENTITY = process.env.PAYER_DEBTOR_IDENTITY || '98809409129';
 export const PAYER_DESCRIPTION = process.env.PAYER_DESCRIPTION || 'Test Payment';
-export const PAYER_TEST_AMOUNT = parseFloat(process.env.PAYER_TEST_AMOUNT || '0.02');
 export const BALANCE_UPDATE_AMOUNT = parseFloat(process.env.BALANCE_UPDATE_AMOUNT || '0.22');
 export const BENEFICIARY_NAME = process.env.BENEFICIARY_NAME || 'Giorgi Lezhava';
 export const BENEFICIARY_IDENTITY = process.env.BENEFICIARY_IDENTITY || '01024085016';
@@ -825,7 +824,7 @@ export async function runPaymentDescriptionTest(
 
     for (const currency of CURRENCIES) {
       const payload: any = {
-        amount: PAYER_TEST_AMOUNT,
+        amount: TRANSACTION_AMOUNT,
         currency: currency,
         description: PAYER_DESCRIPTION,
         toIban: bank.iban,
@@ -887,7 +886,7 @@ export async function runPaymentDescriptionTest(
     tableData.push({
       transactionId: 0,
       bank: bank.name,
-      amount: PAYER_TEST_AMOUNT,
+      amount: TRANSACTION_AMOUNT,
       currency: 'ALL',
       status: allMatch ? ('Succeeded' as const) : ('Failed' as const),
       errorMessage: summary,
