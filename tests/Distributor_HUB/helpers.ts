@@ -756,3 +756,124 @@ export async function runBalanceUpdateTest(request: any, amountToAdd: number = 0
 
   return { tableData, balanceSummary: [] };
 }
+
+// Test fixtures for payer-details / paymentDescription tests
+const PAYER_DEBTOR_NAME = 'შპს ტესტი';
+const PAYER_DEBTOR_IBAN = 'GE42CD0360000062461306';
+const PAYER_DEBTOR_IDENTITY = '98809409129';
+const PAYER_DESCRIPTION = 'Test Payment';
+const PAYER_TEST_AMOUNT = 0.02;
+const BENEFICIARY_NAME = 'Giorgi Lezhava';
+const BENEFICIARY_IDENTITY = '01024085016';
+const BENEFICIARY_ADDRESS = 'Tbilisi, Georgia';
+const BENEFICIARY_BIRTHDATE = '1990-01-01';
+
+/**
+ * Payment Description test (positive).
+ * Creates orders with payer (debtor) details and verifies the back-end builds
+ * paymentDescription = "{debtorName}, {debtorIban}, {debtorIdentityNumber}, {description}".
+ * When includeBeneficiary is true, beneficiary details are ALSO sent - and the
+ * test verifies they do NOT appear in paymentDescription (only payer + description).
+ * One test case per bank; Details shows Get Token + per-currency (Create Order + Get Transaction Details).
+ */
+export async function runPaymentDescriptionTest(
+  request: any,
+  banksToTest: typeof ALL_BANKS,
+  includeBeneficiary: boolean,
+  testCaseSuffix: string,
+  category: string
+) {
+  const hub = new DistributorHubHelper(request);
+
+  await hub.authenticate();
+  console.log('✅ Token successfully taken\n');
+
+  const tokenCall = hub.apiCalls.find((c) => c.name === 'Get Token');
+  if (tokenCall) {
+    tokenCall.passed = tokenCall.statusCode === 200;
+  }
+
+  // Expected paymentDescription is ALWAYS payer details + description (never beneficiary)
+  const expectedPaymentDescription = `${PAYER_DEBTOR_NAME}, ${PAYER_DEBTOR_IBAN}, ${PAYER_DEBTOR_IDENTITY}, ${PAYER_DESCRIPTION}`;
+
+  const tableData: any[] = [];
+
+  for (const bank of banksToTest) {
+    const startIdx = hub.apiCalls.length;
+    const currencyResults: Array<{ currency: string; matches: boolean }> = [];
+
+    for (const currency of CURRENCIES) {
+      const payload: any = {
+        amount: PAYER_TEST_AMOUNT,
+        currency: currency,
+        description: PAYER_DESCRIPTION,
+        toIban: bank.iban,
+        debtorName: PAYER_DEBTOR_NAME,
+        debtorIban: PAYER_DEBTOR_IBAN,
+        debtorIdentityNumber: PAYER_DEBTOR_IDENTITY,
+      };
+
+      if (includeBeneficiary) {
+        payload.beneficiaryName = BENEFICIARY_NAME;
+        payload.beneficiaryIdentityNumber = BENEFICIARY_IDENTITY;
+        payload.beneficiaryAddress = BENEFICIARY_ADDRESS;
+        payload.beneficiaryBirthDate = BENEFICIARY_BIRTHDATE;
+      } else if (bank.name === 'Liberty') {
+        // Liberty requires beneficiaryName even when we only test payer details.
+        // (It still must NOT appear in paymentDescription.)
+        payload.beneficiaryName = BENEFICIARY_NAME;
+      }
+
+      let matches = false;
+      try {
+        const created = await hub.createTransaction(payload);
+        const details = await hub.getTransactionDetails(created.transactionId);
+        const actual = details.paymentDescription || '';
+        matches = actual === expectedPaymentDescription;
+        if (matches) {
+          console.log(`✅ paymentDescription correct ${bank.name} - ${currency}`);
+        } else {
+          console.log(`❌ paymentDescription mismatch ${bank.name} - ${currency}: got "${actual}"`);
+        }
+      } catch (error) {
+        const msg = error instanceof Error ? error.message : String(error);
+        console.log(`❌ Order creation failed ${bank.name} - ${currency}: ${msg}`);
+        matches = false;
+      }
+
+      currencyResults.push({ currency, matches });
+    }
+
+    // This bank's calls: [Create GEL, Details GEL, Create USD, Details USD, Create EUR, Details EUR]
+    const bankCalls = hub.apiCalls.slice(startIdx);
+    bankCalls.forEach((call) => {
+      if (call.name.startsWith('Create Order')) {
+        call.passed = call.statusCode === 200 || call.statusCode === 201;
+      } else if (call.name === 'Get Transaction Details') {
+        // Show the expected paymentDescription and pass/fail on the match
+        call.expectedResult = { paymentDescription: expectedPaymentDescription };
+        const pd = call.actualResult?.paymentDescription || '';
+        call.passed = pd === expectedPaymentDescription;
+      }
+    });
+
+    const allMatch = currencyResults.every((r) => r.matches);
+    const caseApiCalls = [tokenCall, ...bankCalls];
+    const summary = `Expected paymentDescription: "${expectedPaymentDescription}"`;
+
+    tableData.push({
+      transactionId: 0,
+      bank: bank.name,
+      amount: PAYER_TEST_AMOUNT,
+      currency: 'ALL',
+      status: allMatch ? ('Succeeded' as const) : ('Failed' as const),
+      errorMessage: summary,
+      testCaseName: `${testCaseSuffix} - ${bank.name}`,
+      skipTransactionTable: true,
+      category: category,
+      apiCalls: caseApiCalls,
+    });
+  }
+
+  return { tableData, balanceSummary: [] };
+}

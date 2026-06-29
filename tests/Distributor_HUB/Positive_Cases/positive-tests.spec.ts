@@ -1,6 +1,6 @@
 import { test } from '@playwright/test';
 import * as dotenv from 'dotenv';
-import { runHappyPathTest, ALL_BANKS, runAuthenticationSuccessTest, runBalanceUpdateTest } from '../helpers';
+import { runHappyPathTest, ALL_BANKS, runAuthenticationSuccessTest, runBalanceUpdateTest, runPaymentDescriptionTest } from '../helpers';
 import { HtmlReportGenerator } from '../../../utils/HtmlReportGenerator';
 
 dotenv.config();
@@ -17,6 +17,18 @@ test.describe('Distributor HUB - Positive Tests (Combined)', () => {
   // Balance Update flow per currency: check -> update -> check -> verify increase
   test('Positive - Balance Update (All Currencies)', async ({ request }) => {
     const result = await runBalanceUpdateTest(request);
+    allTestResults.push(...result.tableData);
+  });
+
+  // Payer Details only -> verify paymentDescription = payer details + description
+  test('Positive - Orders with Payer Details', async ({ request }) => {
+    const result = await runPaymentDescriptionTest(request, ALL_BANKS, false, 'Payer Details', 'Payer Details Cases');
+    allTestResults.push(...result.tableData);
+  });
+
+  // Payer + Beneficiary Details -> verify paymentDescription has ONLY payer details + description
+  test('Positive - Orders with Payer + Beneficiary Details', async ({ request }) => {
+    const result = await runPaymentDescriptionTest(request, ALL_BANKS, true, 'Payer + Beneficiary Details', 'Payer + Beneficiary Details Cases');
     allTestResults.push(...result.tableData);
   });
 

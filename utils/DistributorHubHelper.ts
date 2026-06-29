@@ -7,7 +7,9 @@ export interface TransactionPayload {
   description: string;
   toIban: string;
   beneficiaryName?: string;
+  beneficiaryIdentityNumber?: string;
   beneficiaryAddress?: string;
+  beneficiaryBirthDate?: string;
   debtorName?: string;
   debtorIban?: string;
   debtorIdentityNumber?: string;
@@ -167,8 +169,16 @@ export class DistributorHubHelper {
       requestBody.beneficiaryName = payload.beneficiaryName;
     }
 
+    if (payload.beneficiaryIdentityNumber) {
+      requestBody.beneficiaryIdentityNumber = payload.beneficiaryIdentityNumber;
+    }
+
     if (payload.beneficiaryAddress) {
       requestBody.beneficiaryAddress = payload.beneficiaryAddress;
+    }
+
+    if (payload.beneficiaryBirthDate) {
+      requestBody.beneficiaryBirthDate = payload.beneficiaryBirthDate;
     }
 
     if (payload.debtorName) {
@@ -225,19 +235,17 @@ export class DistributorHubHelper {
     });
 
     const data = await response.json();
-    return data.value;
-  }
 
-  private trackTransactionDetailsCall(transactionId: number, data: any, statusCode: number): void {
-    const url = `${this.baseUrl}/api/distributor/details?transaction_id=${transactionId}`;
     this.apiCalls.push({
       name: 'Get Transaction Details',
       url: url,
       method: 'GET',
-      statusCode: statusCode,
-      expectedResult: { transactionId: 'number', status: 'COMPLETED|SUCCESS' },
-      actualResult: data,
+      statusCode: response.status(),
+      expectedResult: { paymentDescription: 'string', status: 'string' },
+      actualResult: data.value,
     });
+
+    return data.value;
   }
 
   async waitForTransactionCompletion(
