@@ -36,11 +36,25 @@
   - Negative test: Expected = error message → Actual matches the error
 - Displayed in a collapsible **Details** section under each test case
 
+### Configuration & Test Data in .env (MANDATORY)
+- **NEVER hardcode** configurable values in test/helper code
+- **ALWAYS extract to `.env`** any value that could change or vary per test/environment:
+  - Credentials (client id, secrets, grant type, balance-update secret)
+  - Bank IBANs (valid & invalid)
+  - Transaction amount limits (min, max, below-min, above-max, insufficient)
+  - Commission configuration
+  - Test fixtures: payer (debtor) details, beneficiary details, test description/amount
+- Code reads from `process.env` with sensible fallback defaults
+- To test with **different values**, edit `.env` only - **no code changes**
+- `.env` is gitignored (values/secrets stay local; share separately with teammates)
+- **Exception:** documentation examples keep concrete values (for readability) - do NOT variable-ize docs
+
 ### Code Structure
 - Use **Helper functions** (`tests/Distributor_HUB/helpers.ts`)
 - Keep test logic separate from test execution
-- Extract credentials to `.env` - NO hardcoding
+- Extract all configurable values to `.env` - NO hardcoding (see rule above)
 - All test categories should be organized and labeled
+- New test cases go in **both** the combined and individual spec files
 
 ### Report Generation
 - Tests generate combined HTML report after all tests complete
