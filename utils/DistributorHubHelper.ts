@@ -49,6 +49,7 @@ export interface ApiCall {
   requestBody?: any;
   expectedResult: any;
   actualResult: any;
+  passed?: boolean;
 }
 
 export class DistributorHubHelper {

@@ -9,6 +9,7 @@ export interface ApiCall {
   requestBody?: any;
   expectedResult: any;
   actualResult: any;
+  passed?: boolean;
 }
 
 export interface TransactionRow {
@@ -430,9 +431,12 @@ export class HtmlReportGenerator {
     let detailsHTML = '';
     if (tx.apiCalls && tx.apiCalls.length > 0) {
       const apiCallsHTML = tx.apiCalls
-        .map((call, idx) => `
+        .map((call, idx) => {
+          const callBadge = call.passed === undefined ? '' :
+            `<span style="background-color: ${call.passed ? '#d4edda' : '#f8d7da'}; color: ${call.passed ? '#155724' : '#721c24'}; padding: 2px 10px; border-radius: 4px; font-size: 11px; font-weight: 600; margin-left: 10px;">${call.passed ? 'Passed ✓' : 'Failed ✗'}</span>`;
+          return `
           <div style="margin-bottom: 16px; padding: 12px; background: white; border: 1px solid #e0e0e0; border-radius: 4px;">
-            <div style="font-weight: 600; color: #333; margin-bottom: 12px;">API Call ${idx + 1}: ${call.name}</div>
+            <div style="font-weight: 600; color: #333; margin-bottom: 12px;">API Call ${idx + 1}: ${call.name}${callBadge}</div>
             <div style="font-size: 13px; color: #666; margin-bottom: 8px;">
               <div style="margin-bottom: 4px;"><strong>Request URL:</strong> <code style="color: #0066cc; word-break: break-all;">${call.url}</code></div>
               <div style="margin-bottom: 4px;"><strong>Request Method:</strong> <span style="font-weight: 500;">${call.method}</span></div>
@@ -455,7 +459,8 @@ export class HtmlReportGenerator {
               </div>
             </div>
           </div>
-        `)
+        `;
+        })
         .join('');
 
       detailsHTML = `

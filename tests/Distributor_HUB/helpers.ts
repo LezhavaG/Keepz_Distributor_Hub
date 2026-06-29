@@ -342,6 +342,7 @@ export async function runIncorrectClientIdTest(request: any) {
             statusCode: statusCode,
             expectedResult: { message: 'Client not found for given id.' },
             actualResult: responseBody,
+            passed: isExpectedError,
           },
         ],
       },
@@ -411,6 +412,7 @@ export async function runIncorrectCredentialsTest(request: any) {
             statusCode: statusCode,
             expectedResult: { message: 'Incorrect credentials' },
             actualResult: responseBody,
+            passed: isExpectedError,
           },
         ],
       },
@@ -503,6 +505,7 @@ export async function runAuthenticationFailureTest(request: any) {
           statusCode: result.statusCode,
           expectedResult: { message: 'Authentication failed' },
           actualResult: result.responseBody,
+          passed: result.isExpectedError,
         },
       ],
     },
@@ -602,6 +605,9 @@ async function runBankGroupedNegativeTest(
 
   // Capture the shared Get Token call (shown in every bank's Details)
   const tokenCall = hub.apiCalls.find((c) => c.name === 'Get Token');
+  if (tokenCall) {
+    tokenCall.passed = tokenCall.statusCode === 200;
+  }
 
   const tableData: any[] = [];
 
@@ -654,6 +660,10 @@ async function runBankGroupedNegativeTest(
 
     // This bank's Create Order calls (only the 3 currencies for THIS bank)
     const bankCreateCalls = hub.apiCalls.slice(startIdx);
+    // Mark each Create Order call passed/failed by its currency result (same order)
+    bankCreateCalls.forEach((call, i) => {
+      call.passed = currencyResults[i]?.isExpectedError ?? false;
+    });
     const allExpected = currencyResults.every((r) => r.isExpectedError);
 
     // Details = shared token call + this bank's create orders
