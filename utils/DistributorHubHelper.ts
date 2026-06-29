@@ -213,7 +213,16 @@ export class DistributorHubHelper {
       method: 'POST',
       requestBody: requestBody,
       statusCode: response.status(),
-      expectedResult: { value: { transactionId: 'number', status: 'INITIAL|PENDING' } },
+      expectedResult: {
+        value: {
+          transactionId: 'number',
+          status: 'INITIAL',
+          statusDescription: 'Initial',
+          uniqueId: 'string (same as request uniqueId)',
+          createdAt: 'string (ISO timestamp)',
+          distributionFlow: 'STANDARD',
+        },
+      },
       actualResult: data,
     });
 
