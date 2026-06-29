@@ -1,0 +1,1006 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Distributor HUB Test Report</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 40px 20px;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      overflow: hidden;
+    }
+
+    .header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 40px;
+      text-align: center;
+    }
+
+    .header h1 {
+      font-size: 28px;
+      margin-bottom: 8px;
+    }
+
+    .header p {
+      font-size: 14px;
+      opacity: 0.9;
+    }
+
+    .content {
+      padding: 40px;
+    }
+
+    button {
+      transition: all 0.3s ease;
+    }
+
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .status-section {
+      border-radius: 6px;
+      overflow: hidden;
+    }
+
+    .test-case-row {
+      border-bottom: 1px solid #e0e0e0;
+      background: white;
+    }
+
+    .test-case-header {
+      padding: 16px;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #fafafa;
+      border-bottom: 1px solid #e0e0e0;
+    }
+
+    .test-case-header:hover {
+      background: #f0f0f0;
+    }
+
+    .test-case-content {
+      display: none;
+      padding: 16px;
+      background: white;
+    }
+
+    .test-case-content.expanded {
+      display: block;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    thead {
+      background: #f5f5f5;
+    }
+
+    th {
+      padding: 12px 16px;
+      text-align: left;
+      font-weight: 600;
+      color: #333;
+      border-bottom: 2px solid #e0e0e0;
+      font-size: 13px;
+    }
+
+    td {
+      padding: 12px 16px;
+      border-bottom: 1px solid #e0e0e0;
+    }
+
+    tbody tr:hover {
+      background-color: #fafafa;
+    }
+
+    .footer {
+      padding: 20px 40px;
+      background: #f9f9f9;
+      border-top: 1px solid #e0e0e0;
+      text-align: center;
+      color: #666;
+      font-size: 12px;
+    }
+
+    .error-detail {
+      display: none;
+      padding: 12px 16px;
+      background-color: #ffe6e6;
+      border-top: 1px solid #ffcccc;
+      color: #cc0000;
+      font-size: 12px;
+      font-family: monospace;
+    }
+  </style>
+  <script>
+    function toggleSection(button) {
+      const section = button.nextElementSibling;
+      const arrow = button.querySelector('span:last-child');
+
+      if (section.style.display === 'none') {
+        section.style.display = 'block';
+        arrow.style.transform = 'rotate(0deg)';
+      } else {
+        section.style.display = 'none';
+        arrow.style.transform = 'rotate(-90deg)';
+      }
+    }
+
+    function toggleTestCase(element) {
+      const content = element.nextElementSibling;
+      const arrow = element.querySelector('.arrow');
+      content.classList.toggle('expanded');
+      arrow.style.transform = content.classList.contains('expanded') ? 'rotate(0deg)' : 'rotate(-90deg)';
+    }
+
+    function toggleError(button) {
+      const errorDetail = button.parentElement.querySelector('.error-detail');
+      const arrow = button.querySelector('span:last-child');
+      const isHidden = window.getComputedStyle(errorDetail).display === 'none';
+
+      if (isHidden) {
+        errorDetail.style.display = 'block';
+        arrow.style.transform = 'rotate(0deg)';
+      } else {
+        errorDetail.style.display = 'none';
+        arrow.style.transform = 'rotate(-90deg)';
+      }
+    }
+
+    function toggleCategory(button) {
+      const categorySection = button.nextElementSibling;
+      const arrow = button.querySelector('span:last-child');
+      const isHidden = window.getComputedStyle(categorySection).display === 'none';
+
+      if (isHidden) {
+        categorySection.style.display = 'block';
+        arrow.style.transform = 'rotate(0deg)';
+      } else {
+        categorySection.style.display = 'none';
+        arrow.style.transform = 'rotate(-90deg)';
+      }
+    }
+
+    function toggleDetails(button) {
+      const detailsSection = button.parentElement.querySelector('.details-section');
+      const arrow = button.querySelector('.details-arrow');
+      const isHidden = window.getComputedStyle(detailsSection).display === 'none';
+
+      if (isHidden) {
+        detailsSection.style.display = 'block';
+        arrow.style.transform = 'rotate(0deg)';
+      } else {
+        detailsSection.style.display = 'none';
+        arrow.style.transform = 'rotate(-90deg)';
+      }
+    }
+
+    function toggleApiDetails(button) {
+      const apiDetails = button.parentElement.querySelector('.api-details');
+      const arrow = button.querySelector('.api-arrow');
+      const isHidden = window.getComputedStyle(apiDetails).display === 'none';
+
+      if (isHidden) {
+        apiDetails.style.display = 'block';
+        arrow.style.transform = 'rotate(0deg)';
+      } else {
+        apiDetails.style.display = 'none';
+        arrow.style.transform = 'rotate(-90deg)';
+      }
+    }
+  </script>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Distributor HUB Test Report</h1>
+      <p>Distributor HUB - Negative Tests</p>
+    </div>
+
+    <div class="content">
+      <div style="margin-bottom: 24px;">
+        <a href="./index.html" style="display: inline-block; padding: 10px 16px; background: #667eea; color: white; text-decoration: none; border-radius: 6px; font-weight: 500; transition: background 0.2s;">
+          ← Back to Portal
+        </a>
+      </div>
+      
+      <div style="margin-bottom: 32px;">
+        <h2 style="font-size: 20px; font-weight: 600; color: #333; margin-bottom: 16px;">Test Case Summary - (Negative Cases)</h2>
+        <div style="padding: 16px; background: #f5f5f5; border-radius: 8px; border-left: 4px solid #667eea; margin-bottom: 24px;">
+          <div style="font-size: 14px; color: #666;">
+            <strong>Total Test Cases:</strong> <span style="font-weight: 600; color: #333;">4</span>
+            <span style="margin: 0 8px;">|</span>
+            <strong>Passed:</strong> <span style="font-weight: 600; color: #2e7d32;">4</span>
+            <span style="margin: 0 8px;">|</span>
+            <strong>Failed:</strong> <span style="font-weight: 600; color: #c62828;">0</span>
+            <span style="margin: 0 8px;">|</span>
+            <strong>Success Rate:</strong> <span style="font-weight: 600; color: #333;">100%</span>
+          </div>
+        </div>
+        
+        <div style="margin-bottom: 24px;">
+          <button type="button" onclick="toggleSection(this)" style="width: 100%; padding: 16px; background-color: #d4edda; border: none; cursor: pointer; border-radius: 6px; font-weight: 600; text-align: left; font-size: 16px; display: flex; justify-content: space-between; align-items: center;">
+            <span>✓ Passed Cases (4)</span>
+            <span style="font-size: 20px;">▼</span>
+          </button>
+          <div class="status-section" style="display: none; margin-top: 12px;">
+            <div style="background: white; border-radius: 6px; overflow: hidden;">
+              
+      <div style="margin-bottom: 16px;">
+        <button type="button" onclick="toggleCategory(this)" style="width: 100%; padding: 12px 16px; background: #f5f5f5; border: none; cursor: pointer; border-left: 4px solid #667eea; font-weight: 500; font-size: 14px; color: #333; display: flex; justify-content: space-between; align-items: center; text-align: left;">
+          <span>📁 Amount Validation Cases</span>
+          <span style="font-size: 16px; transition: transform 0.3s; transform: rotate(-90deg);">▼</span>
+        </button>
+        <div class="category-section" style="display: none; background: white; border-radius: 0 0 6px 6px; overflow: hidden;">
+          
+      <div class="test-case-row">
+        <div class="test-case-header" onclick="toggleTestCase(this)">
+          <div style="font-weight: 500; color: #333;">Distributor BOG - Below Minimum Amount</div>
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <span style="background-color: #d4edda; padding: 4px 12px; border-radius: 4px; font-size: 12px; font-weight: 500;">
+              Passed ✓
+            </span>
+            <span class="arrow" style="font-size: 18px; transition: transform 0.3s; transform: rotate(-90deg);">▼</span>
+          </div>
+        </div>
+        <div class="test-case-content">
+          
+          <div style="padding: 16px;">
+            
+        <div style="margin-bottom: 16px; padding: 12px; background: #f9f9f9; border-radius: 4px; border-left: 3px solid #667eea;">
+          <button type="button" onclick="toggleDetails(this)" style="width: 100%; padding: 12px; background: none; border: none; cursor: pointer; text-align: left; font-size: 13px; font-weight: 500; color: #333; display: flex; justify-content: space-between; align-items: center;">
+            <span>📡 Details (4 API calls)</span>
+            <span class="details-arrow" style="font-size: 16px; transition: transform 0.3s; transform: rotate(-90deg);">▼</span>
+          </button>
+          <div class="details-section" style="display: none; margin-top: 12px;">
+            
+          <div style="margin-bottom: 16px; padding: 12px; background: white; border: 1px solid #e0e0e0; border-radius: 4px;">
+            <div style="font-weight: 600; color: #333; margin-bottom: 12px;">API Call 1: Get Token</div>
+            <div style="font-size: 13px; color: #666; margin-bottom: 8px;">
+              <div style="margin-bottom: 4px;"><strong>Request URL:</strong> <code style="color: #0066cc; word-break: break-all;">https://distributor.dev.keepz.me/api/auth</code></div>
+              <div style="margin-bottom: 4px;"><strong>Request Method:</strong> <span style="font-weight: 500;">POST</span></div>
+              <div style="margin-bottom: 8px;"><strong>Status Code:</strong> <span style="background: #f0f0f0; padding: 2px 8px; border-radius: 3px; font-family: monospace;">200</span></div>
+              <div style="margin-bottom: 4px;"><strong>Request Body:</strong></div>
+              <pre style="margin: 4px 0 8px 0; background: #fff8e6; padding: 8px; border-radius: 3px; border-left: 3px solid #f0ad4e; overflow-x: auto; font-family: monospace; font-size: 12px; color: #8a6d3b;">{
+  "client_id": "fb769cdd-7e9d-4355-a331-43028700ca3a",
+  "client_secret": "***",
+  "grant_type": "client_credentials"
+}</pre>
+            </div>
+            <button type="button" onclick="toggleApiDetails(this)" style="width: 100%; padding: 8px 12px; background: #f5f5f5; border: 1px solid #e0e0e0; cursor: pointer; border-radius: 4px; font-size: 12px; color: #333; display: flex; justify-content: space-between; align-items: center;">
+              <span>Expected vs Actual Response</span>
+              <span class="api-arrow" style="font-size: 14px; transition: transform 0.3s; transform: rotate(-90deg);">▼</span>
+            </button>
+            <div class="api-details" style="display: none; margin-top: 12px; padding: 12px; background: #f9f9f9; border-radius: 4px; border-left: 3px solid #667eea; font-family: monospace; font-size: 12px; line-height: 1.5; max-height: 400px; overflow-y: auto;">
+              <div style="margin-bottom: 12px;">
+                <strong style="color: #333;">Expected Result:</strong>
+                <pre style="margin: 8px 0 0 0; background: white; padding: 8px; border-radius: 3px; overflow-x: auto; color: #0066cc;">{
+  "access_token": "***"
+}</pre>
+              </div>
+              <div>
+                <strong style="color: #333;">Actual Result:</strong>
+                <pre style="margin: 8px 0 0 0; background: white; padding: 8px; border-radius: 3px; overflow-x: auto; color: #066600;">{
+  "value": {
+    "access_token": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJmYjc2OWNkZC03ZTlkLTQzNTUtYTMzMS00MzAyODcwMGNhM2EiLCJpYXQiOjE3ODI3MjY3NTcsImV4cCI6MTc4MjcyODU1NywicGVybWlzc2lvbnMiOltdfQ.hOrTeWcYxbPrkjZ2b-rLfG7JS9dvmXbt9wz8Cc33oWqTjsQ5tETb1KNzlwtIvgm8VacAPA-iCS-Sy_MGEtvj6w",
+    "expires_in": 1800,
+    "token_type": "Bearer"
+  }
+}</pre>
+              </div>
+            </div>
+          </div>
+        
+          <div style="margin-bottom: 16px; padding: 12px; background: white; border: 1px solid #e0e0e0; border-radius: 4px;">
+            <div style="font-weight: 600; color: #333; margin-bottom: 12px;">API Call 2: Create Order (GEL)</div>
+            <div style="font-size: 13px; color: #666; margin-bottom: 8px;">
+              <div style="margin-bottom: 4px;"><strong>Request URL:</strong> <code style="color: #0066cc; word-break: break-all;">https://distributor.dev.keepz.me/api/distributor</code></div>
+              <div style="margin-bottom: 4px;"><strong>Request Method:</strong> <span style="font-weight: 500;">POST</span></div>
+              <div style="margin-bottom: 8px;"><strong>Status Code:</strong> <span style="background: #f0f0f0; padding: 2px 8px; border-radius: 3px; font-family: monospace;">400</span></div>
+              <div style="margin-bottom: 4px;"><strong>Request Body:</strong></div>
+              <pre style="margin: 4px 0 8px 0; background: #fff8e6; padding: 8px; border-radius: 3px; border-left: 3px solid #f0ad4e; overflow-x: auto; font-family: monospace; font-size: 12px; color: #8a6d3b;">{
+  "amount": 0.01,
+  "currency": "GEL",
+  "description": "Payment to BOG - Below Minimum Amount",
+  "toIban": "GE54BG0000000542056887",
+  "uniqueId": "1db9835d-5b24-4efb-b179-0090ea7e923a"
+}</pre>
+            </div>
+            <button type="button" onclick="toggleApiDetails(this)" style="width: 100%; padding: 8px 12px; background: #f5f5f5; border: 1px solid #e0e0e0; cursor: pointer; border-radius: 4px; font-size: 12px; color: #333; display: flex; justify-content: space-between; align-items: center;">
+              <span>Expected vs Actual Response</span>
+              <span class="api-arrow" style="font-size: 14px; transition: transform 0.3s; transform: rotate(-90deg);">▼</span>
+            </button>
+            <div class="api-details" style="display: none; margin-top: 12px; padding: 12px; background: #f9f9f9; border-radius: 4px; border-left: 3px solid #667eea; font-family: monospace; font-size: 12px; line-height: 1.5; max-height: 400px; overflow-y: auto;">
+              <div style="margin-bottom: 12px;">
+                <strong style="color: #333;">Expected Result:</strong>
+                <pre style="margin: 8px 0 0 0; background: white; padding: 8px; border-radius: 3px; overflow-x: auto; color: #0066cc;">{
+  "message": "Amount below minimum transaction amount.",
+  "statusCode": "number"
+}</pre>
+              </div>
+              <div>
+                <strong style="color: #333;">Actual Result:</strong>
+                <pre style="margin: 8px 0 0 0; background: white; padding: 8px; border-radius: 3px; overflow-x: auto; color: #066600;">{
+  "message": "Amount below minimum transaction amount.",
+  "statusCode": 5045,
+  "exceptionGroup": 1
+}</pre>
+              </div>
+            </div>
+          </div>
+        
+          <div style="margin-bottom: 16px; padding: 12px; background: white; border: 1px solid #e0e0e0; border-radius: 4px;">
+            <div style="font-weight: 600; color: #333; margin-bottom: 12px;">API Call 3: Create Order (USD)</div>
+            <div style="font-size: 13px; color: #666; margin-bottom: 8px;">
+              <div style="margin-bottom: 4px;"><strong>Request URL:</strong> <code style="color: #0066cc; word-break: break-all;">https://distributor.dev.keepz.me/api/distributor</code></div>
+              <div style="margin-bottom: 4px;"><strong>Request Method:</strong> <span style="font-weight: 500;">POST</span></div>
+              <div style="margin-bottom: 8px;"><strong>Status Code:</strong> <span style="background: #f0f0f0; padding: 2px 8px; border-radius: 3px; font-family: monospace;">400</span></div>
+              <div style="margin-bottom: 4px;"><strong>Request Body:</strong></div>
+              <pre style="margin: 4px 0 8px 0; background: #fff8e6; padding: 8px; border-radius: 3px; border-left: 3px solid #f0ad4e; overflow-x: auto; font-family: monospace; font-size: 12px; color: #8a6d3b;">{
+  "amount": 0.01,
+  "currency": "USD",
+  "description": "Payment to BOG - Below Minimum Amount",
+  "toIban": "GE54BG0000000542056887",
+  "uniqueId": "aaa499de-7f65-4006-b6c9-f03222e2a5b6"
+}</pre>
+            </div>
+            <button type="button" onclick="toggleApiDetails(this)" style="width: 100%; padding: 8px 12px; background: #f5f5f5; border: 1px solid #e0e0e0; cursor: pointer; border-radius: 4px; font-size: 12px; color: #333; display: flex; justify-content: space-between; align-items: center;">
+              <span>Expected vs Actual Response</span>
+              <span class="api-arrow" style="font-size: 14px; transition: transform 0.3s; transform: rotate(-90deg);">▼</span>
+            </button>
+            <div class="api-details" style="display: none; margin-top: 12px; padding: 12px; background: #f9f9f9; border-radius: 4px; border-left: 3px solid #667eea; font-family: monospace; font-size: 12px; line-height: 1.5; max-height: 400px; overflow-y: auto;">
+              <div style="margin-bottom: 12px;">
+                <strong style="color: #333;">Expected Result:</strong>
+                <pre style="margin: 8px 0 0 0; background: white; padding: 8px; border-radius: 3px; overflow-x: auto; color: #0066cc;">{
+  "message": "Amount below minimum transaction amount.",
+  "statusCode": "number"
+}</pre>
+              </div>
+              <div>
+                <strong style="color: #333;">Actual Result:</strong>
+                <pre style="margin: 8px 0 0 0; background: white; padding: 8px; border-radius: 3px; overflow-x: auto; color: #066600;">{
+  "message": "Amount below minimum transaction amount.",
+  "statusCode": 5045,
+  "exceptionGroup": 1
+}</pre>
+              </div>
+            </div>
+          </div>
+        
+          <div style="margin-bottom: 16px; padding: 12px; background: white; border: 1px solid #e0e0e0; border-radius: 4px;">
+            <div style="font-weight: 600; color: #333; margin-bottom: 12px;">API Call 4: Create Order (EUR)</div>
+            <div style="font-size: 13px; color: #666; margin-bottom: 8px;">
+              <div style="margin-bottom: 4px;"><strong>Request URL:</strong> <code style="color: #0066cc; word-break: break-all;">https://distributor.dev.keepz.me/api/distributor</code></div>
+              <div style="margin-bottom: 4px;"><strong>Request Method:</strong> <span style="font-weight: 500;">POST</span></div>
+              <div style="margin-bottom: 8px;"><strong>Status Code:</strong> <span style="background: #f0f0f0; padding: 2px 8px; border-radius: 3px; font-family: monospace;">400</span></div>
+              <div style="margin-bottom: 4px;"><strong>Request Body:</strong></div>
+              <pre style="margin: 4px 0 8px 0; background: #fff8e6; padding: 8px; border-radius: 3px; border-left: 3px solid #f0ad4e; overflow-x: auto; font-family: monospace; font-size: 12px; color: #8a6d3b;">{
+  "amount": 0.01,
+  "currency": "EUR",
+  "description": "Payment to BOG - Below Minimum Amount",
+  "toIban": "GE54BG0000000542056887",
+  "uniqueId": "ef24d439-9608-40e6-aa1e-1d0f5017b7aa"
+}</pre>
+            </div>
+            <button type="button" onclick="toggleApiDetails(this)" style="width: 100%; padding: 8px 12px; background: #f5f5f5; border: 1px solid #e0e0e0; cursor: pointer; border-radius: 4px; font-size: 12px; color: #333; display: flex; justify-content: space-between; align-items: center;">
+              <span>Expected vs Actual Response</span>
+              <span class="api-arrow" style="font-size: 14px; transition: transform 0.3s; transform: rotate(-90deg);">▼</span>
+            </button>
+            <div class="api-details" style="display: none; margin-top: 12px; padding: 12px; background: #f9f9f9; border-radius: 4px; border-left: 3px solid #667eea; font-family: monospace; font-size: 12px; line-height: 1.5; max-height: 400px; overflow-y: auto;">
+              <div style="margin-bottom: 12px;">
+                <strong style="color: #333;">Expected Result:</strong>
+                <pre style="margin: 8px 0 0 0; background: white; padding: 8px; border-radius: 3px; overflow-x: auto; color: #0066cc;">{
+  "message": "Amount below minimum transaction amount.",
+  "statusCode": "number"
+}</pre>
+              </div>
+              <div>
+                <strong style="color: #333;">Actual Result:</strong>
+                <pre style="margin: 8px 0 0 0; background: white; padding: 8px; border-radius: 3px; overflow-x: auto; color: #066600;">{
+  "message": "Amount below minimum transaction amount.",
+  "statusCode": 5045,
+  "exceptionGroup": 1
+}</pre>
+              </div>
+            </div>
+          </div>
+        
+          </div>
+        </div>
+      
+            
+          </div>
+        
+        </div>
+      </div>
+    
+      <div class="test-case-row">
+        <div class="test-case-header" onclick="toggleTestCase(this)">
+          <div style="font-weight: 500; color: #333;">Distributor TBC - Below Minimum Amount</div>
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <span style="background-color: #d4edda; padding: 4px 12px; border-radius: 4px; font-size: 12px; font-weight: 500;">
+              Passed ✓
+            </span>
+            <span class="arrow" style="font-size: 18px; transition: transform 0.3s; transform: rotate(-90deg);">▼</span>
+          </div>
+        </div>
+        <div class="test-case-content">
+          
+          <div style="padding: 16px;">
+            
+        <div style="margin-bottom: 16px; padding: 12px; background: #f9f9f9; border-radius: 4px; border-left: 3px solid #667eea;">
+          <button type="button" onclick="toggleDetails(this)" style="width: 100%; padding: 12px; background: none; border: none; cursor: pointer; text-align: left; font-size: 13px; font-weight: 500; color: #333; display: flex; justify-content: space-between; align-items: center;">
+            <span>📡 Details (4 API calls)</span>
+            <span class="details-arrow" style="font-size: 16px; transition: transform 0.3s; transform: rotate(-90deg);">▼</span>
+          </button>
+          <div class="details-section" style="display: none; margin-top: 12px;">
+            
+          <div style="margin-bottom: 16px; padding: 12px; background: white; border: 1px solid #e0e0e0; border-radius: 4px;">
+            <div style="font-weight: 600; color: #333; margin-bottom: 12px;">API Call 1: Get Token</div>
+            <div style="font-size: 13px; color: #666; margin-bottom: 8px;">
+              <div style="margin-bottom: 4px;"><strong>Request URL:</strong> <code style="color: #0066cc; word-break: break-all;">https://distributor.dev.keepz.me/api/auth</code></div>
+              <div style="margin-bottom: 4px;"><strong>Request Method:</strong> <span style="font-weight: 500;">POST</span></div>
+              <div style="margin-bottom: 8px;"><strong>Status Code:</strong> <span style="background: #f0f0f0; padding: 2px 8px; border-radius: 3px; font-family: monospace;">200</span></div>
+              <div style="margin-bottom: 4px;"><strong>Request Body:</strong></div>
+              <pre style="margin: 4px 0 8px 0; background: #fff8e6; padding: 8px; border-radius: 3px; border-left: 3px solid #f0ad4e; overflow-x: auto; font-family: monospace; font-size: 12px; color: #8a6d3b;">{
+  "client_id": "fb769cdd-7e9d-4355-a331-43028700ca3a",
+  "client_secret": "***",
+  "grant_type": "client_credentials"
+}</pre>
+            </div>
+            <button type="button" onclick="toggleApiDetails(this)" style="width: 100%; padding: 8px 12px; background: #f5f5f5; border: 1px solid #e0e0e0; cursor: pointer; border-radius: 4px; font-size: 12px; color: #333; display: flex; justify-content: space-between; align-items: center;">
+              <span>Expected vs Actual Response</span>
+              <span class="api-arrow" style="font-size: 14px; transition: transform 0.3s; transform: rotate(-90deg);">▼</span>
+            </button>
+            <div class="api-details" style="display: none; margin-top: 12px; padding: 12px; background: #f9f9f9; border-radius: 4px; border-left: 3px solid #667eea; font-family: monospace; font-size: 12px; line-height: 1.5; max-height: 400px; overflow-y: auto;">
+              <div style="margin-bottom: 12px;">
+                <strong style="color: #333;">Expected Result:</strong>
+                <pre style="margin: 8px 0 0 0; background: white; padding: 8px; border-radius: 3px; overflow-x: auto; color: #0066cc;">{
+  "access_token": "***"
+}</pre>
+              </div>
+              <div>
+                <strong style="color: #333;">Actual Result:</strong>
+                <pre style="margin: 8px 0 0 0; background: white; padding: 8px; border-radius: 3px; overflow-x: auto; color: #066600;">{
+  "value": {
+    "access_token": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJmYjc2OWNkZC03ZTlkLTQzNTUtYTMzMS00MzAyODcwMGNhM2EiLCJpYXQiOjE3ODI3MjY3NTcsImV4cCI6MTc4MjcyODU1NywicGVybWlzc2lvbnMiOltdfQ.hOrTeWcYxbPrkjZ2b-rLfG7JS9dvmXbt9wz8Cc33oWqTjsQ5tETb1KNzlwtIvgm8VacAPA-iCS-Sy_MGEtvj6w",
+    "expires_in": 1800,
+    "token_type": "Bearer"
+  }
+}</pre>
+              </div>
+            </div>
+          </div>
+        
+          <div style="margin-bottom: 16px; padding: 12px; background: white; border: 1px solid #e0e0e0; border-radius: 4px;">
+            <div style="font-weight: 600; color: #333; margin-bottom: 12px;">API Call 2: Create Order (GEL)</div>
+            <div style="font-size: 13px; color: #666; margin-bottom: 8px;">
+              <div style="margin-bottom: 4px;"><strong>Request URL:</strong> <code style="color: #0066cc; word-break: break-all;">https://distributor.dev.keepz.me/api/distributor</code></div>
+              <div style="margin-bottom: 4px;"><strong>Request Method:</strong> <span style="font-weight: 500;">POST</span></div>
+              <div style="margin-bottom: 8px;"><strong>Status Code:</strong> <span style="background: #f0f0f0; padding: 2px 8px; border-radius: 3px; font-family: monospace;">400</span></div>
+              <div style="margin-bottom: 4px;"><strong>Request Body:</strong></div>
+              <pre style="margin: 4px 0 8px 0; background: #fff8e6; padding: 8px; border-radius: 3px; border-left: 3px solid #f0ad4e; overflow-x: auto; font-family: monospace; font-size: 12px; color: #8a6d3b;">{
+  "amount": 0.01,
+  "currency": "GEL",
+  "description": "Payment to TBC - Below Minimum Amount",
+  "toIban": "GE26TB7899045061100085",
+  "uniqueId": "962ec04c-a8f8-4e2f-845a-227bf8a3a72c"
+}</pre>
+            </div>
+            <button type="button" onclick="toggleApiDetails(this)" style="width: 100%; padding: 8px 12px; background: #f5f5f5; border: 1px solid #e0e0e0; cursor: pointer; border-radius: 4px; font-size: 12px; color: #333; display: flex; justify-content: space-between; align-items: center;">
+              <span>Expected vs Actual Response</span>
+              <span class="api-arrow" style="font-size: 14px; transition: transform 0.3s; transform: rotate(-90deg);">▼</span>
+            </button>
+            <div class="api-details" style="display: none; margin-top: 12px; padding: 12px; background: #f9f9f9; border-radius: 4px; border-left: 3px solid #667eea; font-family: monospace; font-size: 12px; line-height: 1.5; max-height: 400px; overflow-y: auto;">
+              <div style="margin-bottom: 12px;">
+                <strong style="color: #333;">Expected Result:</strong>
+                <pre style="margin: 8px 0 0 0; background: white; padding: 8px; border-radius: 3px; overflow-x: auto; color: #0066cc;">{
+  "message": "Amount below minimum transaction amount.",
+  "statusCode": "number"
+}</pre>
+              </div>
+              <div>
+                <strong style="color: #333;">Actual Result:</strong>
+                <pre style="margin: 8px 0 0 0; background: white; padding: 8px; border-radius: 3px; overflow-x: auto; color: #066600;">{
+  "message": "Amount below minimum transaction amount.",
+  "statusCode": 5045,
+  "exceptionGroup": 1
+}</pre>
+              </div>
+            </div>
+          </div>
+        
+          <div style="margin-bottom: 16px; padding: 12px; background: white; border: 1px solid #e0e0e0; border-radius: 4px;">
+            <div style="font-weight: 600; color: #333; margin-bottom: 12px;">API Call 3: Create Order (USD)</div>
+            <div style="font-size: 13px; color: #666; margin-bottom: 8px;">
+              <div style="margin-bottom: 4px;"><strong>Request URL:</strong> <code style="color: #0066cc; word-break: break-all;">https://distributor.dev.keepz.me/api/distributor</code></div>
+              <div style="margin-bottom: 4px;"><strong>Request Method:</strong> <span style="font-weight: 500;">POST</span></div>
+              <div style="margin-bottom: 8px;"><strong>Status Code:</strong> <span style="background: #f0f0f0; padding: 2px 8px; border-radius: 3px; font-family: monospace;">400</span></div>
+              <div style="margin-bottom: 4px;"><strong>Request Body:</strong></div>
+              <pre style="margin: 4px 0 8px 0; background: #fff8e6; padding: 8px; border-radius: 3px; border-left: 3px solid #f0ad4e; overflow-x: auto; font-family: monospace; font-size: 12px; color: #8a6d3b;">{
+  "amount": 0.01,
+  "currency": "USD",
+  "description": "Payment to TBC - Below Minimum Amount",
+  "toIban": "GE26TB7899045061100085",
+  "uniqueId": "544ef5c2-2920-49e3-9b10-b2b16d7bfdd8"
+}</pre>
+            </div>
+            <button type="button" onclick="toggleApiDetails(this)" style="width: 100%; padding: 8px 12px; background: #f5f5f5; border: 1px solid #e0e0e0; cursor: pointer; border-radius: 4px; font-size: 12px; color: #333; display: flex; justify-content: space-between; align-items: center;">
+              <span>Expected vs Actual Response</span>
+              <span class="api-arrow" style="font-size: 14px; transition: transform 0.3s; transform: rotate(-90deg);">▼</span>
+            </button>
+            <div class="api-details" style="display: none; margin-top: 12px; padding: 12px; background: #f9f9f9; border-radius: 4px; border-left: 3px solid #667eea; font-family: monospace; font-size: 12px; line-height: 1.5; max-height: 400px; overflow-y: auto;">
+              <div style="margin-bottom: 12px;">
+                <strong style="color: #333;">Expected Result:</strong>
+                <pre style="margin: 8px 0 0 0; background: white; padding: 8px; border-radius: 3px; overflow-x: auto; color: #0066cc;">{
+  "message": "Amount below minimum transaction amount.",
+  "statusCode": "number"
+}</pre>
+              </div>
+              <div>
+                <strong style="color: #333;">Actual Result:</strong>
+                <pre style="margin: 8px 0 0 0; background: white; padding: 8px; border-radius: 3px; overflow-x: auto; color: #066600;">{
+  "message": "Amount below minimum transaction amount.",
+  "statusCode": 5045,
+  "exceptionGroup": 1
+}</pre>
+              </div>
+            </div>
+          </div>
+        
+          <div style="margin-bottom: 16px; padding: 12px; background: white; border: 1px solid #e0e0e0; border-radius: 4px;">
+            <div style="font-weight: 600; color: #333; margin-bottom: 12px;">API Call 4: Create Order (EUR)</div>
+            <div style="font-size: 13px; color: #666; margin-bottom: 8px;">
+              <div style="margin-bottom: 4px;"><strong>Request URL:</strong> <code style="color: #0066cc; word-break: break-all;">https://distributor.dev.keepz.me/api/distributor</code></div>
+              <div style="margin-bottom: 4px;"><strong>Request Method:</strong> <span style="font-weight: 500;">POST</span></div>
+              <div style="margin-bottom: 8px;"><strong>Status Code:</strong> <span style="background: #f0f0f0; padding: 2px 8px; border-radius: 3px; font-family: monospace;">400</span></div>
+              <div style="margin-bottom: 4px;"><strong>Request Body:</strong></div>
+              <pre style="margin: 4px 0 8px 0; background: #fff8e6; padding: 8px; border-radius: 3px; border-left: 3px solid #f0ad4e; overflow-x: auto; font-family: monospace; font-size: 12px; color: #8a6d3b;">{
+  "amount": 0.01,
+  "currency": "EUR",
+  "description": "Payment to TBC - Below Minimum Amount",
+  "toIban": "GE26TB7899045061100085",
+  "uniqueId": "9df6e99c-724b-4d57-897c-b7c7551690ae"
+}</pre>
+            </div>
+            <button type="button" onclick="toggleApiDetails(this)" style="width: 100%; padding: 8px 12px; background: #f5f5f5; border: 1px solid #e0e0e0; cursor: pointer; border-radius: 4px; font-size: 12px; color: #333; display: flex; justify-content: space-between; align-items: center;">
+              <span>Expected vs Actual Response</span>
+              <span class="api-arrow" style="font-size: 14px; transition: transform 0.3s; transform: rotate(-90deg);">▼</span>
+            </button>
+            <div class="api-details" style="display: none; margin-top: 12px; padding: 12px; background: #f9f9f9; border-radius: 4px; border-left: 3px solid #667eea; font-family: monospace; font-size: 12px; line-height: 1.5; max-height: 400px; overflow-y: auto;">
+              <div style="margin-bottom: 12px;">
+                <strong style="color: #333;">Expected Result:</strong>
+                <pre style="margin: 8px 0 0 0; background: white; padding: 8px; border-radius: 3px; overflow-x: auto; color: #0066cc;">{
+  "message": "Amount below minimum transaction amount.",
+  "statusCode": "number"
+}</pre>
+              </div>
+              <div>
+                <strong style="color: #333;">Actual Result:</strong>
+                <pre style="margin: 8px 0 0 0; background: white; padding: 8px; border-radius: 3px; overflow-x: auto; color: #066600;">{
+  "message": "Amount below minimum transaction amount.",
+  "statusCode": 5045,
+  "exceptionGroup": 1
+}</pre>
+              </div>
+            </div>
+          </div>
+        
+          </div>
+        </div>
+      
+            
+          </div>
+        
+        </div>
+      </div>
+    
+      <div class="test-case-row">
+        <div class="test-case-header" onclick="toggleTestCase(this)">
+          <div style="font-weight: 500; color: #333;">Distributor Liberty - Below Minimum Amount</div>
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <span style="background-color: #d4edda; padding: 4px 12px; border-radius: 4px; font-size: 12px; font-weight: 500;">
+              Passed ✓
+            </span>
+            <span class="arrow" style="font-size: 18px; transition: transform 0.3s; transform: rotate(-90deg);">▼</span>
+          </div>
+        </div>
+        <div class="test-case-content">
+          
+          <div style="padding: 16px;">
+            
+        <div style="margin-bottom: 16px; padding: 12px; background: #f9f9f9; border-radius: 4px; border-left: 3px solid #667eea;">
+          <button type="button" onclick="toggleDetails(this)" style="width: 100%; padding: 12px; background: none; border: none; cursor: pointer; text-align: left; font-size: 13px; font-weight: 500; color: #333; display: flex; justify-content: space-between; align-items: center;">
+            <span>📡 Details (4 API calls)</span>
+            <span class="details-arrow" style="font-size: 16px; transition: transform 0.3s; transform: rotate(-90deg);">▼</span>
+          </button>
+          <div class="details-section" style="display: none; margin-top: 12px;">
+            
+          <div style="margin-bottom: 16px; padding: 12px; background: white; border: 1px solid #e0e0e0; border-radius: 4px;">
+            <div style="font-weight: 600; color: #333; margin-bottom: 12px;">API Call 1: Get Token</div>
+            <div style="font-size: 13px; color: #666; margin-bottom: 8px;">
+              <div style="margin-bottom: 4px;"><strong>Request URL:</strong> <code style="color: #0066cc; word-break: break-all;">https://distributor.dev.keepz.me/api/auth</code></div>
+              <div style="margin-bottom: 4px;"><strong>Request Method:</strong> <span style="font-weight: 500;">POST</span></div>
+              <div style="margin-bottom: 8px;"><strong>Status Code:</strong> <span style="background: #f0f0f0; padding: 2px 8px; border-radius: 3px; font-family: monospace;">200</span></div>
+              <div style="margin-bottom: 4px;"><strong>Request Body:</strong></div>
+              <pre style="margin: 4px 0 8px 0; background: #fff8e6; padding: 8px; border-radius: 3px; border-left: 3px solid #f0ad4e; overflow-x: auto; font-family: monospace; font-size: 12px; color: #8a6d3b;">{
+  "client_id": "fb769cdd-7e9d-4355-a331-43028700ca3a",
+  "client_secret": "***",
+  "grant_type": "client_credentials"
+}</pre>
+            </div>
+            <button type="button" onclick="toggleApiDetails(this)" style="width: 100%; padding: 8px 12px; background: #f5f5f5; border: 1px solid #e0e0e0; cursor: pointer; border-radius: 4px; font-size: 12px; color: #333; display: flex; justify-content: space-between; align-items: center;">
+              <span>Expected vs Actual Response</span>
+              <span class="api-arrow" style="font-size: 14px; transition: transform 0.3s; transform: rotate(-90deg);">▼</span>
+            </button>
+            <div class="api-details" style="display: none; margin-top: 12px; padding: 12px; background: #f9f9f9; border-radius: 4px; border-left: 3px solid #667eea; font-family: monospace; font-size: 12px; line-height: 1.5; max-height: 400px; overflow-y: auto;">
+              <div style="margin-bottom: 12px;">
+                <strong style="color: #333;">Expected Result:</strong>
+                <pre style="margin: 8px 0 0 0; background: white; padding: 8px; border-radius: 3px; overflow-x: auto; color: #0066cc;">{
+  "access_token": "***"
+}</pre>
+              </div>
+              <div>
+                <strong style="color: #333;">Actual Result:</strong>
+                <pre style="margin: 8px 0 0 0; background: white; padding: 8px; border-radius: 3px; overflow-x: auto; color: #066600;">{
+  "value": {
+    "access_token": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJmYjc2OWNkZC03ZTlkLTQzNTUtYTMzMS00MzAyODcwMGNhM2EiLCJpYXQiOjE3ODI3MjY3NTcsImV4cCI6MTc4MjcyODU1NywicGVybWlzc2lvbnMiOltdfQ.hOrTeWcYxbPrkjZ2b-rLfG7JS9dvmXbt9wz8Cc33oWqTjsQ5tETb1KNzlwtIvgm8VacAPA-iCS-Sy_MGEtvj6w",
+    "expires_in": 1800,
+    "token_type": "Bearer"
+  }
+}</pre>
+              </div>
+            </div>
+          </div>
+        
+          <div style="margin-bottom: 16px; padding: 12px; background: white; border: 1px solid #e0e0e0; border-radius: 4px;">
+            <div style="font-weight: 600; color: #333; margin-bottom: 12px;">API Call 2: Create Order (GEL)</div>
+            <div style="font-size: 13px; color: #666; margin-bottom: 8px;">
+              <div style="margin-bottom: 4px;"><strong>Request URL:</strong> <code style="color: #0066cc; word-break: break-all;">https://distributor.dev.keepz.me/api/distributor</code></div>
+              <div style="margin-bottom: 4px;"><strong>Request Method:</strong> <span style="font-weight: 500;">POST</span></div>
+              <div style="margin-bottom: 8px;"><strong>Status Code:</strong> <span style="background: #f0f0f0; padding: 2px 8px; border-radius: 3px; font-family: monospace;">400</span></div>
+              <div style="margin-bottom: 4px;"><strong>Request Body:</strong></div>
+              <pre style="margin: 4px 0 8px 0; background: #fff8e6; padding: 8px; border-radius: 3px; border-left: 3px solid #f0ad4e; overflow-x: auto; font-family: monospace; font-size: 12px; color: #8a6d3b;">{
+  "amount": 0.01,
+  "currency": "GEL",
+  "description": "Payment to Liberty - Below Minimum Amount",
+  "toIban": "GE29LB0711197559630000",
+  "uniqueId": "efcd1f72-9ce5-423e-a259-6d3289ceb4b9",
+  "beneficiaryName": "Giorgi Lezhava"
+}</pre>
+            </div>
+            <button type="button" onclick="toggleApiDetails(this)" style="width: 100%; padding: 8px 12px; background: #f5f5f5; border: 1px solid #e0e0e0; cursor: pointer; border-radius: 4px; font-size: 12px; color: #333; display: flex; justify-content: space-between; align-items: center;">
+              <span>Expected vs Actual Response</span>
+              <span class="api-arrow" style="font-size: 14px; transition: transform 0.3s; transform: rotate(-90deg);">▼</span>
+            </button>
+            <div class="api-details" style="display: none; margin-top: 12px; padding: 12px; background: #f9f9f9; border-radius: 4px; border-left: 3px solid #667eea; font-family: monospace; font-size: 12px; line-height: 1.5; max-height: 400px; overflow-y: auto;">
+              <div style="margin-bottom: 12px;">
+                <strong style="color: #333;">Expected Result:</strong>
+                <pre style="margin: 8px 0 0 0; background: white; padding: 8px; border-radius: 3px; overflow-x: auto; color: #0066cc;">{
+  "message": "Amount below minimum transaction amount.",
+  "statusCode": "number"
+}</pre>
+              </div>
+              <div>
+                <strong style="color: #333;">Actual Result:</strong>
+                <pre style="margin: 8px 0 0 0; background: white; padding: 8px; border-radius: 3px; overflow-x: auto; color: #066600;">{
+  "message": "Amount below minimum transaction amount.",
+  "statusCode": 5045,
+  "exceptionGroup": 1
+}</pre>
+              </div>
+            </div>
+          </div>
+        
+          <div style="margin-bottom: 16px; padding: 12px; background: white; border: 1px solid #e0e0e0; border-radius: 4px;">
+            <div style="font-weight: 600; color: #333; margin-bottom: 12px;">API Call 3: Create Order (USD)</div>
+            <div style="font-size: 13px; color: #666; margin-bottom: 8px;">
+              <div style="margin-bottom: 4px;"><strong>Request URL:</strong> <code style="color: #0066cc; word-break: break-all;">https://distributor.dev.keepz.me/api/distributor</code></div>
+              <div style="margin-bottom: 4px;"><strong>Request Method:</strong> <span style="font-weight: 500;">POST</span></div>
+              <div style="margin-bottom: 8px;"><strong>Status Code:</strong> <span style="background: #f0f0f0; padding: 2px 8px; border-radius: 3px; font-family: monospace;">400</span></div>
+              <div style="margin-bottom: 4px;"><strong>Request Body:</strong></div>
+              <pre style="margin: 4px 0 8px 0; background: #fff8e6; padding: 8px; border-radius: 3px; border-left: 3px solid #f0ad4e; overflow-x: auto; font-family: monospace; font-size: 12px; color: #8a6d3b;">{
+  "amount": 0.01,
+  "currency": "USD",
+  "description": "Payment to Liberty - Below Minimum Amount",
+  "toIban": "GE29LB0711197559630000",
+  "uniqueId": "9b3b4ade-4c17-45f1-90c4-bb25bf457c19",
+  "beneficiaryName": "Giorgi Lezhava"
+}</pre>
+            </div>
+            <button type="button" onclick="toggleApiDetails(this)" style="width: 100%; padding: 8px 12px; background: #f5f5f5; border: 1px solid #e0e0e0; cursor: pointer; border-radius: 4px; font-size: 12px; color: #333; display: flex; justify-content: space-between; align-items: center;">
+              <span>Expected vs Actual Response</span>
+              <span class="api-arrow" style="font-size: 14px; transition: transform 0.3s; transform: rotate(-90deg);">▼</span>
+            </button>
+            <div class="api-details" style="display: none; margin-top: 12px; padding: 12px; background: #f9f9f9; border-radius: 4px; border-left: 3px solid #667eea; font-family: monospace; font-size: 12px; line-height: 1.5; max-height: 400px; overflow-y: auto;">
+              <div style="margin-bottom: 12px;">
+                <strong style="color: #333;">Expected Result:</strong>
+                <pre style="margin: 8px 0 0 0; background: white; padding: 8px; border-radius: 3px; overflow-x: auto; color: #0066cc;">{
+  "message": "Amount below minimum transaction amount.",
+  "statusCode": "number"
+}</pre>
+              </div>
+              <div>
+                <strong style="color: #333;">Actual Result:</strong>
+                <pre style="margin: 8px 0 0 0; background: white; padding: 8px; border-radius: 3px; overflow-x: auto; color: #066600;">{
+  "message": "Amount below minimum transaction amount.",
+  "statusCode": 5045,
+  "exceptionGroup": 1
+}</pre>
+              </div>
+            </div>
+          </div>
+        
+          <div style="margin-bottom: 16px; padding: 12px; background: white; border: 1px solid #e0e0e0; border-radius: 4px;">
+            <div style="font-weight: 600; color: #333; margin-bottom: 12px;">API Call 4: Create Order (EUR)</div>
+            <div style="font-size: 13px; color: #666; margin-bottom: 8px;">
+              <div style="margin-bottom: 4px;"><strong>Request URL:</strong> <code style="color: #0066cc; word-break: break-all;">https://distributor.dev.keepz.me/api/distributor</code></div>
+              <div style="margin-bottom: 4px;"><strong>Request Method:</strong> <span style="font-weight: 500;">POST</span></div>
+              <div style="margin-bottom: 8px;"><strong>Status Code:</strong> <span style="background: #f0f0f0; padding: 2px 8px; border-radius: 3px; font-family: monospace;">400</span></div>
+              <div style="margin-bottom: 4px;"><strong>Request Body:</strong></div>
+              <pre style="margin: 4px 0 8px 0; background: #fff8e6; padding: 8px; border-radius: 3px; border-left: 3px solid #f0ad4e; overflow-x: auto; font-family: monospace; font-size: 12px; color: #8a6d3b;">{
+  "amount": 0.01,
+  "currency": "EUR",
+  "description": "Payment to Liberty - Below Minimum Amount",
+  "toIban": "GE29LB0711197559630000",
+  "uniqueId": "20516033-d431-4869-822e-85062dd78a08",
+  "beneficiaryName": "Giorgi Lezhava"
+}</pre>
+            </div>
+            <button type="button" onclick="toggleApiDetails(this)" style="width: 100%; padding: 8px 12px; background: #f5f5f5; border: 1px solid #e0e0e0; cursor: pointer; border-radius: 4px; font-size: 12px; color: #333; display: flex; justify-content: space-between; align-items: center;">
+              <span>Expected vs Actual Response</span>
+              <span class="api-arrow" style="font-size: 14px; transition: transform 0.3s; transform: rotate(-90deg);">▼</span>
+            </button>
+            <div class="api-details" style="display: none; margin-top: 12px; padding: 12px; background: #f9f9f9; border-radius: 4px; border-left: 3px solid #667eea; font-family: monospace; font-size: 12px; line-height: 1.5; max-height: 400px; overflow-y: auto;">
+              <div style="margin-bottom: 12px;">
+                <strong style="color: #333;">Expected Result:</strong>
+                <pre style="margin: 8px 0 0 0; background: white; padding: 8px; border-radius: 3px; overflow-x: auto; color: #0066cc;">{
+  "message": "Amount below minimum transaction amount.",
+  "statusCode": "number"
+}</pre>
+              </div>
+              <div>
+                <strong style="color: #333;">Actual Result:</strong>
+                <pre style="margin: 8px 0 0 0; background: white; padding: 8px; border-radius: 3px; overflow-x: auto; color: #066600;">{
+  "message": "Amount below minimum transaction amount.",
+  "statusCode": 5045,
+  "exceptionGroup": 1
+}</pre>
+              </div>
+            </div>
+          </div>
+        
+          </div>
+        </div>
+      
+            
+          </div>
+        
+        </div>
+      </div>
+    
+      <div class="test-case-row">
+        <div class="test-case-header" onclick="toggleTestCase(this)">
+          <div style="font-weight: 500; color: #333;">Distributor CREDO - Below Minimum Amount</div>
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <span style="background-color: #d4edda; padding: 4px 12px; border-radius: 4px; font-size: 12px; font-weight: 500;">
+              Passed ✓
+            </span>
+            <span class="arrow" style="font-size: 18px; transition: transform 0.3s; transform: rotate(-90deg);">▼</span>
+          </div>
+        </div>
+        <div class="test-case-content">
+          
+          <div style="padding: 16px;">
+            
+        <div style="margin-bottom: 16px; padding: 12px; background: #f9f9f9; border-radius: 4px; border-left: 3px solid #667eea;">
+          <button type="button" onclick="toggleDetails(this)" style="width: 100%; padding: 12px; background: none; border: none; cursor: pointer; text-align: left; font-size: 13px; font-weight: 500; color: #333; display: flex; justify-content: space-between; align-items: center;">
+            <span>📡 Details (4 API calls)</span>
+            <span class="details-arrow" style="font-size: 16px; transition: transform 0.3s; transform: rotate(-90deg);">▼</span>
+          </button>
+          <div class="details-section" style="display: none; margin-top: 12px;">
+            
+          <div style="margin-bottom: 16px; padding: 12px; background: white; border: 1px solid #e0e0e0; border-radius: 4px;">
+            <div style="font-weight: 600; color: #333; margin-bottom: 12px;">API Call 1: Get Token</div>
+            <div style="font-size: 13px; color: #666; margin-bottom: 8px;">
+              <div style="margin-bottom: 4px;"><strong>Request URL:</strong> <code style="color: #0066cc; word-break: break-all;">https://distributor.dev.keepz.me/api/auth</code></div>
+              <div style="margin-bottom: 4px;"><strong>Request Method:</strong> <span style="font-weight: 500;">POST</span></div>
+              <div style="margin-bottom: 8px;"><strong>Status Code:</strong> <span style="background: #f0f0f0; padding: 2px 8px; border-radius: 3px; font-family: monospace;">200</span></div>
+              <div style="margin-bottom: 4px;"><strong>Request Body:</strong></div>
+              <pre style="margin: 4px 0 8px 0; background: #fff8e6; padding: 8px; border-radius: 3px; border-left: 3px solid #f0ad4e; overflow-x: auto; font-family: monospace; font-size: 12px; color: #8a6d3b;">{
+  "client_id": "fb769cdd-7e9d-4355-a331-43028700ca3a",
+  "client_secret": "***",
+  "grant_type": "client_credentials"
+}</pre>
+            </div>
+            <button type="button" onclick="toggleApiDetails(this)" style="width: 100%; padding: 8px 12px; background: #f5f5f5; border: 1px solid #e0e0e0; cursor: pointer; border-radius: 4px; font-size: 12px; color: #333; display: flex; justify-content: space-between; align-items: center;">
+              <span>Expected vs Actual Response</span>
+              <span class="api-arrow" style="font-size: 14px; transition: transform 0.3s; transform: rotate(-90deg);">▼</span>
+            </button>
+            <div class="api-details" style="display: none; margin-top: 12px; padding: 12px; background: #f9f9f9; border-radius: 4px; border-left: 3px solid #667eea; font-family: monospace; font-size: 12px; line-height: 1.5; max-height: 400px; overflow-y: auto;">
+              <div style="margin-bottom: 12px;">
+                <strong style="color: #333;">Expected Result:</strong>
+                <pre style="margin: 8px 0 0 0; background: white; padding: 8px; border-radius: 3px; overflow-x: auto; color: #0066cc;">{
+  "access_token": "***"
+}</pre>
+              </div>
+              <div>
+                <strong style="color: #333;">Actual Result:</strong>
+                <pre style="margin: 8px 0 0 0; background: white; padding: 8px; border-radius: 3px; overflow-x: auto; color: #066600;">{
+  "value": {
+    "access_token": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJmYjc2OWNkZC03ZTlkLTQzNTUtYTMzMS00MzAyODcwMGNhM2EiLCJpYXQiOjE3ODI3MjY3NTcsImV4cCI6MTc4MjcyODU1NywicGVybWlzc2lvbnMiOltdfQ.hOrTeWcYxbPrkjZ2b-rLfG7JS9dvmXbt9wz8Cc33oWqTjsQ5tETb1KNzlwtIvgm8VacAPA-iCS-Sy_MGEtvj6w",
+    "expires_in": 1800,
+    "token_type": "Bearer"
+  }
+}</pre>
+              </div>
+            </div>
+          </div>
+        
+          <div style="margin-bottom: 16px; padding: 12px; background: white; border: 1px solid #e0e0e0; border-radius: 4px;">
+            <div style="font-weight: 600; color: #333; margin-bottom: 12px;">API Call 2: Create Order (GEL)</div>
+            <div style="font-size: 13px; color: #666; margin-bottom: 8px;">
+              <div style="margin-bottom: 4px;"><strong>Request URL:</strong> <code style="color: #0066cc; word-break: break-all;">https://distributor.dev.keepz.me/api/distributor</code></div>
+              <div style="margin-bottom: 4px;"><strong>Request Method:</strong> <span style="font-weight: 500;">POST</span></div>
+              <div style="margin-bottom: 8px;"><strong>Status Code:</strong> <span style="background: #f0f0f0; padding: 2px 8px; border-radius: 3px; font-family: monospace;">400</span></div>
+              <div style="margin-bottom: 4px;"><strong>Request Body:</strong></div>
+              <pre style="margin: 4px 0 8px 0; background: #fff8e6; padding: 8px; border-radius: 3px; border-left: 3px solid #f0ad4e; overflow-x: auto; font-family: monospace; font-size: 12px; color: #8a6d3b;">{
+  "amount": 0.01,
+  "currency": "GEL",
+  "description": "Payment to CREDO - Below Minimum Amount",
+  "toIban": "GE42CD0360000062461306",
+  "uniqueId": "1fe55d2d-068a-47b5-90c8-72cb98638aa0"
+}</pre>
+            </div>
+            <button type="button" onclick="toggleApiDetails(this)" style="width: 100%; padding: 8px 12px; background: #f5f5f5; border: 1px solid #e0e0e0; cursor: pointer; border-radius: 4px; font-size: 12px; color: #333; display: flex; justify-content: space-between; align-items: center;">
+              <span>Expected vs Actual Response</span>
+              <span class="api-arrow" style="font-size: 14px; transition: transform 0.3s; transform: rotate(-90deg);">▼</span>
+            </button>
+            <div class="api-details" style="display: none; margin-top: 12px; padding: 12px; background: #f9f9f9; border-radius: 4px; border-left: 3px solid #667eea; font-family: monospace; font-size: 12px; line-height: 1.5; max-height: 400px; overflow-y: auto;">
+              <div style="margin-bottom: 12px;">
+                <strong style="color: #333;">Expected Result:</strong>
+                <pre style="margin: 8px 0 0 0; background: white; padding: 8px; border-radius: 3px; overflow-x: auto; color: #0066cc;">{
+  "message": "Amount below minimum transaction amount.",
+  "statusCode": "number"
+}</pre>
+              </div>
+              <div>
+                <strong style="color: #333;">Actual Result:</strong>
+                <pre style="margin: 8px 0 0 0; background: white; padding: 8px; border-radius: 3px; overflow-x: auto; color: #066600;">{
+  "message": "Amount below minimum transaction amount.",
+  "statusCode": 5045,
+  "exceptionGroup": 1
+}</pre>
+              </div>
+            </div>
+          </div>
+        
+          <div style="margin-bottom: 16px; padding: 12px; background: white; border: 1px solid #e0e0e0; border-radius: 4px;">
+            <div style="font-weight: 600; color: #333; margin-bottom: 12px;">API Call 3: Create Order (USD)</div>
+            <div style="font-size: 13px; color: #666; margin-bottom: 8px;">
+              <div style="margin-bottom: 4px;"><strong>Request URL:</strong> <code style="color: #0066cc; word-break: break-all;">https://distributor.dev.keepz.me/api/distributor</code></div>
+              <div style="margin-bottom: 4px;"><strong>Request Method:</strong> <span style="font-weight: 500;">POST</span></div>
+              <div style="margin-bottom: 8px;"><strong>Status Code:</strong> <span style="background: #f0f0f0; padding: 2px 8px; border-radius: 3px; font-family: monospace;">400</span></div>
+              <div style="margin-bottom: 4px;"><strong>Request Body:</strong></div>
+              <pre style="margin: 4px 0 8px 0; background: #fff8e6; padding: 8px; border-radius: 3px; border-left: 3px solid #f0ad4e; overflow-x: auto; font-family: monospace; font-size: 12px; color: #8a6d3b;">{
+  "amount": 0.01,
+  "currency": "USD",
+  "description": "Payment to CREDO - Below Minimum Amount",
+  "toIban": "GE42CD0360000062461306",
+  "uniqueId": "3b7a4362-9be0-4acc-bc95-b7b035e929e2"
+}</pre>
+            </div>
+            <button type="button" onclick="toggleApiDetails(this)" style="width: 100%; padding: 8px 12px; background: #f5f5f5; border: 1px solid #e0e0e0; cursor: pointer; border-radius: 4px; font-size: 12px; color: #333; display: flex; justify-content: space-between; align-items: center;">
+              <span>Expected vs Actual Response</span>
+              <span class="api-arrow" style="font-size: 14px; transition: transform 0.3s; transform: rotate(-90deg);">▼</span>
+            </button>
+            <div class="api-details" style="display: none; margin-top: 12px; padding: 12px; background: #f9f9f9; border-radius: 4px; border-left: 3px solid #667eea; font-family: monospace; font-size: 12px; line-height: 1.5; max-height: 400px; overflow-y: auto;">
+              <div style="margin-bottom: 12px;">
+                <strong style="color: #333;">Expected Result:</strong>
+                <pre style="margin: 8px 0 0 0; background: white; padding: 8px; border-radius: 3px; overflow-x: auto; color: #0066cc;">{
+  "message": "Amount below minimum transaction amount.",
+  "statusCode": "number"
+}</pre>
+              </div>
+              <div>
+                <strong style="color: #333;">Actual Result:</strong>
+                <pre style="margin: 8px 0 0 0; background: white; padding: 8px; border-radius: 3px; overflow-x: auto; color: #066600;">{
+  "message": "Amount below minimum transaction amount.",
+  "statusCode": 5045,
+  "exceptionGroup": 1
+}</pre>
+              </div>
+            </div>
+          </div>
+        
+          <div style="margin-bottom: 16px; padding: 12px; background: white; border: 1px solid #e0e0e0; border-radius: 4px;">
+            <div style="font-weight: 600; color: #333; margin-bottom: 12px;">API Call 4: Create Order (EUR)</div>
+            <div style="font-size: 13px; color: #666; margin-bottom: 8px;">
+              <div style="margin-bottom: 4px;"><strong>Request URL:</strong> <code style="color: #0066cc; word-break: break-all;">https://distributor.dev.keepz.me/api/distributor</code></div>
+              <div style="margin-bottom: 4px;"><strong>Request Method:</strong> <span style="font-weight: 500;">POST</span></div>
+              <div style="margin-bottom: 8px;"><strong>Status Code:</strong> <span style="background: #f0f0f0; padding: 2px 8px; border-radius: 3px; font-family: monospace;">400</span></div>
+              <div style="margin-bottom: 4px;"><strong>Request Body:</strong></div>
+              <pre style="margin: 4px 0 8px 0; background: #fff8e6; padding: 8px; border-radius: 3px; border-left: 3px solid #f0ad4e; overflow-x: auto; font-family: monospace; font-size: 12px; color: #8a6d3b;">{
+  "amount": 0.01,
+  "currency": "EUR",
+  "description": "Payment to CREDO - Below Minimum Amount",
+  "toIban": "GE42CD0360000062461306",
+  "uniqueId": "33bb002b-0194-4bc6-b0de-7b1be01c6d60"
+}</pre>
+            </div>
+            <button type="button" onclick="toggleApiDetails(this)" style="width: 100%; padding: 8px 12px; background: #f5f5f5; border: 1px solid #e0e0e0; cursor: pointer; border-radius: 4px; font-size: 12px; color: #333; display: flex; justify-content: space-between; align-items: center;">
+              <span>Expected vs Actual Response</span>
+              <span class="api-arrow" style="font-size: 14px; transition: transform 0.3s; transform: rotate(-90deg);">▼</span>
+            </button>
+            <div class="api-details" style="display: none; margin-top: 12px; padding: 12px; background: #f9f9f9; border-radius: 4px; border-left: 3px solid #667eea; font-family: monospace; font-size: 12px; line-height: 1.5; max-height: 400px; overflow-y: auto;">
+              <div style="margin-bottom: 12px;">
+                <strong style="color: #333;">Expected Result:</strong>
+                <pre style="margin: 8px 0 0 0; background: white; padding: 8px; border-radius: 3px; overflow-x: auto; color: #0066cc;">{
+  "message": "Amount below minimum transaction amount.",
+  "statusCode": "number"
+}</pre>
+              </div>
+              <div>
+                <strong style="color: #333;">Actual Result:</strong>
+                <pre style="margin: 8px 0 0 0; background: white; padding: 8px; border-radius: 3px; overflow-x: auto; color: #066600;">{
+  "message": "Amount below minimum transaction amount.",
+  "statusCode": 5045,
+  "exceptionGroup": 1
+}</pre>
+              </div>
+            </div>
+          </div>
+        
+          </div>
+        </div>
+      
+            
+          </div>
+        
+        </div>
+      </div>
+    
+        </div>
+      </div>
+    
+            </div>
+          </div>
+        </div>
+      
+      </div>
+    
+    </div>
+
+    <div class="footer">
+      Generated on 6/29/2026, 1:52:38 PM
+    </div>
+  </div>
+</body>
+</html>
+    

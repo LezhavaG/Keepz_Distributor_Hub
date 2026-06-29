@@ -279,7 +279,7 @@ export async function runHappyPathTest(request: any, banksToTest: typeof ALL_BAN
 
   // Attach API calls to each test case with corrected expected results for positive tests
   const apiCallsWithCorrectExpectations = hub.apiCalls.map(call => {
-    if (call.name === 'Create Order') {
+    if (call.name.startsWith('Create Order')) {
       return {
         ...call,
         expectedResult: { transactionId: 'number', status: 'INITIAL|PENDING' },
@@ -487,106 +487,14 @@ export async function runInsufficientBalanceTest(
   banksToTest: typeof ALL_BANKS,
   expectedErrorMessage: string
 ) {
-  const hub = new DistributorHubHelper(request);
-
-  // Step 1: Authenticate and get token
-  await hub.authenticate();
-  console.log('✅ Token successfully taken\n');
-
-  // Step 2: Try to create orders with insufficient balance
-  const transactions: Array<{ bank: string; id: number; status: string; currency: string; error?: string; isExpectedError?: boolean; uniqueId: string }> = [];
-
-  for (const bank of banksToTest) {
-    for (const currency of CURRENCIES) {
-      const uniqueId = randomUUID();
-
-      const payload: any = {
-        amount: INSUFFICIENT_BALANCE_AMOUNT,
-        currency: currency,
-        description: `Payment to ${bank.name} - Insufficient balance test`,
-        toIban: bank.iban,
-        uniqueId: uniqueId,
-      };
-
-      // LIBERTY requires beneficiaryName
-      if (bank.name === 'Liberty') {
-        payload.beneficiaryName = 'Giorgi Lezhava';
-      }
-
-      try {
-        const transactionResponse = await hub.createTransaction(payload);
-
-        // If we get here, no error - this is FAILED for negative test
-        console.log(`❌ Order succeeded (expected error) ${bank.name} - ${currency}`);
-
-        transactions.push({
-          bank: bank.name,
-          id: 0,
-          status: 'FAILED',
-          currency: currency,
-          error: 'Expected error but got success',
-          isExpectedError: false,
-          uniqueId: uniqueId,
-        });
-      } catch (error: any) {
-        let statusCode = 400;
-        let responseJson = '';
-        let isExpectedError = false;
-
-        // Parse error message which contains status code and response
-        try {
-          const errorData = JSON.parse(error.message);
-          statusCode = errorData.statusCode;
-          const responseBody = errorData.response;
-          responseJson = JSON.stringify(responseBody, null, 2);
-          const message = responseBody.message || responseBody.error || '';
-          isExpectedError = message.includes(expectedErrorMessage);
-        } catch {
-          // Fallback: error message string
-          responseJson = error instanceof Error ? error.message : String(error);
-          isExpectedError = responseJson.includes(expectedErrorMessage);
-        }
-
-        if (isExpectedError) {
-          console.log(`✅ Got expected error ${bank.name} - ${currency}`);
-        } else {
-          console.log(`❌ Got unexpected error ${bank.name} - ${currency}`);
-        }
-
-        transactions.push({
-          bank: bank.name,
-          id: 0,
-          status: 'FAILED',
-          currency: currency,
-          error: `Status: ${statusCode}\n\n${responseJson}`,
-          isExpectedError: isExpectedError,
-          uniqueId: uniqueId,
-        });
-      }
-    }
-  }
-
-  // Step 3: Generate report
-  const correctedApiCalls = fixNegativeTestExpectedResults(hub.apiCalls, expectedErrorMessage);
-
-  const tableData = transactions.map((tx) => {
-    return {
-      transactionId: 0,
-      bank: tx.bank,
-      amount: INSUFFICIENT_BALANCE_AMOUNT,
-      currency: tx.currency,
-      status: 'Failed' as const,
-      errorMessage: tx.error,
-      isExpectedError: tx.isExpectedError,
-      testCaseName: `Distributor ${tx.bank} (${tx.currency}) - Insufficient Balance`,
-      skipTransactionTable: true,
-      category: 'Insufficient Balance Cases',
-      uniqueId: tx.uniqueId,
-      apiCalls: correctedApiCalls,
-    };
-  });
-
-  return { tableData, balanceSummary: [] };
+  return runBankGroupedNegativeTest(
+    request,
+    banksToTest,
+    INSUFFICIENT_BALANCE_AMOUNT,
+    expectedErrorMessage,
+    'Insufficient Balance',
+    'Insufficient Balance Cases'
+  );
 }
 
 export async function runAboveMaximumAmountTest(
@@ -594,106 +502,14 @@ export async function runAboveMaximumAmountTest(
   banksToTest: typeof ALL_BANKS,
   expectedErrorMessage: string
 ) {
-  const hub = new DistributorHubHelper(request);
-
-  // Step 1: Authenticate and get token
-  await hub.authenticate();
-  console.log('✅ Token successfully taken\n');
-
-  // Step 2: Try to create orders with amount above maximum
-  const transactions: Array<{ bank: string; id: number; status: string; currency: string; error?: string; isExpectedError?: boolean; uniqueId: string }> = [];
-
-  for (const bank of banksToTest) {
-    for (const currency of CURRENCIES) {
-      const uniqueId = randomUUID();
-
-      const payload: any = {
-        amount: ABOVE_MAX_AMOUNT,
-        currency: currency,
-        description: `Payment to ${bank.name} - Above maximum amount test`,
-        toIban: bank.iban,
-        uniqueId: uniqueId,
-      };
-
-      // LIBERTY requires beneficiaryName
-      if (bank.name === 'Liberty') {
-        payload.beneficiaryName = 'Giorgi Lezhava';
-      }
-
-      try {
-        const transactionResponse = await hub.createTransaction(payload);
-
-        // If we get here, no error - this is FAILED for negative test
-        console.log(`❌ Order succeeded (expected error) ${bank.name} - ${currency}`);
-
-        transactions.push({
-          bank: bank.name,
-          id: 0,
-          status: 'FAILED',
-          currency: currency,
-          error: 'Expected error but got success',
-          isExpectedError: false,
-          uniqueId: uniqueId,
-        });
-      } catch (error: any) {
-        let statusCode = 400;
-        let responseJson = '';
-        let isExpectedError = false;
-
-        // Parse error message which contains status code and response
-        try {
-          const errorData = JSON.parse(error.message);
-          statusCode = errorData.statusCode;
-          const responseBody = errorData.response;
-          responseJson = JSON.stringify(responseBody, null, 2);
-          const message = responseBody.message || responseBody.error || '';
-          isExpectedError = message.includes(expectedErrorMessage);
-        } catch {
-          // Fallback: error message string
-          responseJson = error instanceof Error ? error.message : String(error);
-          isExpectedError = responseJson.includes(expectedErrorMessage);
-        }
-
-        if (isExpectedError) {
-          console.log(`✅ Got expected error ${bank.name} - ${currency}`);
-        } else {
-          console.log(`❌ Got unexpected error ${bank.name} - ${currency}`);
-        }
-
-        transactions.push({
-          bank: bank.name,
-          id: 0,
-          status: 'FAILED',
-          currency: currency,
-          error: `Status: ${statusCode}\n\n${responseJson}`,
-          isExpectedError: isExpectedError,
-          uniqueId: uniqueId,
-        });
-      }
-    }
-  }
-
-  // Step 3: Generate report
-  const correctedApiCalls = fixNegativeTestExpectedResults(hub.apiCalls, expectedErrorMessage);
-
-  const tableData = transactions.map((tx) => {
-    return {
-      transactionId: 0,
-      bank: tx.bank,
-      amount: ABOVE_MAX_AMOUNT,
-      currency: tx.currency,
-      status: 'Failed' as const,
-      errorMessage: tx.error,
-      isExpectedError: tx.isExpectedError,
-      testCaseName: `Distributor ${tx.bank} (${tx.currency}) - Above Maximum Amount`,
-      skipTransactionTable: true,
-      category: 'Amount Validation Cases',
-      uniqueId: tx.uniqueId,
-      apiCalls: correctedApiCalls,
-    };
-  });
-
-  return { tableData, balanceSummary: [] };
+  return runBankGroupedNegativeTest(
+    request,
+    banksToTest,
+    ABOVE_MAX_AMOUNT,
+    expectedErrorMessage,
+    'Above Maximum Amount',
+    'Amount Validation Cases'
+  );
 }
 
 export async function runBelowMinimumAmountTest(
@@ -701,23 +517,79 @@ export async function runBelowMinimumAmountTest(
   banksToTest: typeof ALL_BANKS,
   expectedErrorMessage: string
 ) {
+  return runBankGroupedNegativeTest(
+    request,
+    banksToTest,
+    BELOW_MIN_AMOUNT,
+    expectedErrorMessage,
+    'Below Minimum Amount',
+    'Amount Validation Cases'
+  );
+}
+
+export async function runNegativeTest(
+  request: any,
+  banksToTest: typeof ALL_BANKS,
+  expectedErrorMessage: string
+) {
+  return runBankGroupedNegativeTest(
+    request,
+    banksToTest,
+    TRANSACTION_AMOUNT,
+    expectedErrorMessage,
+    'Invalid IBAN',
+    'Invalid IBAN Cases'
+  );
+}
+
+// Helper function to fix expected results for negative test API calls
+export function fixNegativeTestExpectedResults(apiCalls: any[], errorMessage: string): any[] {
+  return apiCalls.map(call => {
+    if (call.name.startsWith('Create Order')) {
+      return {
+        ...call,
+        expectedResult: { message: errorMessage, statusCode: 'number' },
+      };
+    }
+    return call;
+  });
+}
+
+/**
+ * Shared per-bank negative test runner.
+ * Creates one test case PER BANK (not per bank+currency).
+ * Each bank case's Details shows: Get Token (shared) + 3 Create Orders (GEL, USD, EUR).
+ */
+async function runBankGroupedNegativeTest(
+  request: any,
+  banksToTest: typeof ALL_BANKS,
+  amount: number,
+  expectedErrorMessage: string,
+  testCaseSuffix: string,
+  category: string
+) {
   const hub = new DistributorHubHelper(request);
 
-  // Step 1: Authenticate and get token
   await hub.authenticate();
   console.log('✅ Token successfully taken\n');
 
-  // Step 2: Try to create orders with amount below minimum
-  const transactions: Array<{ bank: string; id: number; status: string; currency: string; error?: string; isExpectedError?: boolean; uniqueId: string }> = [];
+  // Capture the shared Get Token call (shown in every bank's Details)
+  const tokenCall = hub.apiCalls.find((c) => c.name === 'Get Token');
+
+  const tableData: any[] = [];
 
   for (const bank of banksToTest) {
+    // Record where this bank's Create Order calls begin
+    const startIdx = hub.apiCalls.length;
+    const currencyResults: Array<{ currency: string; isExpectedError: boolean }> = [];
+
     for (const currency of CURRENCIES) {
       const uniqueId = randomUUID();
 
       const payload: any = {
-        amount: BELOW_MIN_AMOUNT,
+        amount: amount,
         currency: currency,
-        description: `Payment to ${bank.name} - Below minimum amount test`,
+        description: `Payment to ${bank.name} - ${testCaseSuffix}`,
         toIban: bank.iban,
         uniqueId: uniqueId,
       };
@@ -727,232 +599,55 @@ export async function runBelowMinimumAmountTest(
         payload.beneficiaryName = 'Giorgi Lezhava';
       }
 
+      let isExpectedError = false;
+
       try {
-        const transactionResponse = await hub.createTransaction(payload);
-
-        // If we get here, no error - this is FAILED for negative test
+        await hub.createTransaction(payload);
+        // Got success when we expected an error
         console.log(`❌ Order succeeded (expected error) ${bank.name} - ${currency}`);
-
-        transactions.push({
-          bank: bank.name,
-          id: 0,
-          status: 'FAILED',
-          currency: currency,
-          error: 'Expected error but got success',
-          isExpectedError: false,
-          uniqueId: uniqueId,
-        });
+        isExpectedError = false;
       } catch (error: any) {
-        let statusCode = 400;
-        let responseJson = '';
-        let isExpectedError = false;
-
-        // Parse error message which contains status code and response
         try {
           const errorData = JSON.parse(error.message);
-          statusCode = errorData.statusCode;
           const responseBody = errorData.response;
-          responseJson = JSON.stringify(responseBody, null, 2);
           const message = responseBody.message || responseBody.error || '';
           isExpectedError = message.includes(expectedErrorMessage);
         } catch {
-          // Fallback: error message string
-          responseJson = error instanceof Error ? error.message : String(error);
-          isExpectedError = responseJson.includes(expectedErrorMessage);
+          isExpectedError = String(error?.message || error).includes(expectedErrorMessage);
         }
-
-        if (isExpectedError) {
-          console.log(`✅ Got expected error ${bank.name} - ${currency}`);
-        } else {
-          console.log(`❌ Got unexpected error ${bank.name} - ${currency}`);
-        }
-
-        transactions.push({
-          bank: bank.name,
-          id: 0,
-          status: 'FAILED',
-          currency: currency,
-          error: `Status: ${statusCode}\n\n${responseJson}`,
-          isExpectedError: isExpectedError,
-          uniqueId: uniqueId,
-        });
+        console.log(
+          isExpectedError
+            ? `✅ Got expected error ${bank.name} - ${currency}`
+            : `❌ Got unexpected error ${bank.name} - ${currency}`
+        );
       }
+
+      currencyResults.push({ currency, isExpectedError });
     }
-  }
 
-  // Step 3: Generate report
-  const correctedApiCalls = fixNegativeTestExpectedResults(hub.apiCalls, expectedErrorMessage);
+    // This bank's Create Order calls (only the 3 currencies for THIS bank)
+    const bankCreateCalls = hub.apiCalls.slice(startIdx);
+    const allExpected = currencyResults.every((r) => r.isExpectedError);
 
-  const tableData = transactions.map((tx) => {
-    return {
+    // Details = shared token call + this bank's create orders
+    const caseApiCalls = fixNegativeTestExpectedResults(
+      [tokenCall, ...bankCreateCalls],
+      expectedErrorMessage
+    );
+
+    tableData.push({
       transactionId: 0,
-      bank: tx.bank,
-      amount: BELOW_MIN_AMOUNT,
-      currency: tx.currency,
+      bank: bank.name,
+      amount: amount,
+      currency: 'ALL',
       status: 'Failed' as const,
-      errorMessage: tx.error,
-      isExpectedError: tx.isExpectedError,
-      testCaseName: `Distributor ${tx.bank} (${tx.currency}) - Below Minimum Amount`,
+      isExpectedError: allExpected,
+      testCaseName: `Distributor ${bank.name} - ${testCaseSuffix}`,
       skipTransactionTable: true,
-      category: 'Amount Validation Cases',
-      uniqueId: tx.uniqueId,
-      apiCalls: correctedApiCalls,
-    };
-  });
+      category: category,
+      apiCalls: caseApiCalls,
+    });
+  }
 
   return { tableData, balanceSummary: [] };
-}
-
-export async function runNegativeTest(
-  request: any,
-  banksToTest: typeof ALL_BANKS,
-  expectedErrorMessage: string
-) {
-  const hub = new DistributorHubHelper(request);
-
-  // Step 1: Authenticate and get token
-  await hub.authenticate();
-  console.log('✅ Token successfully taken\n');
-
-  // Step 2: Check initial balances for all currencies
-  const initialBalanceGEL = await hub.getBalance('GEL');
-  const initialBalanceUSD = await hub.getBalance('USD');
-  const initialBalanceEUR = await hub.getBalance('EUR');
-
-  // Step 3: Try to create orders with invalid IBANs and verify error messages
-  const transactions: Array<{ bank: string; id: number; status: string; currency: string; error?: string; isExpectedError?: boolean; uniqueId: string }> = [];
-
-  for (const bank of banksToTest) {
-    for (const currency of CURRENCIES) {
-      const uniqueId = randomUUID();
-
-      const payload: any = {
-        amount: TRANSACTION_AMOUNT,
-        currency: currency,
-        description: `Payment to ${bank.name}`,
-        toIban: bank.iban, // This will be invalid IBAN
-        uniqueId: uniqueId,
-      };
-
-      // LIBERTY requires beneficiaryName
-      if (bank.name === 'Liberty') {
-        payload.beneficiaryName = 'Giorgi Lezhava';
-      }
-
-      try {
-        const transactionResponse = await hub.createTransaction(payload);
-
-        // If we get here, no error - this is FAILED for negative test
-        console.log(`❌ Order succeeded (expected error) ${bank.name} - ${currency}`);
-
-        transactions.push({
-          bank: bank.name,
-          id: 0,
-          status: 'FAILED',
-          currency: currency,
-          error: 'Expected error but got success',
-          isExpectedError: false,
-          uniqueId: uniqueId,
-        });
-      } catch (error: any) {
-        let statusCode = 400;
-        let responseJson = '';
-        let isExpectedError = false;
-
-        // Parse error message which contains status code and response
-        try {
-          const errorData = JSON.parse(error.message);
-          statusCode = errorData.statusCode;
-          const responseBody = errorData.response;
-          responseJson = JSON.stringify(responseBody, null, 2);
-          const message = responseBody.message || responseBody.error || '';
-          isExpectedError = message.includes(expectedErrorMessage);
-        } catch {
-          // Fallback: error message string
-          responseJson = error instanceof Error ? error.message : String(error);
-          isExpectedError = responseJson.includes(expectedErrorMessage);
-        }
-
-        if (isExpectedError) {
-          console.log(`✅ Got expected error ${bank.name} - ${currency}`);
-        } else {
-          console.log(`❌ Got unexpected error ${bank.name} - ${currency}`);
-        }
-
-        transactions.push({
-          bank: bank.name,
-          id: 0,
-          status: 'FAILED',
-          currency: currency,
-          error: `Status: ${statusCode}\n\n${responseJson}`,
-          isExpectedError: isExpectedError,
-          uniqueId: uniqueId,
-        });
-      }
-    }
-  }
-
-  // Step 4: Check final balances for all currencies (should not change since orders failed)
-  const finalBalanceGEL = await hub.getBalance('GEL');
-  const finalBalanceUSD = await hub.getBalance('USD');
-  const finalBalanceEUR = await hub.getBalance('EUR');
-
-  // Step 5: Return test data and balance summary (report will be generated after all tests)
-  const correctedApiCalls = fixNegativeTestExpectedResults(hub.apiCalls, expectedErrorMessage);
-
-  const tableData = transactions.map((tx) => {
-    return {
-      transactionId: 0,
-      bank: tx.bank,
-      amount: TRANSACTION_AMOUNT,
-      currency: tx.currency,
-      status: 'Failed' as const,
-      errorMessage: tx.error,
-      isExpectedError: tx.isExpectedError,
-      testCaseName: `Distributor ${tx.bank} (${tx.currency}) - Invalid IBAN`,
-      skipTransactionTable: true,
-      category: 'Invalid IBAN Cases',
-      uniqueId: tx.uniqueId,
-      apiCalls: correctedApiCalls,
-    };
-  });
-
-  const balanceSummary = [
-    {
-      currency: 'GEL',
-      initialBalance: initialBalanceGEL.amount,
-      totalTransactions: 0,
-      totalCommission: 0,
-      finalBalance: finalBalanceGEL.amount,
-    },
-    {
-      currency: 'USD',
-      initialBalance: initialBalanceUSD.amount,
-      totalTransactions: 0,
-      totalCommission: 0,
-      finalBalance: finalBalanceUSD.amount,
-    },
-    {
-      currency: 'EUR',
-      initialBalance: initialBalanceEUR.amount,
-      totalTransactions: 0,
-      totalCommission: 0,
-      finalBalance: finalBalanceEUR.amount,
-    },
-  ];
-
-  return { tableData, balanceSummary };
-}
-
-// Helper function to fix expected results for negative test API calls
-export function fixNegativeTestExpectedResults(apiCalls: any[], errorMessage: string): any[] {
-  return apiCalls.map(call => {
-    if (call.name === 'Create Order') {
-      return {
-        ...call,
-        expectedResult: { message: errorMessage, statusCode: 'number' },
-      };
-    }
-    return call;
-  });
 }

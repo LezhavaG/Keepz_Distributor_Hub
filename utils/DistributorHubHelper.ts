@@ -154,7 +154,7 @@ export class DistributorHubHelper {
     const data = await response.json();
 
     this.apiCalls.push({
-      name: 'Create Order',
+      name: `Create Order (${payload.currency})`,
       url: url,
       method: 'POST',
       requestBody: requestBody,

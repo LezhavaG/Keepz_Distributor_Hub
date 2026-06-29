@@ -472,7 +472,9 @@ export class HtmlReportGenerator {
     }
 
     if (tx.skipTransactionTable) {
-      // Show response (success or error), no transaction table
+      // Show Details (API calls) always, plus an optional Response section if errorMessage exists
+      let responseSection = '';
+
       if (tx.errorMessage) {
         const isError = tx.status === 'Failed';
         const backgroundColor = isError ? '#ffe6e6' : '#e6f2ff';
@@ -502,10 +504,8 @@ export class HtmlReportGenerator {
         // Add uniqueId to response if available
         const uniqueIdSection = tx.uniqueId ? `<div style="margin-bottom: 12px; padding: 12px; background: #f0f0f0; border-radius: 4px; border-left: 3px solid #667eea;"><strong style="color: #333;">Unique ID:</strong> <code style="color: #0066cc; font-family: monospace; word-break: break-all; font-size: 12px;">${tx.uniqueId}</code></div>` : '';
 
-        contentHTML = `
-          <div style="padding: 16px;">
-            ${detailsHTML}
-            <button type="button" onclick="toggleError(this)" style="width: 100%; padding: 12px 16px; background: none; border: none; cursor: pointer; text-align: left; font-size: 13px; color: ${textColor}; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #e0e0e0; margin-top: -16px; margin-left: -16px; margin-right: -16px; margin-bottom: 0;">
+        responseSection = `
+            <button type="button" onclick="toggleError(this)" style="width: 100%; padding: 12px 16px; background: none; border: none; cursor: pointer; text-align: left; font-size: 13px; color: ${textColor}; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #e0e0e0;">
               <span>📋 ${isBalanceCheck ? 'Balance Details' : 'Response'}</span>
               <span style="font-size: 16px;">▼</span>
             </button>
@@ -513,9 +513,15 @@ export class HtmlReportGenerator {
               ${uniqueIdSection}
               ${isBalanceCheck ? formattedMessage : tx.errorMessage}
             </div>
-          </div>
         `;
       }
+
+      contentHTML = `
+          <div style="padding: 16px;">
+            ${detailsHTML}
+            ${responseSection}
+          </div>
+        `;
     } else {
       // Show full transaction table with optional error details
       let transactionDetailsHTML = `
