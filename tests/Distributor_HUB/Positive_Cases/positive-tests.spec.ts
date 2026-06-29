@@ -1,6 +1,6 @@
 import { test } from '@playwright/test';
 import * as dotenv from 'dotenv';
-import { runHappyPathTest, ALL_BANKS, runAuthenticationSuccessTest } from '../helpers';
+import { runHappyPathTest, ALL_BANKS, runAuthenticationSuccessTest, runBalanceUpdateTest } from '../helpers';
 import { HtmlReportGenerator } from '../../../utils/HtmlReportGenerator';
 
 dotenv.config();
@@ -12,6 +12,12 @@ test.describe('Distributor HUB - Positive Tests (Combined)', () => {
   test('Positive - Successful Authentication', async ({ request }) => {
     const authResults = await runAuthenticationSuccessTest(request);
     allTestResults.push(...authResults);
+  });
+
+  // Balance Update flow per currency: check -> update -> check -> verify increase
+  test('Positive - Balance Update (All Currencies)', async ({ request }) => {
+    const result = await runBalanceUpdateTest(request);
+    allTestResults.push(...result.tableData);
   });
 
   test('Positive - Distributor ALL BANKS', async ({ request }) => {
