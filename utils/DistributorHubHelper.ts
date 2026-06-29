@@ -46,6 +46,7 @@ export interface ApiCall {
   url: string;
   method: string;
   statusCode: number;
+  requestBody?: any;
   expectedResult: any;
   actualResult: any;
 }
@@ -61,12 +62,13 @@ export class DistributorHubHelper {
 
   async authenticate(): Promise<string> {
     const url = `${this.baseUrl}/api/auth`;
+    const requestBody = {
+      client_id: this.clientId,
+      client_secret: this.clientSecret,
+      grant_type: 'client_credentials',
+    };
     const response = await this.request.post(url, {
-      data: {
-        client_id: this.clientId,
-        client_secret: this.clientSecret,
-        grant_type: 'client_credentials',
-      },
+      data: requestBody,
     });
 
     const data = await response.json();
@@ -76,6 +78,7 @@ export class DistributorHubHelper {
       name: 'Get Token',
       url: url,
       method: 'POST',
+      requestBody: { ...requestBody, client_secret: '***' },
       statusCode: response.status(),
       expectedResult: { access_token: '***' },
       actualResult: data,
@@ -98,6 +101,7 @@ export class DistributorHubHelper {
       name: `Get Balance (${currency})`,
       url: url,
       method: 'GET',
+      requestBody: 'N/A (GET request - no body)',
       statusCode: response.status(),
       expectedResult: { amount: 'number', currency: currency },
       actualResult: data.value,
@@ -153,6 +157,7 @@ export class DistributorHubHelper {
       name: 'Create Order',
       url: url,
       method: 'POST',
+      requestBody: requestBody,
       statusCode: response.status(),
       expectedResult: { transactionId: 'number', status: 'string' },
       actualResult: data,
@@ -215,6 +220,7 @@ export class DistributorHubHelper {
           name: 'Get Transaction Details',
           url: url,
           method: 'GET',
+          requestBody: 'N/A (GET request - no body)',
           statusCode: response.status(),
           expectedResult: { transactionId: 'number', status: 'COMPLETED|SUCCESS' },
           actualResult: details,

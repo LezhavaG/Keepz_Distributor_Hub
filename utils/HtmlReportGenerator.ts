@@ -6,6 +6,7 @@ export interface ApiCall {
   url: string;
   method: string;
   statusCode: number;
+  requestBody?: any;
   expectedResult: any;
   actualResult: any;
 }
@@ -436,6 +437,8 @@ export class HtmlReportGenerator {
               <div style="margin-bottom: 4px;"><strong>Request URL:</strong> <code style="color: #0066cc; word-break: break-all;">${call.url}</code></div>
               <div style="margin-bottom: 4px;"><strong>Request Method:</strong> <span style="font-weight: 500;">${call.method}</span></div>
               <div style="margin-bottom: 8px;"><strong>Status Code:</strong> <span style="background: #f0f0f0; padding: 2px 8px; border-radius: 3px; font-family: monospace;">${call.statusCode}</span></div>
+              ${call.requestBody !== undefined ? `<div style="margin-bottom: 4px;"><strong>Request Body:</strong></div>
+              <pre style="margin: 4px 0 8px 0; background: #fff8e6; padding: 8px; border-radius: 3px; border-left: 3px solid #f0ad4e; overflow-x: auto; font-family: monospace; font-size: 12px; color: #8a6d3b;">${typeof call.requestBody === 'string' ? call.requestBody : JSON.stringify(call.requestBody, null, 2)}</pre>` : ''}
             </div>
             <button type="button" onclick="toggleApiDetails(this)" style="width: 100%; padding: 8px 12px; background: #f5f5f5; border: 1px solid #e0e0e0; cursor: pointer; border-radius: 4px; font-size: 12px; color: #333; display: flex; justify-content: space-between; align-items: center;">
               <span>Expected vs Actual Response</span>

@@ -27,6 +27,7 @@
   - **Request URL** - the full endpoint URL called
   - **Request Method** - HTTP method (GET, POST, etc.)
   - **Status Code** - the HTTP status code returned
+  - **Request Body** - the payload sent (for POST; "N/A" for GET; mask secrets like client_secret)
   - **Expected Result** - the full response body we expect
   - **Actual Result** - the full response body the API actually returned
 - **ALWAYS show all API calls** made during a test (Get Token, Get Balance, Create Order, Get Transaction Details, etc.)
