@@ -19,8 +19,9 @@ export default defineConfig({
   /* Retry on CI only */
   retries: 0,
 
-  /* Reporter to use - Disabled, using custom HTML reports */
-  reporter: [],
+  /* Reporter: 'list' shows test progress in terminal without deleting folders.
+     We avoid the 'html' reporter because it wipes the output folder on each run. */
+  reporter: [['list']],
 
   /* Shared settings for all the projects below */
   use: {
