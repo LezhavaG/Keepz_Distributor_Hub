@@ -1,6 +1,6 @@
 import { test } from '@playwright/test';
 import * as dotenv from 'dotenv';
-import { runHappyPathTest, BOG_BANK, TBC_BANK, LIBERTY_BANK, CREDO_BANK, runAuthenticationSuccessTest } from '../helpers';
+import { runHappyPathTest, BOG_BANK, TBC_BANK, LIBERTY_BANK, CREDO_BANK, runAuthenticationSuccessTest, runBalanceUpdateTest, runPaymentDescriptionTest } from '../helpers';
 import { HtmlReportGenerator } from '../../../utils/HtmlReportGenerator';
 
 dotenv.config();
@@ -36,6 +36,64 @@ test.describe('Distributor HUB - Positive Tests (Individual Banks)', () => {
     const result = await runHappyPathTest(request, [CREDO_BANK]);
     allTestResults.push(...result.tableData);
     balanceSummary = result.balanceSummary;
+  });
+
+  // Balance Update - per currency
+  test('Positive - Balance Update - GEL', async ({ request }) => {
+    const result = await runBalanceUpdateTest(request, 0.22, ['GEL']);
+    allTestResults.push(...result.tableData);
+  });
+
+  test('Positive - Balance Update - USD', async ({ request }) => {
+    const result = await runBalanceUpdateTest(request, 0.22, ['USD']);
+    allTestResults.push(...result.tableData);
+  });
+
+  test('Positive - Balance Update - EUR', async ({ request }) => {
+    const result = await runBalanceUpdateTest(request, 0.22, ['EUR']);
+    allTestResults.push(...result.tableData);
+  });
+
+  // Payer Details - per bank
+  test('Positive - Payer Details - BOG', async ({ request }) => {
+    const result = await runPaymentDescriptionTest(request, [BOG_BANK], false, 'Payer Details', 'Payer Details Cases');
+    allTestResults.push(...result.tableData);
+  });
+
+  test('Positive - Payer Details - TBC', async ({ request }) => {
+    const result = await runPaymentDescriptionTest(request, [TBC_BANK], false, 'Payer Details', 'Payer Details Cases');
+    allTestResults.push(...result.tableData);
+  });
+
+  test('Positive - Payer Details - Liberty', async ({ request }) => {
+    const result = await runPaymentDescriptionTest(request, [LIBERTY_BANK], false, 'Payer Details', 'Payer Details Cases');
+    allTestResults.push(...result.tableData);
+  });
+
+  test('Positive - Payer Details - CREDO', async ({ request }) => {
+    const result = await runPaymentDescriptionTest(request, [CREDO_BANK], false, 'Payer Details', 'Payer Details Cases');
+    allTestResults.push(...result.tableData);
+  });
+
+  // Payer + Beneficiary Details - per bank
+  test('Positive - Payer + Beneficiary Details - BOG', async ({ request }) => {
+    const result = await runPaymentDescriptionTest(request, [BOG_BANK], true, 'Payer + Beneficiary Details', 'Payer + Beneficiary Details Cases');
+    allTestResults.push(...result.tableData);
+  });
+
+  test('Positive - Payer + Beneficiary Details - TBC', async ({ request }) => {
+    const result = await runPaymentDescriptionTest(request, [TBC_BANK], true, 'Payer + Beneficiary Details', 'Payer + Beneficiary Details Cases');
+    allTestResults.push(...result.tableData);
+  });
+
+  test('Positive - Payer + Beneficiary Details - Liberty', async ({ request }) => {
+    const result = await runPaymentDescriptionTest(request, [LIBERTY_BANK], true, 'Payer + Beneficiary Details', 'Payer + Beneficiary Details Cases');
+    allTestResults.push(...result.tableData);
+  });
+
+  test('Positive - Payer + Beneficiary Details - CREDO', async ({ request }) => {
+    const result = await runPaymentDescriptionTest(request, [CREDO_BANK], true, 'Payer + Beneficiary Details', 'Payer + Beneficiary Details Cases');
+    allTestResults.push(...result.tableData);
   });
 
   test.afterAll(async () => {

@@ -696,7 +696,7 @@ async function runBankGroupedNegativeTest(
  * One test case per currency. Details shows: Get Token + Get Balance (initial)
  * + Update Balance + Get Balance (final).
  */
-export async function runBalanceUpdateTest(request: any, amountToAdd: number = 0.22) {
+export async function runBalanceUpdateTest(request: any, amountToAdd: number = 0.22, currenciesToTest: string[] = CURRENCIES) {
   const hub = new DistributorHubHelper(request);
 
   await hub.authenticate();
@@ -709,7 +709,7 @@ export async function runBalanceUpdateTest(request: any, amountToAdd: number = 0
 
   const tableData: any[] = [];
 
-  for (const currency of CURRENCIES) {
+  for (const currency of currenciesToTest) {
     const startIdx = hub.apiCalls.length;
 
     // 1. Check initial balance
