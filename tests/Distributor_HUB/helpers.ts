@@ -114,11 +114,18 @@ export async function runHappyPathTest(request: any, banksToTest: typeof ALL_BAN
   // Step 1: Authenticate and get token
   await hub.authenticate();
   console.log('✅ Token successfully taken\n');
+  const tokenCall = hub.apiCalls.find((c) => c.name === 'Get Token');
+  if (tokenCall) {
+    tokenCall.passed = tokenCall.statusCode === 200;
+  }
 
-  // Step 2: Check initial balances for all currencies
+  // Step 2: Check initial balances for all currencies (track these calls for the Balance Check case)
+  const initialBalanceIdx = hub.apiCalls.length;
   const initialBalanceGEL = await hub.getBalance('GEL');
   const initialBalanceUSD = await hub.getBalance('USD');
   const initialBalanceEUR = await hub.getBalance('EUR');
+  const initialBalanceCalls = hub.apiCalls.slice(initialBalanceIdx);
+  initialBalanceCalls.forEach((c) => { c.passed = c.statusCode === 200; });
 
   const initialBalancesSuccessful = initialBalanceGEL && initialBalanceUSD && initialBalanceEUR;
 
@@ -198,48 +205,62 @@ export async function runHappyPathTest(request: any, banksToTest: typeof ALL_BAN
 
   const finalStatuses = await Promise.all(pollPromises);
 
-  // Step 4: Check final balances for all currencies
+  // Step 4: Check final balances for all currencies (track these calls for the Balance Check case)
+  const finalBalanceIdx = hub.apiCalls.length;
   const finalBalanceGEL = await hub.getBalance('GEL');
   const finalBalanceUSD = await hub.getBalance('USD');
   const finalBalanceEUR = await hub.getBalance('EUR');
+  const finalBalanceCalls = hub.apiCalls.slice(finalBalanceIdx);
+  finalBalanceCalls.forEach((c) => { c.passed = c.statusCode === 200; });
 
-  // Step 5: Final Report - Table Format
-  const transactionTestCases = transactions.map((tx_info) => {
-    if (tx_info.error) {
-      return {
-        transactionId: 0,
-        bank: tx_info.bank,
-        amount: TRANSACTION_AMOUNT,
-        currency: tx_info.currency,
-        status: 'Failed' as const,
-        errorMessage: tx_info.error,
-        testCaseName: `Distribute To ${tx_info.bank} - ${tx_info.currency}`,
-        category: 'Transactions',
-        uniqueId: tx_info.uniqueId,
-      };
-    }
+  // Step 5: Build per-bank transaction cases (Details format).
+  // Each bank case shows Get Token + per-currency (Create Order + Get Transaction Details).
+  // Calls are matched by toIban/currency and transactionId (robust to parallel polling).
+  const transactionTestCases = banksToTest.map((bank) => {
+    const caseApiCalls: any[] = tokenCall ? [tokenCall] : [];
+    let allSucceeded = true;
 
-    const finalStatus = finalStatuses.find((s) => s.id === tx_info.id);
-    let status: 'Succeeded' | 'Failed' | 'Pending' = 'Pending';
+    for (const currency of CURRENCIES) {
+      const tx = transactions.find((t) => t.bank === bank.name && t.currency === currency);
 
-    if (finalStatus) {
-      if (finalStatus.status === 'COMPLETED' || finalStatus.status === 'SUCCESS') {
-        status = 'Succeeded';
-      } else if (finalStatus.status === 'FAILED') {
-        status = 'Failed';
+      // Create Order call for this bank+currency
+      const createCall = hub.apiCalls.find(
+        (c) => c.name === `Create Order (${currency})` && c.requestBody?.toIban === bank.iban
+      );
+      if (createCall) {
+        createCall.expectedResult = { transactionId: 'number', status: 'INITIAL|PENDING' };
+        createCall.passed = createCall.statusCode === 200 || createCall.statusCode === 201;
+        caseApiCalls.push(createCall);
+      }
+
+      // Determine final status of this transaction
+      const finalStatus = tx && tx.id !== 0 ? finalStatuses.find((s) => s.id === tx.id) : undefined;
+      const succeeded = !!finalStatus && (finalStatus.status === 'COMPLETED' || finalStatus.status === 'SUCCESS');
+      if (!succeeded) allSucceeded = false;
+
+      // Get Transaction Details call (only for created transactions)
+      if (tx && tx.id !== 0) {
+        const detailsCall = hub.apiCalls.find(
+          (c) => c.name === 'Get Transaction Details' && c.actualResult?.transactionId === tx.id
+        );
+        if (detailsCall) {
+          detailsCall.expectedResult = { transactionId: 'number', status: 'COMPLETED|SUCCESS' };
+          detailsCall.passed = succeeded;
+          caseApiCalls.push(detailsCall);
+        }
       }
     }
 
     return {
-      transactionId: tx_info.id,
-      bank: tx_info.bank,
+      transactionId: 0,
+      bank: bank.name,
       amount: TRANSACTION_AMOUNT,
-      currency: tx_info.currency,
-      status: status,
-      errorMessage: finalStatus?.status === 'FAILED' ? `Transaction status: ${finalStatus.status}` : undefined,
-      testCaseName: `Distribute To ${tx_info.bank} - ${tx_info.currency}`,
+      currency: 'ALL',
+      status: allSucceeded ? ('Succeeded' as const) : ('Failed' as const),
+      testCaseName: `Distribute To ${bank.name}`,
+      skipTransactionTable: true,
       category: 'Transactions',
-      uniqueId: tx_info.uniqueId,
+      apiCalls: caseApiCalls,
     };
   });
 
@@ -262,8 +283,8 @@ export async function runHappyPathTest(request: any, banksToTest: typeof ALL_BAN
   const totalCommissionEUR = succeededTxs.filter(tx => tx.currency === 'EUR').reduce((sum, tx) => sum + (tx.commission || 0), 0);
   const totalDeductedEUR = totalTransactionsEUR + totalCommissionEUR;
 
-  // Step 6: Create Balance Check test cases
-  const balanceCheckTestCases = [
+  // Step 6: Create Balance Check test cases (with their own API calls in Details)
+  const balanceCheckTestCases: any[] = [
     {
       transactionId: 0,
       bank: 'N/A',
@@ -274,6 +295,7 @@ export async function runHappyPathTest(request: any, banksToTest: typeof ALL_BAN
       testCaseName: 'Balance Check - Get Initial Balances',
       skipTransactionTable: true,
       category: 'Balance Check',
+      apiCalls: tokenCall ? [tokenCall, ...initialBalanceCalls] : [...initialBalanceCalls],
     },
   ];
 
@@ -295,26 +317,13 @@ export async function runHappyPathTest(request: any, banksToTest: typeof ALL_BAN
     testCaseName: 'Balance Check - Verify Final Balances',
     skipTransactionTable: true,
     category: 'Balance Check',
+    apiCalls: tokenCall ? [tokenCall, ...finalBalanceCalls] : [...finalBalanceCalls],
   });
 
-  // Attach API calls to each test case with corrected expected results for positive tests
-  const apiCallsWithCorrectExpectations = hub.apiCalls.map(call => {
-    if (call.name.startsWith('Create Order')) {
-      return {
-        ...call,
-        expectedResult: { transactionId: 'number', status: 'INITIAL|PENDING' },
-      };
-    }
-    return call;
-  });
-
-  const tableDataWithApiCalls = [...transactionTestCases, ...balanceCheckTestCases].map(testCase => ({
-    ...testCase,
-    apiCalls: apiCallsWithCorrectExpectations,
-  }));
+  const tableData = [...transactionTestCases, ...balanceCheckTestCases];
 
   // Return test data (report will be generated after all tests)
-  return { tableData: tableDataWithApiCalls, balanceSummary: [] };
+  return { tableData, balanceSummary: [] };
 }
 
 export async function runIncorrectClientIdTest(request: any) {
