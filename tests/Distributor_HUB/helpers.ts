@@ -49,16 +49,14 @@ export async function runAuthenticationSuccessTest(request: any) {
   };
 
   try {
-    const response = await request.post(
-      'https://distributor.dev.keepz.me/api/auth',
-      { data: payload }
-    );
+    const url = 'https://distributor.dev.keepz.me/api/auth';
+    const response = await request.post(url, { data: payload });
 
     const statusCode = response.status();
     const responseBody = await response.json();
-    const responseJson = JSON.stringify(responseBody, null, 2);
-    const accessToken = responseBody.access_token || '';
-    const isSuccessful = statusCode === 200 && accessToken;
+    // Token is nested under "value" in the response
+    const accessToken = responseBody.value?.access_token || responseBody.access_token || '';
+    const isSuccessful = statusCode === 200 && !!accessToken;
 
     if (isSuccessful) {
       console.log(`✅ Authentication successful\n`);
@@ -73,11 +71,21 @@ export async function runAuthenticationSuccessTest(request: any) {
         amount: TRANSACTION_AMOUNT,
         currency: 'GEL',
         status: isSuccessful ? ('Succeeded' as const) : ('Failed' as const),
-        errorMessage: `Status: ${statusCode}\n\n${responseJson}`,
-        isExpectedError: true,
         testCaseName: 'Successful Authentication',
         skipTransactionTable: true,
         category: 'Authentication Cases',
+        apiCalls: [
+          {
+            name: 'Get Token',
+            url: url,
+            method: 'POST',
+            requestBody: { ...payload, client_secret: '***' },
+            statusCode: statusCode,
+            expectedResult: { value: { access_token: 'string', token_type: 'Bearer' } },
+            actualResult: responseBody,
+            passed: isSuccessful,
+          },
+        ],
       },
     ];
   } catch (error) {
