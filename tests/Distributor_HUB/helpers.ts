@@ -228,7 +228,7 @@ export async function runHappyPathTest(request: any, banksToTest: typeof ALL_BAN
         (c) => c.name === `Create Order (${currency})` && c.requestBody?.toIban === bank.iban
       );
       if (createCall) {
-        createCall.expectedResult = { transactionId: 'number', status: 'INITIAL|PENDING' };
+        createCall.expectedResult = { value: { transactionId: 'number', status: 'INITIAL|PENDING' } };
         createCall.passed = createCall.statusCode === 200 || createCall.statusCode === 201;
         caseApiCalls.push(createCall);
       }

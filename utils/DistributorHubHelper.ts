@@ -213,7 +213,7 @@ export class DistributorHubHelper {
       method: 'POST',
       requestBody: requestBody,
       statusCode: response.status(),
-      expectedResult: { transactionId: 'number', status: 'string' },
+      expectedResult: { value: { transactionId: 'number', status: 'INITIAL|PENDING' } },
       actualResult: data,
     });
 
