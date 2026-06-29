@@ -28,6 +28,17 @@ export const INSUFFICIENT_BALANCE_AMOUNT = parseFloat(process.env.INSUFFICIENT_B
 export const ABOVE_MAX_AMOUNT = parseFloat(process.env.ABOVE_MAX_AMOUNT || '999999');
 export const CURRENCIES = ['GEL', 'USD', 'EUR'];
 
+// Test fixtures for payer-details / paymentDescription tests (configurable via .env)
+export const PAYER_DEBTOR_NAME = process.env.PAYER_DEBTOR_NAME || 'შპს ტესტი';
+export const PAYER_DEBTOR_IBAN = process.env.PAYER_DEBTOR_IBAN || 'GE42CD0360000062461306';
+export const PAYER_DEBTOR_IDENTITY = process.env.PAYER_DEBTOR_IDENTITY || '98809409129';
+export const PAYER_DESCRIPTION = process.env.PAYER_DESCRIPTION || 'Test Payment';
+export const PAYER_TEST_AMOUNT = parseFloat(process.env.PAYER_TEST_AMOUNT || '0.02');
+export const BENEFICIARY_NAME = process.env.BENEFICIARY_NAME || 'Giorgi Lezhava';
+export const BENEFICIARY_IDENTITY = process.env.BENEFICIARY_IDENTITY || '01024085016';
+export const BENEFICIARY_ADDRESS = process.env.BENEFICIARY_ADDRESS || 'Tbilisi, Georgia';
+export const BENEFICIARY_BIRTHDATE = process.env.BENEFICIARY_BIRTHDATE || '1990-01-01';
+
 export async function runAuthenticationSuccessTest(request: any) {
   // Try to authenticate with correct credentials
   const payload = {
@@ -120,7 +131,7 @@ export async function runHappyPathTest(request: any, banksToTest: typeof ALL_BAN
 
       // LIBERTY requires beneficiaryName
       if (bank.name === 'Liberty') {
-        payload.beneficiaryName = 'Giorgi Lezhava';
+        payload.beneficiaryName = BENEFICIARY_NAME;
       }
 
       try {
@@ -629,7 +640,7 @@ async function runBankGroupedNegativeTest(
 
       // LIBERTY requires beneficiaryName
       if (bank.name === 'Liberty') {
-        payload.beneficiaryName = 'Giorgi Lezhava';
+        payload.beneficiaryName = BENEFICIARY_NAME;
       }
 
       let isExpectedError = false;
@@ -756,17 +767,6 @@ export async function runBalanceUpdateTest(request: any, amountToAdd: number = 0
 
   return { tableData, balanceSummary: [] };
 }
-
-// Test fixtures for payer-details / paymentDescription tests
-const PAYER_DEBTOR_NAME = 'შპს ტესტი';
-const PAYER_DEBTOR_IBAN = 'GE42CD0360000062461306';
-const PAYER_DEBTOR_IDENTITY = '98809409129';
-const PAYER_DESCRIPTION = 'Test Payment';
-const PAYER_TEST_AMOUNT = 0.02;
-const BENEFICIARY_NAME = 'Giorgi Lezhava';
-const BENEFICIARY_IDENTITY = '01024085016';
-const BENEFICIARY_ADDRESS = 'Tbilisi, Georgia';
-const BENEFICIARY_BIRTHDATE = '1990-01-01';
 
 /**
  * Payment Description test (positive).
