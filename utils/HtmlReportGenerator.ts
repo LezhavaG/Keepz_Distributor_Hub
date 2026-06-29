@@ -422,9 +422,9 @@ export class HtmlReportGenerator {
       <div style="margin-bottom: 32px; border: 2px solid #667eea; border-radius: 8px; overflow: hidden;">
         <button type="button" onclick="toggleSection(this)" style="width: 100%; padding: 18px; background-color: #667eea; color: white; border: none; cursor: pointer; font-weight: 700; text-align: left; font-size: 18px; display: flex; justify-content: space-between; align-items: center;">
           <span>${label} (${transactions.length}) — ${passed} passed, ${failed} failed</span>
-          <span style="font-size: 20px;">▼</span>
+          <span style="font-size: 20px; transition: transform 0.3s; transform: rotate(-90deg);">▼</span>
         </button>
-        <div class="status-section" style="display: block; padding: 16px;">
+        <div class="status-section" style="display: none; padding: 16px;">
           ${this.buildStatusSections(transactions)}
         </div>
       </div>
