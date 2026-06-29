@@ -22,6 +22,19 @@
 - **ALWAYS show** full JSON response with proper formatting
 - Reports must display real API behavior for verification
 
+### API Request Details in Reports (MANDATORY)
+- **For EVERY API request tested**, the report MUST include:
+  - **Request URL** - the full endpoint URL called
+  - **Request Method** - HTTP method (GET, POST, etc.)
+  - **Status Code** - the HTTP status code returned
+  - **Expected Result** - the full response body we expect
+  - **Actual Result** - the full response body the API actually returned
+- **ALWAYS show all API calls** made during a test (Get Token, Get Balance, Create Order, Get Transaction Details, etc.)
+- **Expected vs Actual** must make it clear WHY a test passed or failed:
+  - Positive test: Expected = successful response → Actual matches
+  - Negative test: Expected = error message → Actual matches the error
+- Displayed in a collapsible **Details** section under each test case
+
 ### Code Structure
 - Use **Helper functions** (`tests/Distributor_HUB/helpers.ts`)
 - Keep test logic separate from test execution
