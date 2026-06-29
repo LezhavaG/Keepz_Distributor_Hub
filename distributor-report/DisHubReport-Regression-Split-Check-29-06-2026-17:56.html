@@ -234,9 +234,9 @@
         <h2 style="font-size: 20px; font-weight: 600; color: #333; margin-bottom: 16px;">Test Case Summary - (Full Regression)</h2>
         <div style="padding: 16px; background: #f5f5f5; border-radius: 8px; border-left: 4px solid #667eea; margin-bottom: 24px;">
           <div style="font-size: 14px; color: #666;">
-            <strong>Total Test Cases:</strong> <span style="font-weight: 600; color: #333;">15</span>
+            <strong>Total Test Cases:</strong> <span style="font-weight: 600; color: #333;">10</span>
             <span style="margin: 0 8px;">|</span>
-            <strong>Passed:</strong> <span style="font-weight: 600; color: #2e7d32;">15</span>
+            <strong>Passed:</strong> <span style="font-weight: 600; color: #2e7d32;">10</span>
             <span style="margin: 0 8px;">|</span>
             <strong>Failed:</strong> <span style="font-weight: 600; color: #c62828;">0</span>
             <span style="margin: 0 8px;">|</span>
@@ -244,9 +244,16 @@
           </div>
         </div>
         
+      <div style="margin-bottom: 32px; border: 2px solid #667eea; border-radius: 8px; overflow: hidden;">
+        <button type="button" onclick="toggleSection(this)" style="width: 100%; padding: 18px; background-color: #667eea; color: white; border: none; cursor: pointer; font-weight: 700; text-align: left; font-size: 18px; display: flex; justify-content: space-between; align-items: center;">
+          <span>🟢 Positive Cases (5) — 5 passed, 0 failed</span>
+          <span style="font-size: 20px;">▼</span>
+        </button>
+        <div class="status-section" style="display: block; padding: 16px;">
+          
         <div style="margin-bottom: 24px;">
           <button type="button" onclick="toggleSection(this)" style="width: 100%; padding: 16px; background-color: #d4edda; border: none; cursor: pointer; border-radius: 6px; font-weight: 600; text-align: left; font-size: 16px; display: flex; justify-content: space-between; align-items: center;">
-            <span>✓ Passed Cases (15)</span>
+            <span>✓ Passed Cases (5)</span>
             <span style="font-size: 20px;">▼</span>
           </button>
           <div class="status-section" style="display: none; margin-top: 12px;">
@@ -273,112 +280,6 @@
           
           <div style="padding: 16px;">
             
-            
-            <button type="button" onclick="toggleError(this)" style="width: 100%; padding: 12px 16px; background: none; border: none; cursor: pointer; text-align: left; font-size: 13px; color: #cc0000; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #e0e0e0;">
-              <span>📋 Response</span>
-              <span style="font-size: 16px;">▼</span>
-            </button>
-            <div class="error-detail" style="background-color: #ffe6e6; color: #cc0000; ">
-              
-              Status: 200
-
-{
-  "value": {
-    "access_token": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJmYjc2OWNkZC03ZTlkLTQzNTUtYTMzMS00MzAyODcwMGNhM2EiLCJpYXQiOjE3ODI3Mzg2ODYsImV4cCI6MTc4Mjc0MDQ4NiwicGVybWlzc2lvbnMiOltdfQ.23v-h9euvZOjg4P4Z5mKOuwvuRQmKqOFd92H5Mhh2hgJQnkpZGaPJg-Wx0zDen7HfJRn1joj26uJ9jkabubGVg",
-    "expires_in": 1800,
-    "token_type": "Bearer"
-  }
-}
-            </div>
-        
-          </div>
-        
-        </div>
-      </div>
-    
-      <div class="test-case-row">
-        <div class="test-case-header" onclick="toggleTestCase(this)">
-          <div style="font-weight: 500; color: #333;">No Token (Authentication Failure)</div>
-          <div style="display: flex; align-items: center; gap: 12px;">
-            <span style="background-color: #d4edda; padding: 4px 12px; border-radius: 4px; font-size: 12px; font-weight: 500;">
-              Passed ✓
-            </span>
-            <span class="arrow" style="font-size: 18px; transition: transform 0.3s; transform: rotate(-90deg);">▼</span>
-          </div>
-        </div>
-        <div class="test-case-content">
-          
-          <div style="padding: 16px;">
-            
-        <div style="margin-bottom: 16px; padding: 12px; background: #f9f9f9; border-radius: 4px; border-left: 3px solid #667eea;">
-          <button type="button" onclick="toggleDetails(this)" style="width: 100%; padding: 12px; background: none; border: none; cursor: pointer; text-align: left; font-size: 13px; font-weight: 500; color: #333; display: flex; justify-content: space-between; align-items: center;">
-            <span>📡 Details (1 API calls)</span>
-            <span class="details-arrow" style="font-size: 16px; transition: transform 0.3s; transform: rotate(-90deg);">▼</span>
-          </button>
-          <div class="details-section" style="display: none; margin-top: 12px;">
-            
-          <div style="margin-bottom: 16px; padding: 12px; background: white; border: 1px solid #e0e0e0; border-radius: 4px;">
-            <div style="font-weight: 600; color: #333; margin-bottom: 12px;">API Call 1: Create Order (No Token)<span style="background-color: #d4edda; color: #155724; padding: 2px 10px; border-radius: 4px; font-size: 11px; font-weight: 600; margin-left: 10px;">Passed ✓</span></div>
-            <div style="font-size: 13px; color: #666; margin-bottom: 8px;">
-              <div style="margin-bottom: 4px;"><strong>Request URL:</strong> <code style="color: #0066cc; word-break: break-all;">https://distributor.dev.keepz.me/api/distributor</code></div>
-              <div style="margin-bottom: 4px;"><strong>Request Method:</strong> <span style="font-weight: 500;">POST</span></div>
-              <div style="margin-bottom: 8px;"><strong>Status Code:</strong> <span style="background: #f0f0f0; padding: 2px 8px; border-radius: 3px; font-family: monospace;">401</span></div>
-              <div style="margin-bottom: 4px;"><strong>Request Body:</strong></div>
-              <pre style="margin: 4px 0 8px 0; background: #fff8e6; padding: 8px; border-radius: 3px; border-left: 3px solid #f0ad4e; overflow-x: auto; font-family: monospace; font-size: 12px; color: #8a6d3b;">{
-  "amount": 0.1,
-  "currency": "GEL",
-  "description": "Payment without authentication",
-  "toIban": "GE54BG0000000542056887"
-}</pre>
-            </div>
-            <button type="button" onclick="toggleApiDetails(this)" style="width: 100%; padding: 8px 12px; background: #f5f5f5; border: 1px solid #e0e0e0; cursor: pointer; border-radius: 4px; font-size: 12px; color: #333; display: flex; justify-content: space-between; align-items: center;">
-              <span>Expected vs Actual Response</span>
-              <span class="api-arrow" style="font-size: 14px; transition: transform 0.3s; transform: rotate(-90deg);">▼</span>
-            </button>
-            <div class="api-details" style="display: none; margin-top: 12px; padding: 12px; background: #f9f9f9; border-radius: 4px; border-left: 3px solid #667eea; font-family: monospace; font-size: 12px; line-height: 1.5; max-height: 400px; overflow-y: auto;">
-              <div style="margin-bottom: 12px;">
-                <strong style="color: #333;">Expected Result:</strong>
-                <pre style="margin: 8px 0 0 0; background: white; padding: 8px; border-radius: 3px; overflow-x: auto; color: #0066cc;">{
-  "message": "Authentication failed"
-}</pre>
-              </div>
-              <div>
-                <strong style="color: #333;">Actual Result:</strong>
-                <pre style="margin: 8px 0 0 0; background: white; padding: 8px; border-radius: 3px; overflow-x: auto; color: #066600;">{
-  "application_name": null,
-  "method_name": null,
-  "exception_name": null,
-  "status": null,
-  "message": "Authentication failed",
-  "timestamp": null
-}</pre>
-              </div>
-            </div>
-          </div>
-        
-          </div>
-        </div>
-      
-            
-          </div>
-        
-        </div>
-      </div>
-    
-      <div class="test-case-row">
-        <div class="test-case-header" onclick="toggleTestCase(this)">
-          <div style="font-weight: 500; color: #333;">Invalid Credentials (Authentication)</div>
-          <div style="display: flex; align-items: center; gap: 12px;">
-            <span style="background-color: #d4edda; padding: 4px 12px; border-radius: 4px; font-size: 12px; font-weight: 500;">
-              Passed ✓
-            </span>
-            <span class="arrow" style="font-size: 18px; transition: transform 0.3s; transform: rotate(-90deg);">▼</span>
-          </div>
-        </div>
-        <div class="test-case-content">
-          
-          <div style="padding: 16px;">
-            
         <div style="margin-bottom: 16px; padding: 12px; background: #f9f9f9; border-radius: 4px; border-left: 3px solid #667eea;">
           <button type="button" onclick="toggleDetails(this)" style="width: 100%; padding: 12px; background: none; border: none; cursor: pointer; text-align: left; font-size: 13px; font-weight: 500; color: #333; display: flex; justify-content: space-between; align-items: center;">
             <span>📡 Details (1 API calls)</span>
@@ -391,146 +292,6 @@
             <div style="font-size: 13px; color: #666; margin-bottom: 8px;">
               <div style="margin-bottom: 4px;"><strong>Request URL:</strong> <code style="color: #0066cc; word-break: break-all;">https://distributor.dev.keepz.me/api/auth</code></div>
               <div style="margin-bottom: 4px;"><strong>Request Method:</strong> <span style="font-weight: 500;">POST</span></div>
-              <div style="margin-bottom: 8px;"><strong>Status Code:</strong> <span style="background: #f0f0f0; padding: 2px 8px; border-radius: 3px; font-family: monospace;">400</span></div>
-              <div style="margin-bottom: 4px;"><strong>Request Body:</strong></div>
-              <pre style="margin: 4px 0 8px 0; background: #fff8e6; padding: 8px; border-radius: 3px; border-left: 3px solid #f0ad4e; overflow-x: auto; font-family: monospace; font-size: 12px; color: #8a6d3b;">{
-  "client_id": "fb769cdd-7e9d-4355-a331-43028700ca3a",
-  "client_secret": "***",
-  "grant_type": "client_credentials"
-}</pre>
-            </div>
-            <button type="button" onclick="toggleApiDetails(this)" style="width: 100%; padding: 8px 12px; background: #f5f5f5; border: 1px solid #e0e0e0; cursor: pointer; border-radius: 4px; font-size: 12px; color: #333; display: flex; justify-content: space-between; align-items: center;">
-              <span>Expected vs Actual Response</span>
-              <span class="api-arrow" style="font-size: 14px; transition: transform 0.3s; transform: rotate(-90deg);">▼</span>
-            </button>
-            <div class="api-details" style="display: none; margin-top: 12px; padding: 12px; background: #f9f9f9; border-radius: 4px; border-left: 3px solid #667eea; font-family: monospace; font-size: 12px; line-height: 1.5; max-height: 400px; overflow-y: auto;">
-              <div style="margin-bottom: 12px;">
-                <strong style="color: #333;">Expected Result:</strong>
-                <pre style="margin: 8px 0 0 0; background: white; padding: 8px; border-radius: 3px; overflow-x: auto; color: #0066cc;">{
-  "message": "Incorrect credentials"
-}</pre>
-              </div>
-              <div>
-                <strong style="color: #333;">Actual Result:</strong>
-                <pre style="margin: 8px 0 0 0; background: white; padding: 8px; border-radius: 3px; overflow-x: auto; color: #066600;">{
-  "message": "Incorrect credentials",
-  "statusCode": 5021,
-  "exceptionGroup": 3
-}</pre>
-              </div>
-            </div>
-          </div>
-        
-          </div>
-        </div>
-      
-            
-          </div>
-        
-        </div>
-      </div>
-    
-      <div class="test-case-row">
-        <div class="test-case-header" onclick="toggleTestCase(this)">
-          <div style="font-weight: 500; color: #333;">Incorrect Client ID (Authentication)</div>
-          <div style="display: flex; align-items: center; gap: 12px;">
-            <span style="background-color: #d4edda; padding: 4px 12px; border-radius: 4px; font-size: 12px; font-weight: 500;">
-              Passed ✓
-            </span>
-            <span class="arrow" style="font-size: 18px; transition: transform 0.3s; transform: rotate(-90deg);">▼</span>
-          </div>
-        </div>
-        <div class="test-case-content">
-          
-          <div style="padding: 16px;">
-            
-        <div style="margin-bottom: 16px; padding: 12px; background: #f9f9f9; border-radius: 4px; border-left: 3px solid #667eea;">
-          <button type="button" onclick="toggleDetails(this)" style="width: 100%; padding: 12px; background: none; border: none; cursor: pointer; text-align: left; font-size: 13px; font-weight: 500; color: #333; display: flex; justify-content: space-between; align-items: center;">
-            <span>📡 Details (1 API calls)</span>
-            <span class="details-arrow" style="font-size: 16px; transition: transform 0.3s; transform: rotate(-90deg);">▼</span>
-          </button>
-          <div class="details-section" style="display: none; margin-top: 12px;">
-            
-          <div style="margin-bottom: 16px; padding: 12px; background: white; border: 1px solid #e0e0e0; border-radius: 4px;">
-            <div style="font-weight: 600; color: #333; margin-bottom: 12px;">API Call 1: Get Token<span style="background-color: #d4edda; color: #155724; padding: 2px 10px; border-radius: 4px; font-size: 11px; font-weight: 600; margin-left: 10px;">Passed ✓</span></div>
-            <div style="font-size: 13px; color: #666; margin-bottom: 8px;">
-              <div style="margin-bottom: 4px;"><strong>Request URL:</strong> <code style="color: #0066cc; word-break: break-all;">https://distributor.dev.keepz.me/api/auth</code></div>
-              <div style="margin-bottom: 4px;"><strong>Request Method:</strong> <span style="font-weight: 500;">POST</span></div>
-              <div style="margin-bottom: 8px;"><strong>Status Code:</strong> <span style="background: #f0f0f0; padding: 2px 8px; border-radius: 3px; font-family: monospace;">400</span></div>
-              <div style="margin-bottom: 4px;"><strong>Request Body:</strong></div>
-              <pre style="margin: 4px 0 8px 0; background: #fff8e6; padding: 8px; border-radius: 3px; border-left: 3px solid #f0ad4e; overflow-x: auto; font-family: monospace; font-size: 12px; color: #8a6d3b;">{
-  "client_id": "fb769cdd-7e9d-4355-a331-43028700ca32",
-  "client_secret": "***",
-  "grant_type": "client_credentials"
-}</pre>
-            </div>
-            <button type="button" onclick="toggleApiDetails(this)" style="width: 100%; padding: 8px 12px; background: #f5f5f5; border: 1px solid #e0e0e0; cursor: pointer; border-radius: 4px; font-size: 12px; color: #333; display: flex; justify-content: space-between; align-items: center;">
-              <span>Expected vs Actual Response</span>
-              <span class="api-arrow" style="font-size: 14px; transition: transform 0.3s; transform: rotate(-90deg);">▼</span>
-            </button>
-            <div class="api-details" style="display: none; margin-top: 12px; padding: 12px; background: #f9f9f9; border-radius: 4px; border-left: 3px solid #667eea; font-family: monospace; font-size: 12px; line-height: 1.5; max-height: 400px; overflow-y: auto;">
-              <div style="margin-bottom: 12px;">
-                <strong style="color: #333;">Expected Result:</strong>
-                <pre style="margin: 8px 0 0 0; background: white; padding: 8px; border-radius: 3px; overflow-x: auto; color: #0066cc;">{
-  "message": "Client not found for given id."
-}</pre>
-              </div>
-              <div>
-                <strong style="color: #333;">Actual Result:</strong>
-                <pre style="margin: 8px 0 0 0; background: white; padding: 8px; border-radius: 3px; overflow-x: auto; color: #066600;">{
-  "message": "Client not found for given id.",
-  "statusCode": 5003,
-  "exceptionGroup": 5
-}</pre>
-              </div>
-            </div>
-          </div>
-        
-          </div>
-        </div>
-      
-            
-          </div>
-        
-        </div>
-      </div>
-    
-        </div>
-      </div>
-    
-      <div style="margin-bottom: 16px;">
-        <button type="button" onclick="toggleCategory(this)" style="width: 100%; padding: 12px 16px; background: #f5f5f5; border: none; cursor: pointer; border-left: 4px solid #667eea; font-weight: 500; font-size: 14px; color: #333; display: flex; justify-content: space-between; align-items: center; text-align: left;">
-          <span>📁 Balance Update Cases</span>
-          <span style="font-size: 16px; transition: transform 0.3s; transform: rotate(-90deg);">▼</span>
-        </button>
-        <div class="category-section" style="display: none; background: white; border-radius: 0 0 6px 6px; overflow: hidden;">
-          
-      <div class="test-case-row">
-        <div class="test-case-header" onclick="toggleTestCase(this)">
-          <div style="font-weight: 500; color: #333;">Balance Update - GEL</div>
-          <div style="display: flex; align-items: center; gap: 12px;">
-            <span style="background-color: #d4edda; padding: 4px 12px; border-radius: 4px; font-size: 12px; font-weight: 500;">
-              Passed ✓
-            </span>
-            <span class="arrow" style="font-size: 18px; transition: transform 0.3s; transform: rotate(-90deg);">▼</span>
-          </div>
-        </div>
-        <div class="test-case-content">
-          
-          <div style="padding: 16px;">
-            
-        <div style="margin-bottom: 16px; padding: 12px; background: #f9f9f9; border-radius: 4px; border-left: 3px solid #667eea;">
-          <button type="button" onclick="toggleDetails(this)" style="width: 100%; padding: 12px; background: none; border: none; cursor: pointer; text-align: left; font-size: 13px; font-weight: 500; color: #333; display: flex; justify-content: space-between; align-items: center;">
-            <span>📡 Details (4 API calls)</span>
-            <span class="details-arrow" style="font-size: 16px; transition: transform 0.3s; transform: rotate(-90deg);">▼</span>
-          </button>
-          <div class="details-section" style="display: none; margin-top: 12px;">
-            
-          <div style="margin-bottom: 16px; padding: 12px; background: white; border: 1px solid #e0e0e0; border-radius: 4px;">
-            <div style="font-weight: 600; color: #333; margin-bottom: 12px;">API Call 1: Get Token<span style="background-color: #d4edda; color: #155724; padding: 2px 10px; border-radius: 4px; font-size: 11px; font-weight: 600; margin-left: 10px;">Passed ✓</span></div>
-            <div style="font-size: 13px; color: #666; margin-bottom: 8px;">
-              <div style="margin-bottom: 4px;"><strong>Request URL:</strong> <code style="color: #0066cc; word-break: break-all;">https://distributor.dev.keepz.me/api/auth</code></div>
-              <div style="margin-bottom: 4px;"><strong>Request Method:</strong> <span style="font-weight: 500;">POST</span></div>
               <div style="margin-bottom: 8px;"><strong>Status Code:</strong> <span style="background: #f0f0f0; padding: 2px 8px; border-radius: 3px; font-family: monospace;">200</span></div>
               <div style="margin-bottom: 4px;"><strong>Request Body:</strong></div>
               <pre style="margin: 4px 0 8px 0; background: #fff8e6; padding: 8px; border-radius: 3px; border-left: 3px solid #f0ad4e; overflow-x: auto; font-family: monospace; font-size: 12px; color: #8a6d3b;">{
@@ -547,14 +308,17 @@
               <div style="margin-bottom: 12px;">
                 <strong style="color: #333;">Expected Result:</strong>
                 <pre style="margin: 8px 0 0 0; background: white; padding: 8px; border-radius: 3px; overflow-x: auto; color: #0066cc;">{
-  "access_token": "***"
+  "value": {
+    "access_token": "string",
+    "token_type": "Bearer"
+  }
 }</pre>
               </div>
               <div>
                 <strong style="color: #333;">Actual Result:</strong>
                 <pre style="margin: 8px 0 0 0; background: white; padding: 8px; border-radius: 3px; overflow-x: auto; color: #066600;">{
   "value": {
-    "access_token": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJmYjc2OWNkZC03ZTlkLTQzNTUtYTMzMS00MzAyODcwMGNhM2EiLCJpYXQiOjE3ODI3Mzg2ODYsImV4cCI6MTc4Mjc0MDQ4NiwicGVybWlzc2lvbnMiOltdfQ.23v-h9euvZOjg4P4Z5mKOuwvuRQmKqOFd92H5Mhh2hgJQnkpZGaPJg-Wx0zDen7HfJRn1joj26uJ9jkabubGVg",
+    "access_token": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJmYjc2OWNkZC03ZTlkLTQzNTUtYTMzMS00MzAyODcwMGNhM2EiLCJpYXQiOjE3ODI3NDEzNzgsImV4cCI6MTc4Mjc0MzE3OCwicGVybWlzc2lvbnMiOltdfQ.1AlZD80Abql9xXg-W29gcXObouNvzEPnE2iZQ2xN3x1wIva5AIwJuAHXcS_sCQXDwlJmji6_O-AkZ6rMc2yhmA",
     "expires_in": 1800,
     "token_type": "Bearer"
   }
@@ -563,471 +327,10 @@
             </div>
           </div>
         
-          <div style="margin-bottom: 16px; padding: 12px; background: white; border: 1px solid #e0e0e0; border-radius: 4px;">
-            <div style="font-weight: 600; color: #333; margin-bottom: 12px;">API Call 2: Get Balance (GEL)<span style="background-color: #d4edda; color: #155724; padding: 2px 10px; border-radius: 4px; font-size: 11px; font-weight: 600; margin-left: 10px;">Passed ✓</span></div>
-            <div style="font-size: 13px; color: #666; margin-bottom: 8px;">
-              <div style="margin-bottom: 4px;"><strong>Request URL:</strong> <code style="color: #0066cc; word-break: break-all;">https://distributor.dev.keepz.me/api/distributor/balance/check?currency=GEL</code></div>
-              <div style="margin-bottom: 4px;"><strong>Request Method:</strong> <span style="font-weight: 500;">GET</span></div>
-              <div style="margin-bottom: 8px;"><strong>Status Code:</strong> <span style="background: #f0f0f0; padding: 2px 8px; border-radius: 3px; font-family: monospace;">200</span></div>
-              <div style="margin-bottom: 4px;"><strong>Query Parameters:</strong></div>
-              <pre style="margin: 4px 0 8px 0; background: #eef6ff; padding: 8px; border-radius: 3px; border-left: 3px solid #4a90d9; overflow-x: auto; font-family: monospace; font-size: 12px; color: #2c5d8a;">{
-  "currency": "GEL"
-}</pre>
-            </div>
-            <button type="button" onclick="toggleApiDetails(this)" style="width: 100%; padding: 8px 12px; background: #f5f5f5; border: 1px solid #e0e0e0; cursor: pointer; border-radius: 4px; font-size: 12px; color: #333; display: flex; justify-content: space-between; align-items: center;">
-              <span>Expected vs Actual Response</span>
-              <span class="api-arrow" style="font-size: 14px; transition: transform 0.3s; transform: rotate(-90deg);">▼</span>
-            </button>
-            <div class="api-details" style="display: none; margin-top: 12px; padding: 12px; background: #f9f9f9; border-radius: 4px; border-left: 3px solid #667eea; font-family: monospace; font-size: 12px; line-height: 1.5; max-height: 400px; overflow-y: auto;">
-              <div style="margin-bottom: 12px;">
-                <strong style="color: #333;">Expected Result:</strong>
-                <pre style="margin: 8px 0 0 0; background: white; padding: 8px; border-radius: 3px; overflow-x: auto; color: #0066cc;">{
-  "amount": "number",
-  "currency": "GEL"
-}</pre>
-              </div>
-              <div>
-                <strong style="color: #333;">Actual Result:</strong>
-                <pre style="margin: 8px 0 0 0; background: white; padding: 8px; border-radius: 3px; overflow-x: auto; color: #066600;">{
-  "amount": 2.04,
-  "currency": "GEL"
-}</pre>
-              </div>
-            </div>
-          </div>
-        
-          <div style="margin-bottom: 16px; padding: 12px; background: white; border: 1px solid #e0e0e0; border-radius: 4px;">
-            <div style="font-weight: 600; color: #333; margin-bottom: 12px;">API Call 3: Update Balance (GEL)<span style="background-color: #d4edda; color: #155724; padding: 2px 10px; border-radius: 4px; font-size: 11px; font-weight: 600; margin-left: 10px;">Passed ✓</span></div>
-            <div style="font-size: 13px; color: #666; margin-bottom: 8px;">
-              <div style="margin-bottom: 4px;"><strong>Request URL:</strong> <code style="color: #0066cc; word-break: break-all;">https://distributor.dev.keepz.me/api/distributor/balance/update</code></div>
-              <div style="margin-bottom: 4px;"><strong>Request Method:</strong> <span style="font-weight: 500;">PUT</span></div>
-              <div style="margin-bottom: 8px;"><strong>Status Code:</strong> <span style="background: #f0f0f0; padding: 2px 8px; border-radius: 3px; font-family: monospace;">200</span></div>
-              <div style="margin-bottom: 4px;"><strong>Request Body:</strong></div>
-              <pre style="margin: 4px 0 8px 0; background: #fff8e6; padding: 8px; border-radius: 3px; border-left: 3px solid #f0ad4e; overflow-x: auto; font-family: monospace; font-size: 12px; color: #8a6d3b;">{
-  "amount": 0.15,
-  "clientId": "fb769cdd-7e9d-4355-a331-43028700ca3a",
-  "secret": "***",
-  "currency": "GEL"
-}</pre>
-            </div>
-            <button type="button" onclick="toggleApiDetails(this)" style="width: 100%; padding: 8px 12px; background: #f5f5f5; border: 1px solid #e0e0e0; cursor: pointer; border-radius: 4px; font-size: 12px; color: #333; display: flex; justify-content: space-between; align-items: center;">
-              <span>Expected vs Actual Response</span>
-              <span class="api-arrow" style="font-size: 14px; transition: transform 0.3s; transform: rotate(-90deg);">▼</span>
-            </button>
-            <div class="api-details" style="display: none; margin-top: 12px; padding: 12px; background: #f9f9f9; border-radius: 4px; border-left: 3px solid #667eea; font-family: monospace; font-size: 12px; line-height: 1.5; max-height: 400px; overflow-y: auto;">
-              <div style="margin-bottom: 12px;">
-                <strong style="color: #333;">Expected Result:</strong>
-                <pre style="margin: 8px 0 0 0; background: white; padding: 8px; border-radius: 3px; overflow-x: auto; color: #0066cc;">{
-  "statusCode": 200
-}</pre>
-              </div>
-              <div>
-                <strong style="color: #333;">Actual Result:</strong>
-                <pre style="margin: 8px 0 0 0; background: white; padding: 8px; border-radius: 3px; overflow-x: auto; color: #066600;">{
-  "statusCode": 200
-}</pre>
-              </div>
-            </div>
-          </div>
-        
-          <div style="margin-bottom: 16px; padding: 12px; background: white; border: 1px solid #e0e0e0; border-radius: 4px;">
-            <div style="font-weight: 600; color: #333; margin-bottom: 12px;">API Call 4: Get Balance (GEL)<span style="background-color: #d4edda; color: #155724; padding: 2px 10px; border-radius: 4px; font-size: 11px; font-weight: 600; margin-left: 10px;">Passed ✓</span></div>
-            <div style="font-size: 13px; color: #666; margin-bottom: 8px;">
-              <div style="margin-bottom: 4px;"><strong>Request URL:</strong> <code style="color: #0066cc; word-break: break-all;">https://distributor.dev.keepz.me/api/distributor/balance/check?currency=GEL</code></div>
-              <div style="margin-bottom: 4px;"><strong>Request Method:</strong> <span style="font-weight: 500;">GET</span></div>
-              <div style="margin-bottom: 8px;"><strong>Status Code:</strong> <span style="background: #f0f0f0; padding: 2px 8px; border-radius: 3px; font-family: monospace;">200</span></div>
-              <div style="margin-bottom: 4px;"><strong>Query Parameters:</strong></div>
-              <pre style="margin: 4px 0 8px 0; background: #eef6ff; padding: 8px; border-radius: 3px; border-left: 3px solid #4a90d9; overflow-x: auto; font-family: monospace; font-size: 12px; color: #2c5d8a;">{
-  "currency": "GEL"
-}</pre>
-            </div>
-            <button type="button" onclick="toggleApiDetails(this)" style="width: 100%; padding: 8px 12px; background: #f5f5f5; border: 1px solid #e0e0e0; cursor: pointer; border-radius: 4px; font-size: 12px; color: #333; display: flex; justify-content: space-between; align-items: center;">
-              <span>Expected vs Actual Response</span>
-              <span class="api-arrow" style="font-size: 14px; transition: transform 0.3s; transform: rotate(-90deg);">▼</span>
-            </button>
-            <div class="api-details" style="display: none; margin-top: 12px; padding: 12px; background: #f9f9f9; border-radius: 4px; border-left: 3px solid #667eea; font-family: monospace; font-size: 12px; line-height: 1.5; max-height: 400px; overflow-y: auto;">
-              <div style="margin-bottom: 12px;">
-                <strong style="color: #333;">Expected Result:</strong>
-                <pre style="margin: 8px 0 0 0; background: white; padding: 8px; border-radius: 3px; overflow-x: auto; color: #0066cc;">{
-  "amount": "number",
-  "currency": "GEL"
-}</pre>
-              </div>
-              <div>
-                <strong style="color: #333;">Actual Result:</strong>
-                <pre style="margin: 8px 0 0 0; background: white; padding: 8px; border-radius: 3px; overflow-x: auto; color: #066600;">{
-  "amount": 2.19,
-  "currency": "GEL"
-}</pre>
-              </div>
-            </div>
-          </div>
-        
           </div>
         </div>
       
             
-            <button type="button" onclick="toggleError(this)" style="width: 100%; padding: 12px 16px; background: none; border: none; cursor: pointer; text-align: left; font-size: 13px; color: #0066cc; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #e0e0e0;">
-              <span>📋 Response</span>
-              <span style="font-size: 16px;">▼</span>
-            </button>
-            <div class="error-detail" style="background-color: #e6f2ff; color: #0066cc; ">
-              
-              GEL balance updated: 2.04 + 0.15 = 2.19 (Expected: 2.19)
-            </div>
-        
-          </div>
-        
-        </div>
-      </div>
-    
-      <div class="test-case-row">
-        <div class="test-case-header" onclick="toggleTestCase(this)">
-          <div style="font-weight: 500; color: #333;">Balance Update - USD</div>
-          <div style="display: flex; align-items: center; gap: 12px;">
-            <span style="background-color: #d4edda; padding: 4px 12px; border-radius: 4px; font-size: 12px; font-weight: 500;">
-              Passed ✓
-            </span>
-            <span class="arrow" style="font-size: 18px; transition: transform 0.3s; transform: rotate(-90deg);">▼</span>
-          </div>
-        </div>
-        <div class="test-case-content">
-          
-          <div style="padding: 16px;">
-            
-        <div style="margin-bottom: 16px; padding: 12px; background: #f9f9f9; border-radius: 4px; border-left: 3px solid #667eea;">
-          <button type="button" onclick="toggleDetails(this)" style="width: 100%; padding: 12px; background: none; border: none; cursor: pointer; text-align: left; font-size: 13px; font-weight: 500; color: #333; display: flex; justify-content: space-between; align-items: center;">
-            <span>📡 Details (4 API calls)</span>
-            <span class="details-arrow" style="font-size: 16px; transition: transform 0.3s; transform: rotate(-90deg);">▼</span>
-          </button>
-          <div class="details-section" style="display: none; margin-top: 12px;">
-            
-          <div style="margin-bottom: 16px; padding: 12px; background: white; border: 1px solid #e0e0e0; border-radius: 4px;">
-            <div style="font-weight: 600; color: #333; margin-bottom: 12px;">API Call 1: Get Token<span style="background-color: #d4edda; color: #155724; padding: 2px 10px; border-radius: 4px; font-size: 11px; font-weight: 600; margin-left: 10px;">Passed ✓</span></div>
-            <div style="font-size: 13px; color: #666; margin-bottom: 8px;">
-              <div style="margin-bottom: 4px;"><strong>Request URL:</strong> <code style="color: #0066cc; word-break: break-all;">https://distributor.dev.keepz.me/api/auth</code></div>
-              <div style="margin-bottom: 4px;"><strong>Request Method:</strong> <span style="font-weight: 500;">POST</span></div>
-              <div style="margin-bottom: 8px;"><strong>Status Code:</strong> <span style="background: #f0f0f0; padding: 2px 8px; border-radius: 3px; font-family: monospace;">200</span></div>
-              <div style="margin-bottom: 4px;"><strong>Request Body:</strong></div>
-              <pre style="margin: 4px 0 8px 0; background: #fff8e6; padding: 8px; border-radius: 3px; border-left: 3px solid #f0ad4e; overflow-x: auto; font-family: monospace; font-size: 12px; color: #8a6d3b;">{
-  "client_id": "fb769cdd-7e9d-4355-a331-43028700ca3a",
-  "client_secret": "***",
-  "grant_type": "client_credentials"
-}</pre>
-            </div>
-            <button type="button" onclick="toggleApiDetails(this)" style="width: 100%; padding: 8px 12px; background: #f5f5f5; border: 1px solid #e0e0e0; cursor: pointer; border-radius: 4px; font-size: 12px; color: #333; display: flex; justify-content: space-between; align-items: center;">
-              <span>Expected vs Actual Response</span>
-              <span class="api-arrow" style="font-size: 14px; transition: transform 0.3s; transform: rotate(-90deg);">▼</span>
-            </button>
-            <div class="api-details" style="display: none; margin-top: 12px; padding: 12px; background: #f9f9f9; border-radius: 4px; border-left: 3px solid #667eea; font-family: monospace; font-size: 12px; line-height: 1.5; max-height: 400px; overflow-y: auto;">
-              <div style="margin-bottom: 12px;">
-                <strong style="color: #333;">Expected Result:</strong>
-                <pre style="margin: 8px 0 0 0; background: white; padding: 8px; border-radius: 3px; overflow-x: auto; color: #0066cc;">{
-  "access_token": "***"
-}</pre>
-              </div>
-              <div>
-                <strong style="color: #333;">Actual Result:</strong>
-                <pre style="margin: 8px 0 0 0; background: white; padding: 8px; border-radius: 3px; overflow-x: auto; color: #066600;">{
-  "value": {
-    "access_token": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJmYjc2OWNkZC03ZTlkLTQzNTUtYTMzMS00MzAyODcwMGNhM2EiLCJpYXQiOjE3ODI3Mzg2ODYsImV4cCI6MTc4Mjc0MDQ4NiwicGVybWlzc2lvbnMiOltdfQ.23v-h9euvZOjg4P4Z5mKOuwvuRQmKqOFd92H5Mhh2hgJQnkpZGaPJg-Wx0zDen7HfJRn1joj26uJ9jkabubGVg",
-    "expires_in": 1800,
-    "token_type": "Bearer"
-  }
-}</pre>
-              </div>
-            </div>
-          </div>
-        
-          <div style="margin-bottom: 16px; padding: 12px; background: white; border: 1px solid #e0e0e0; border-radius: 4px;">
-            <div style="font-weight: 600; color: #333; margin-bottom: 12px;">API Call 2: Get Balance (USD)<span style="background-color: #d4edda; color: #155724; padding: 2px 10px; border-radius: 4px; font-size: 11px; font-weight: 600; margin-left: 10px;">Passed ✓</span></div>
-            <div style="font-size: 13px; color: #666; margin-bottom: 8px;">
-              <div style="margin-bottom: 4px;"><strong>Request URL:</strong> <code style="color: #0066cc; word-break: break-all;">https://distributor.dev.keepz.me/api/distributor/balance/check?currency=USD</code></div>
-              <div style="margin-bottom: 4px;"><strong>Request Method:</strong> <span style="font-weight: 500;">GET</span></div>
-              <div style="margin-bottom: 8px;"><strong>Status Code:</strong> <span style="background: #f0f0f0; padding: 2px 8px; border-radius: 3px; font-family: monospace;">200</span></div>
-              <div style="margin-bottom: 4px;"><strong>Query Parameters:</strong></div>
-              <pre style="margin: 4px 0 8px 0; background: #eef6ff; padding: 8px; border-radius: 3px; border-left: 3px solid #4a90d9; overflow-x: auto; font-family: monospace; font-size: 12px; color: #2c5d8a;">{
-  "currency": "USD"
-}</pre>
-            </div>
-            <button type="button" onclick="toggleApiDetails(this)" style="width: 100%; padding: 8px 12px; background: #f5f5f5; border: 1px solid #e0e0e0; cursor: pointer; border-radius: 4px; font-size: 12px; color: #333; display: flex; justify-content: space-between; align-items: center;">
-              <span>Expected vs Actual Response</span>
-              <span class="api-arrow" style="font-size: 14px; transition: transform 0.3s; transform: rotate(-90deg);">▼</span>
-            </button>
-            <div class="api-details" style="display: none; margin-top: 12px; padding: 12px; background: #f9f9f9; border-radius: 4px; border-left: 3px solid #667eea; font-family: monospace; font-size: 12px; line-height: 1.5; max-height: 400px; overflow-y: auto;">
-              <div style="margin-bottom: 12px;">
-                <strong style="color: #333;">Expected Result:</strong>
-                <pre style="margin: 8px 0 0 0; background: white; padding: 8px; border-radius: 3px; overflow-x: auto; color: #0066cc;">{
-  "amount": "number",
-  "currency": "USD"
-}</pre>
-              </div>
-              <div>
-                <strong style="color: #333;">Actual Result:</strong>
-                <pre style="margin: 8px 0 0 0; background: white; padding: 8px; border-radius: 3px; overflow-x: auto; color: #066600;">{
-  "amount": 1.14,
-  "currency": "USD"
-}</pre>
-              </div>
-            </div>
-          </div>
-        
-          <div style="margin-bottom: 16px; padding: 12px; background: white; border: 1px solid #e0e0e0; border-radius: 4px;">
-            <div style="font-weight: 600; color: #333; margin-bottom: 12px;">API Call 3: Update Balance (USD)<span style="background-color: #d4edda; color: #155724; padding: 2px 10px; border-radius: 4px; font-size: 11px; font-weight: 600; margin-left: 10px;">Passed ✓</span></div>
-            <div style="font-size: 13px; color: #666; margin-bottom: 8px;">
-              <div style="margin-bottom: 4px;"><strong>Request URL:</strong> <code style="color: #0066cc; word-break: break-all;">https://distributor.dev.keepz.me/api/distributor/balance/update</code></div>
-              <div style="margin-bottom: 4px;"><strong>Request Method:</strong> <span style="font-weight: 500;">PUT</span></div>
-              <div style="margin-bottom: 8px;"><strong>Status Code:</strong> <span style="background: #f0f0f0; padding: 2px 8px; border-radius: 3px; font-family: monospace;">200</span></div>
-              <div style="margin-bottom: 4px;"><strong>Request Body:</strong></div>
-              <pre style="margin: 4px 0 8px 0; background: #fff8e6; padding: 8px; border-radius: 3px; border-left: 3px solid #f0ad4e; overflow-x: auto; font-family: monospace; font-size: 12px; color: #8a6d3b;">{
-  "amount": 0.15,
-  "clientId": "fb769cdd-7e9d-4355-a331-43028700ca3a",
-  "secret": "***",
-  "currency": "USD"
-}</pre>
-            </div>
-            <button type="button" onclick="toggleApiDetails(this)" style="width: 100%; padding: 8px 12px; background: #f5f5f5; border: 1px solid #e0e0e0; cursor: pointer; border-radius: 4px; font-size: 12px; color: #333; display: flex; justify-content: space-between; align-items: center;">
-              <span>Expected vs Actual Response</span>
-              <span class="api-arrow" style="font-size: 14px; transition: transform 0.3s; transform: rotate(-90deg);">▼</span>
-            </button>
-            <div class="api-details" style="display: none; margin-top: 12px; padding: 12px; background: #f9f9f9; border-radius: 4px; border-left: 3px solid #667eea; font-family: monospace; font-size: 12px; line-height: 1.5; max-height: 400px; overflow-y: auto;">
-              <div style="margin-bottom: 12px;">
-                <strong style="color: #333;">Expected Result:</strong>
-                <pre style="margin: 8px 0 0 0; background: white; padding: 8px; border-radius: 3px; overflow-x: auto; color: #0066cc;">{
-  "statusCode": 200
-}</pre>
-              </div>
-              <div>
-                <strong style="color: #333;">Actual Result:</strong>
-                <pre style="margin: 8px 0 0 0; background: white; padding: 8px; border-radius: 3px; overflow-x: auto; color: #066600;">{
-  "statusCode": 200
-}</pre>
-              </div>
-            </div>
-          </div>
-        
-          <div style="margin-bottom: 16px; padding: 12px; background: white; border: 1px solid #e0e0e0; border-radius: 4px;">
-            <div style="font-weight: 600; color: #333; margin-bottom: 12px;">API Call 4: Get Balance (USD)<span style="background-color: #d4edda; color: #155724; padding: 2px 10px; border-radius: 4px; font-size: 11px; font-weight: 600; margin-left: 10px;">Passed ✓</span></div>
-            <div style="font-size: 13px; color: #666; margin-bottom: 8px;">
-              <div style="margin-bottom: 4px;"><strong>Request URL:</strong> <code style="color: #0066cc; word-break: break-all;">https://distributor.dev.keepz.me/api/distributor/balance/check?currency=USD</code></div>
-              <div style="margin-bottom: 4px;"><strong>Request Method:</strong> <span style="font-weight: 500;">GET</span></div>
-              <div style="margin-bottom: 8px;"><strong>Status Code:</strong> <span style="background: #f0f0f0; padding: 2px 8px; border-radius: 3px; font-family: monospace;">200</span></div>
-              <div style="margin-bottom: 4px;"><strong>Query Parameters:</strong></div>
-              <pre style="margin: 4px 0 8px 0; background: #eef6ff; padding: 8px; border-radius: 3px; border-left: 3px solid #4a90d9; overflow-x: auto; font-family: monospace; font-size: 12px; color: #2c5d8a;">{
-  "currency": "USD"
-}</pre>
-            </div>
-            <button type="button" onclick="toggleApiDetails(this)" style="width: 100%; padding: 8px 12px; background: #f5f5f5; border: 1px solid #e0e0e0; cursor: pointer; border-radius: 4px; font-size: 12px; color: #333; display: flex; justify-content: space-between; align-items: center;">
-              <span>Expected vs Actual Response</span>
-              <span class="api-arrow" style="font-size: 14px; transition: transform 0.3s; transform: rotate(-90deg);">▼</span>
-            </button>
-            <div class="api-details" style="display: none; margin-top: 12px; padding: 12px; background: #f9f9f9; border-radius: 4px; border-left: 3px solid #667eea; font-family: monospace; font-size: 12px; line-height: 1.5; max-height: 400px; overflow-y: auto;">
-              <div style="margin-bottom: 12px;">
-                <strong style="color: #333;">Expected Result:</strong>
-                <pre style="margin: 8px 0 0 0; background: white; padding: 8px; border-radius: 3px; overflow-x: auto; color: #0066cc;">{
-  "amount": "number",
-  "currency": "USD"
-}</pre>
-              </div>
-              <div>
-                <strong style="color: #333;">Actual Result:</strong>
-                <pre style="margin: 8px 0 0 0; background: white; padding: 8px; border-radius: 3px; overflow-x: auto; color: #066600;">{
-  "amount": 1.29,
-  "currency": "USD"
-}</pre>
-              </div>
-            </div>
-          </div>
-        
-          </div>
-        </div>
-      
-            
-            <button type="button" onclick="toggleError(this)" style="width: 100%; padding: 12px 16px; background: none; border: none; cursor: pointer; text-align: left; font-size: 13px; color: #0066cc; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #e0e0e0;">
-              <span>📋 Response</span>
-              <span style="font-size: 16px;">▼</span>
-            </button>
-            <div class="error-detail" style="background-color: #e6f2ff; color: #0066cc; ">
-              
-              USD balance updated: 1.14 + 0.15 = 1.29 (Expected: 1.29)
-            </div>
-        
-          </div>
-        
-        </div>
-      </div>
-    
-      <div class="test-case-row">
-        <div class="test-case-header" onclick="toggleTestCase(this)">
-          <div style="font-weight: 500; color: #333;">Balance Update - EUR</div>
-          <div style="display: flex; align-items: center; gap: 12px;">
-            <span style="background-color: #d4edda; padding: 4px 12px; border-radius: 4px; font-size: 12px; font-weight: 500;">
-              Passed ✓
-            </span>
-            <span class="arrow" style="font-size: 18px; transition: transform 0.3s; transform: rotate(-90deg);">▼</span>
-          </div>
-        </div>
-        <div class="test-case-content">
-          
-          <div style="padding: 16px;">
-            
-        <div style="margin-bottom: 16px; padding: 12px; background: #f9f9f9; border-radius: 4px; border-left: 3px solid #667eea;">
-          <button type="button" onclick="toggleDetails(this)" style="width: 100%; padding: 12px; background: none; border: none; cursor: pointer; text-align: left; font-size: 13px; font-weight: 500; color: #333; display: flex; justify-content: space-between; align-items: center;">
-            <span>📡 Details (4 API calls)</span>
-            <span class="details-arrow" style="font-size: 16px; transition: transform 0.3s; transform: rotate(-90deg);">▼</span>
-          </button>
-          <div class="details-section" style="display: none; margin-top: 12px;">
-            
-          <div style="margin-bottom: 16px; padding: 12px; background: white; border: 1px solid #e0e0e0; border-radius: 4px;">
-            <div style="font-weight: 600; color: #333; margin-bottom: 12px;">API Call 1: Get Token<span style="background-color: #d4edda; color: #155724; padding: 2px 10px; border-radius: 4px; font-size: 11px; font-weight: 600; margin-left: 10px;">Passed ✓</span></div>
-            <div style="font-size: 13px; color: #666; margin-bottom: 8px;">
-              <div style="margin-bottom: 4px;"><strong>Request URL:</strong> <code style="color: #0066cc; word-break: break-all;">https://distributor.dev.keepz.me/api/auth</code></div>
-              <div style="margin-bottom: 4px;"><strong>Request Method:</strong> <span style="font-weight: 500;">POST</span></div>
-              <div style="margin-bottom: 8px;"><strong>Status Code:</strong> <span style="background: #f0f0f0; padding: 2px 8px; border-radius: 3px; font-family: monospace;">200</span></div>
-              <div style="margin-bottom: 4px;"><strong>Request Body:</strong></div>
-              <pre style="margin: 4px 0 8px 0; background: #fff8e6; padding: 8px; border-radius: 3px; border-left: 3px solid #f0ad4e; overflow-x: auto; font-family: monospace; font-size: 12px; color: #8a6d3b;">{
-  "client_id": "fb769cdd-7e9d-4355-a331-43028700ca3a",
-  "client_secret": "***",
-  "grant_type": "client_credentials"
-}</pre>
-            </div>
-            <button type="button" onclick="toggleApiDetails(this)" style="width: 100%; padding: 8px 12px; background: #f5f5f5; border: 1px solid #e0e0e0; cursor: pointer; border-radius: 4px; font-size: 12px; color: #333; display: flex; justify-content: space-between; align-items: center;">
-              <span>Expected vs Actual Response</span>
-              <span class="api-arrow" style="font-size: 14px; transition: transform 0.3s; transform: rotate(-90deg);">▼</span>
-            </button>
-            <div class="api-details" style="display: none; margin-top: 12px; padding: 12px; background: #f9f9f9; border-radius: 4px; border-left: 3px solid #667eea; font-family: monospace; font-size: 12px; line-height: 1.5; max-height: 400px; overflow-y: auto;">
-              <div style="margin-bottom: 12px;">
-                <strong style="color: #333;">Expected Result:</strong>
-                <pre style="margin: 8px 0 0 0; background: white; padding: 8px; border-radius: 3px; overflow-x: auto; color: #0066cc;">{
-  "access_token": "***"
-}</pre>
-              </div>
-              <div>
-                <strong style="color: #333;">Actual Result:</strong>
-                <pre style="margin: 8px 0 0 0; background: white; padding: 8px; border-radius: 3px; overflow-x: auto; color: #066600;">{
-  "value": {
-    "access_token": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJmYjc2OWNkZC03ZTlkLTQzNTUtYTMzMS00MzAyODcwMGNhM2EiLCJpYXQiOjE3ODI3Mzg2ODYsImV4cCI6MTc4Mjc0MDQ4NiwicGVybWlzc2lvbnMiOltdfQ.23v-h9euvZOjg4P4Z5mKOuwvuRQmKqOFd92H5Mhh2hgJQnkpZGaPJg-Wx0zDen7HfJRn1joj26uJ9jkabubGVg",
-    "expires_in": 1800,
-    "token_type": "Bearer"
-  }
-}</pre>
-              </div>
-            </div>
-          </div>
-        
-          <div style="margin-bottom: 16px; padding: 12px; background: white; border: 1px solid #e0e0e0; border-radius: 4px;">
-            <div style="font-weight: 600; color: #333; margin-bottom: 12px;">API Call 2: Get Balance (EUR)<span style="background-color: #d4edda; color: #155724; padding: 2px 10px; border-radius: 4px; font-size: 11px; font-weight: 600; margin-left: 10px;">Passed ✓</span></div>
-            <div style="font-size: 13px; color: #666; margin-bottom: 8px;">
-              <div style="margin-bottom: 4px;"><strong>Request URL:</strong> <code style="color: #0066cc; word-break: break-all;">https://distributor.dev.keepz.me/api/distributor/balance/check?currency=EUR</code></div>
-              <div style="margin-bottom: 4px;"><strong>Request Method:</strong> <span style="font-weight: 500;">GET</span></div>
-              <div style="margin-bottom: 8px;"><strong>Status Code:</strong> <span style="background: #f0f0f0; padding: 2px 8px; border-radius: 3px; font-family: monospace;">200</span></div>
-              <div style="margin-bottom: 4px;"><strong>Query Parameters:</strong></div>
-              <pre style="margin: 4px 0 8px 0; background: #eef6ff; padding: 8px; border-radius: 3px; border-left: 3px solid #4a90d9; overflow-x: auto; font-family: monospace; font-size: 12px; color: #2c5d8a;">{
-  "currency": "EUR"
-}</pre>
-            </div>
-            <button type="button" onclick="toggleApiDetails(this)" style="width: 100%; padding: 8px 12px; background: #f5f5f5; border: 1px solid #e0e0e0; cursor: pointer; border-radius: 4px; font-size: 12px; color: #333; display: flex; justify-content: space-between; align-items: center;">
-              <span>Expected vs Actual Response</span>
-              <span class="api-arrow" style="font-size: 14px; transition: transform 0.3s; transform: rotate(-90deg);">▼</span>
-            </button>
-            <div class="api-details" style="display: none; margin-top: 12px; padding: 12px; background: #f9f9f9; border-radius: 4px; border-left: 3px solid #667eea; font-family: monospace; font-size: 12px; line-height: 1.5; max-height: 400px; overflow-y: auto;">
-              <div style="margin-bottom: 12px;">
-                <strong style="color: #333;">Expected Result:</strong>
-                <pre style="margin: 8px 0 0 0; background: white; padding: 8px; border-radius: 3px; overflow-x: auto; color: #0066cc;">{
-  "amount": "number",
-  "currency": "EUR"
-}</pre>
-              </div>
-              <div>
-                <strong style="color: #333;">Actual Result:</strong>
-                <pre style="margin: 8px 0 0 0; background: white; padding: 8px; border-radius: 3px; overflow-x: auto; color: #066600;">{
-  "amount": 1.14,
-  "currency": "EUR"
-}</pre>
-              </div>
-            </div>
-          </div>
-        
-          <div style="margin-bottom: 16px; padding: 12px; background: white; border: 1px solid #e0e0e0; border-radius: 4px;">
-            <div style="font-weight: 600; color: #333; margin-bottom: 12px;">API Call 3: Update Balance (EUR)<span style="background-color: #d4edda; color: #155724; padding: 2px 10px; border-radius: 4px; font-size: 11px; font-weight: 600; margin-left: 10px;">Passed ✓</span></div>
-            <div style="font-size: 13px; color: #666; margin-bottom: 8px;">
-              <div style="margin-bottom: 4px;"><strong>Request URL:</strong> <code style="color: #0066cc; word-break: break-all;">https://distributor.dev.keepz.me/api/distributor/balance/update</code></div>
-              <div style="margin-bottom: 4px;"><strong>Request Method:</strong> <span style="font-weight: 500;">PUT</span></div>
-              <div style="margin-bottom: 8px;"><strong>Status Code:</strong> <span style="background: #f0f0f0; padding: 2px 8px; border-radius: 3px; font-family: monospace;">200</span></div>
-              <div style="margin-bottom: 4px;"><strong>Request Body:</strong></div>
-              <pre style="margin: 4px 0 8px 0; background: #fff8e6; padding: 8px; border-radius: 3px; border-left: 3px solid #f0ad4e; overflow-x: auto; font-family: monospace; font-size: 12px; color: #8a6d3b;">{
-  "amount": 0.15,
-  "clientId": "fb769cdd-7e9d-4355-a331-43028700ca3a",
-  "secret": "***",
-  "currency": "EUR"
-}</pre>
-            </div>
-            <button type="button" onclick="toggleApiDetails(this)" style="width: 100%; padding: 8px 12px; background: #f5f5f5; border: 1px solid #e0e0e0; cursor: pointer; border-radius: 4px; font-size: 12px; color: #333; display: flex; justify-content: space-between; align-items: center;">
-              <span>Expected vs Actual Response</span>
-              <span class="api-arrow" style="font-size: 14px; transition: transform 0.3s; transform: rotate(-90deg);">▼</span>
-            </button>
-            <div class="api-details" style="display: none; margin-top: 12px; padding: 12px; background: #f9f9f9; border-radius: 4px; border-left: 3px solid #667eea; font-family: monospace; font-size: 12px; line-height: 1.5; max-height: 400px; overflow-y: auto;">
-              <div style="margin-bottom: 12px;">
-                <strong style="color: #333;">Expected Result:</strong>
-                <pre style="margin: 8px 0 0 0; background: white; padding: 8px; border-radius: 3px; overflow-x: auto; color: #0066cc;">{
-  "statusCode": 200
-}</pre>
-              </div>
-              <div>
-                <strong style="color: #333;">Actual Result:</strong>
-                <pre style="margin: 8px 0 0 0; background: white; padding: 8px; border-radius: 3px; overflow-x: auto; color: #066600;">{
-  "statusCode": 200
-}</pre>
-              </div>
-            </div>
-          </div>
-        
-          <div style="margin-bottom: 16px; padding: 12px; background: white; border: 1px solid #e0e0e0; border-radius: 4px;">
-            <div style="font-weight: 600; color: #333; margin-bottom: 12px;">API Call 4: Get Balance (EUR)<span style="background-color: #d4edda; color: #155724; padding: 2px 10px; border-radius: 4px; font-size: 11px; font-weight: 600; margin-left: 10px;">Passed ✓</span></div>
-            <div style="font-size: 13px; color: #666; margin-bottom: 8px;">
-              <div style="margin-bottom: 4px;"><strong>Request URL:</strong> <code style="color: #0066cc; word-break: break-all;">https://distributor.dev.keepz.me/api/distributor/balance/check?currency=EUR</code></div>
-              <div style="margin-bottom: 4px;"><strong>Request Method:</strong> <span style="font-weight: 500;">GET</span></div>
-              <div style="margin-bottom: 8px;"><strong>Status Code:</strong> <span style="background: #f0f0f0; padding: 2px 8px; border-radius: 3px; font-family: monospace;">200</span></div>
-              <div style="margin-bottom: 4px;"><strong>Query Parameters:</strong></div>
-              <pre style="margin: 4px 0 8px 0; background: #eef6ff; padding: 8px; border-radius: 3px; border-left: 3px solid #4a90d9; overflow-x: auto; font-family: monospace; font-size: 12px; color: #2c5d8a;">{
-  "currency": "EUR"
-}</pre>
-            </div>
-            <button type="button" onclick="toggleApiDetails(this)" style="width: 100%; padding: 8px 12px; background: #f5f5f5; border: 1px solid #e0e0e0; cursor: pointer; border-radius: 4px; font-size: 12px; color: #333; display: flex; justify-content: space-between; align-items: center;">
-              <span>Expected vs Actual Response</span>
-              <span class="api-arrow" style="font-size: 14px; transition: transform 0.3s; transform: rotate(-90deg);">▼</span>
-            </button>
-            <div class="api-details" style="display: none; margin-top: 12px; padding: 12px; background: #f9f9f9; border-radius: 4px; border-left: 3px solid #667eea; font-family: monospace; font-size: 12px; line-height: 1.5; max-height: 400px; overflow-y: auto;">
-              <div style="margin-bottom: 12px;">
-                <strong style="color: #333;">Expected Result:</strong>
-                <pre style="margin: 8px 0 0 0; background: white; padding: 8px; border-radius: 3px; overflow-x: auto; color: #0066cc;">{
-  "amount": "number",
-  "currency": "EUR"
-}</pre>
-              </div>
-              <div>
-                <strong style="color: #333;">Actual Result:</strong>
-                <pre style="margin: 8px 0 0 0; background: white; padding: 8px; border-radius: 3px; overflow-x: auto; color: #066600;">{
-  "amount": 1.29,
-  "currency": "EUR"
-}</pre>
-              </div>
-            </div>
-          </div>
-        
-          </div>
-        </div>
-      
-            
-            <button type="button" onclick="toggleError(this)" style="width: 100%; padding: 12px 16px; background: none; border: none; cursor: pointer; text-align: left; font-size: 13px; color: #0066cc; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #e0e0e0;">
-              <span>📋 Response</span>
-              <span style="font-size: 16px;">▼</span>
-            </button>
-            <div class="error-detail" style="background-color: #e6f2ff; color: #0066cc; ">
-              
-              EUR balance updated: 1.14 + 0.15 = 1.29 (Expected: 1.29)
-            </div>
-        
           </div>
         
         </div>
@@ -1092,7 +395,7 @@
                 <strong style="color: #333;">Actual Result:</strong>
                 <pre style="margin: 8px 0 0 0; background: white; padding: 8px; border-radius: 3px; overflow-x: auto; color: #066600;">{
   "value": {
-    "access_token": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJmYjc2OWNkZC03ZTlkLTQzNTUtYTMzMS00MzAyODcwMGNhM2EiLCJpYXQiOjE3ODI3Mzg2ODcsImV4cCI6MTc4Mjc0MDQ4NywicGVybWlzc2lvbnMiOltdfQ.KMToifalpQJUAb2tnGcXxujZqJpnGBeaedztJdgq33jwRBtGFQPQU0VSi4Erbc7VhHkyajoDpkYTB9yBf9oR4Q",
+    "access_token": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJmYjc2OWNkZC03ZTlkLTQzNTUtYTMzMS00MzAyODcwMGNhM2EiLCJpYXQiOjE3ODI3NDEzNzksImV4cCI6MTc4Mjc0MzE3OSwicGVybWlzc2lvbnMiOltdfQ.CKJYN-b0T5JmtMhgv3K2pvjR1vYcfga3J6v_zsA6G08eCnLd2P_mg3qz4Iu26OG3JNVif5cVBmuGfy6kMCv18w",
     "expires_in": 1800,
     "token_type": "Bearer"
   }
@@ -1113,7 +416,7 @@
   "currency": "GEL",
   "description": "Test Payment",
   "toIban": "GE54BG0000000542056887",
-  "uniqueId": "1f91ecce-36df-4972-87d8-58f33a48b24f",
+  "uniqueId": "ef93c24c-8c9a-423f-bc7d-0e50609daf95",
   "debtorName": "შპს ტესტი",
   "debtorIban": "GE42CD0360000062461306",
   "debtorIdentityNumber": "98809409129"
@@ -1135,11 +438,11 @@
                 <strong style="color: #333;">Actual Result:</strong>
                 <pre style="margin: 8px 0 0 0; background: white; padding: 8px; border-radius: 3px; overflow-x: auto; color: #066600;">{
   "value": {
-    "transactionId": 19106,
+    "transactionId": 19160,
     "status": "INITIAL",
     "statusDescription": "Initial",
-    "uniqueId": "1f91ecce-36df-4972-87d8-58f33a48b24f",
-    "createdAt": "2026-06-29T17:11:27.313018611",
+    "uniqueId": "ef93c24c-8c9a-423f-bc7d-0e50609daf95",
+    "createdAt": "2026-06-29T17:56:19.286750278",
     "distributionFlow": "STANDARD"
   }
 }</pre>
@@ -1150,12 +453,12 @@
           <div style="margin-bottom: 16px; padding: 12px; background: white; border: 1px solid #e0e0e0; border-radius: 4px;">
             <div style="font-weight: 600; color: #333; margin-bottom: 12px;">API Call 3: Get Transaction Details<span style="background-color: #d4edda; color: #155724; padding: 2px 10px; border-radius: 4px; font-size: 11px; font-weight: 600; margin-left: 10px;">Passed ✓</span></div>
             <div style="font-size: 13px; color: #666; margin-bottom: 8px;">
-              <div style="margin-bottom: 4px;"><strong>Request URL:</strong> <code style="color: #0066cc; word-break: break-all;">https://distributor.dev.keepz.me/api/distributor/details?transaction_id=19106</code></div>
+              <div style="margin-bottom: 4px;"><strong>Request URL:</strong> <code style="color: #0066cc; word-break: break-all;">https://distributor.dev.keepz.me/api/distributor/details?transaction_id=19160</code></div>
               <div style="margin-bottom: 4px;"><strong>Request Method:</strong> <span style="font-weight: 500;">GET</span></div>
               <div style="margin-bottom: 8px;"><strong>Status Code:</strong> <span style="background: #f0f0f0; padding: 2px 8px; border-radius: 3px; font-family: monospace;">200</span></div>
               <div style="margin-bottom: 4px;"><strong>Query Parameters:</strong></div>
               <pre style="margin: 4px 0 8px 0; background: #eef6ff; padding: 8px; border-radius: 3px; border-left: 3px solid #4a90d9; overflow-x: auto; font-family: monospace; font-size: 12px; color: #2c5d8a;">{
-  "transaction_id": "19106"
+  "transaction_id": "19160"
 }</pre>
             </div>
             <button type="button" onclick="toggleApiDetails(this)" style="width: 100%; padding: 8px 12px; background: #f5f5f5; border: 1px solid #e0e0e0; cursor: pointer; border-radius: 4px; font-size: 12px; color: #333; display: flex; justify-content: space-between; align-items: center;">
@@ -1166,21 +469,22 @@
               <div style="margin-bottom: 12px;">
                 <strong style="color: #333;">Expected Result:</strong>
                 <pre style="margin: 8px 0 0 0; background: white; padding: 8px; border-radius: 3px; overflow-x: auto; color: #0066cc;">{
+  "transactionId": 19160,
   "paymentDescription": "შპს ტესტი, GE42CD0360000062461306, 98809409129, Test Payment"
 }</pre>
               </div>
               <div>
                 <strong style="color: #333;">Actual Result:</strong>
                 <pre style="margin: 8px 0 0 0; background: white; padding: 8px; border-radius: 3px; overflow-x: auto; color: #066600;">{
-  "transactionId": 19106,
+  "transactionId": 19160,
   "status": "INITIAL",
   "statusDescription": "Initial",
   "amount": 0.02,
   "toIban": "GE54BG0000000542056887",
   "currency": "GEL",
   "paymentDescription": "შპს ტესტი, GE42CD0360000062461306, 98809409129, Test Payment",
-  "uniqueId": "1f91ecce-36df-4972-87d8-58f33a48b24f",
-  "createdAt": "2026-06-29T17:11:27.313019",
+  "uniqueId": "ef93c24c-8c9a-423f-bc7d-0e50609daf95",
+  "createdAt": "2026-06-29T17:56:19.28675",
   "commissionAmount": 0.01
 }</pre>
               </div>
@@ -1199,7 +503,7 @@
   "currency": "USD",
   "description": "Test Payment",
   "toIban": "GE54BG0000000542056887",
-  "uniqueId": "082a2c4e-0ba5-4019-88e4-482820b32dff",
+  "uniqueId": "09ebeb12-5b2e-486c-afad-837d7c669e73",
   "debtorName": "შპს ტესტი",
   "debtorIban": "GE42CD0360000062461306",
   "debtorIdentityNumber": "98809409129"
@@ -1221,11 +525,11 @@
                 <strong style="color: #333;">Actual Result:</strong>
                 <pre style="margin: 8px 0 0 0; background: white; padding: 8px; border-radius: 3px; overflow-x: auto; color: #066600;">{
   "value": {
-    "transactionId": 19107,
+    "transactionId": 19161,
     "status": "INITIAL",
     "statusDescription": "Initial",
-    "uniqueId": "082a2c4e-0ba5-4019-88e4-482820b32dff",
-    "createdAt": "2026-06-29T17:11:27.522076812",
+    "uniqueId": "09ebeb12-5b2e-486c-afad-837d7c669e73",
+    "createdAt": "2026-06-29T17:56:19.514020911",
     "distributionFlow": "STANDARD"
   }
 }</pre>
@@ -1236,12 +540,12 @@
           <div style="margin-bottom: 16px; padding: 12px; background: white; border: 1px solid #e0e0e0; border-radius: 4px;">
             <div style="font-weight: 600; color: #333; margin-bottom: 12px;">API Call 5: Get Transaction Details<span style="background-color: #d4edda; color: #155724; padding: 2px 10px; border-radius: 4px; font-size: 11px; font-weight: 600; margin-left: 10px;">Passed ✓</span></div>
             <div style="font-size: 13px; color: #666; margin-bottom: 8px;">
-              <div style="margin-bottom: 4px;"><strong>Request URL:</strong> <code style="color: #0066cc; word-break: break-all;">https://distributor.dev.keepz.me/api/distributor/details?transaction_id=19107</code></div>
+              <div style="margin-bottom: 4px;"><strong>Request URL:</strong> <code style="color: #0066cc; word-break: break-all;">https://distributor.dev.keepz.me/api/distributor/details?transaction_id=19161</code></div>
               <div style="margin-bottom: 4px;"><strong>Request Method:</strong> <span style="font-weight: 500;">GET</span></div>
               <div style="margin-bottom: 8px;"><strong>Status Code:</strong> <span style="background: #f0f0f0; padding: 2px 8px; border-radius: 3px; font-family: monospace;">200</span></div>
               <div style="margin-bottom: 4px;"><strong>Query Parameters:</strong></div>
               <pre style="margin: 4px 0 8px 0; background: #eef6ff; padding: 8px; border-radius: 3px; border-left: 3px solid #4a90d9; overflow-x: auto; font-family: monospace; font-size: 12px; color: #2c5d8a;">{
-  "transaction_id": "19107"
+  "transaction_id": "19161"
 }</pre>
             </div>
             <button type="button" onclick="toggleApiDetails(this)" style="width: 100%; padding: 8px 12px; background: #f5f5f5; border: 1px solid #e0e0e0; cursor: pointer; border-radius: 4px; font-size: 12px; color: #333; display: flex; justify-content: space-between; align-items: center;">
@@ -1252,21 +556,22 @@
               <div style="margin-bottom: 12px;">
                 <strong style="color: #333;">Expected Result:</strong>
                 <pre style="margin: 8px 0 0 0; background: white; padding: 8px; border-radius: 3px; overflow-x: auto; color: #0066cc;">{
+  "transactionId": 19161,
   "paymentDescription": "შპს ტესტი, GE42CD0360000062461306, 98809409129, Test Payment"
 }</pre>
               </div>
               <div>
                 <strong style="color: #333;">Actual Result:</strong>
                 <pre style="margin: 8px 0 0 0; background: white; padding: 8px; border-radius: 3px; overflow-x: auto; color: #066600;">{
-  "transactionId": 19107,
+  "transactionId": 19161,
   "status": "INITIAL",
   "statusDescription": "Initial",
   "amount": 0.02,
   "toIban": "GE54BG0000000542056887",
   "currency": "USD",
   "paymentDescription": "შპს ტესტი, GE42CD0360000062461306, 98809409129, Test Payment",
-  "uniqueId": "082a2c4e-0ba5-4019-88e4-482820b32dff",
-  "createdAt": "2026-06-29T17:11:27.522077",
+  "uniqueId": "09ebeb12-5b2e-486c-afad-837d7c669e73",
+  "createdAt": "2026-06-29T17:56:19.514021",
   "commissionAmount": 0.01
 }</pre>
               </div>
@@ -1285,7 +590,7 @@
   "currency": "EUR",
   "description": "Test Payment",
   "toIban": "GE54BG0000000542056887",
-  "uniqueId": "8a5d21cb-96b2-4986-b7ae-dd5d5cbbf833",
+  "uniqueId": "99c86579-cdf8-4d04-9682-8053ad316f66",
   "debtorName": "შპს ტესტი",
   "debtorIban": "GE42CD0360000062461306",
   "debtorIdentityNumber": "98809409129"
@@ -1307,11 +612,11 @@
                 <strong style="color: #333;">Actual Result:</strong>
                 <pre style="margin: 8px 0 0 0; background: white; padding: 8px; border-radius: 3px; overflow-x: auto; color: #066600;">{
   "value": {
-    "transactionId": 19108,
+    "transactionId": 19162,
     "status": "INITIAL",
     "statusDescription": "Initial",
-    "uniqueId": "8a5d21cb-96b2-4986-b7ae-dd5d5cbbf833",
-    "createdAt": "2026-06-29T17:11:27.711729789",
+    "uniqueId": "99c86579-cdf8-4d04-9682-8053ad316f66",
+    "createdAt": "2026-06-29T17:56:19.72949618",
     "distributionFlow": "STANDARD"
   }
 }</pre>
@@ -1322,12 +627,12 @@
           <div style="margin-bottom: 16px; padding: 12px; background: white; border: 1px solid #e0e0e0; border-radius: 4px;">
             <div style="font-weight: 600; color: #333; margin-bottom: 12px;">API Call 7: Get Transaction Details<span style="background-color: #d4edda; color: #155724; padding: 2px 10px; border-radius: 4px; font-size: 11px; font-weight: 600; margin-left: 10px;">Passed ✓</span></div>
             <div style="font-size: 13px; color: #666; margin-bottom: 8px;">
-              <div style="margin-bottom: 4px;"><strong>Request URL:</strong> <code style="color: #0066cc; word-break: break-all;">https://distributor.dev.keepz.me/api/distributor/details?transaction_id=19108</code></div>
+              <div style="margin-bottom: 4px;"><strong>Request URL:</strong> <code style="color: #0066cc; word-break: break-all;">https://distributor.dev.keepz.me/api/distributor/details?transaction_id=19162</code></div>
               <div style="margin-bottom: 4px;"><strong>Request Method:</strong> <span style="font-weight: 500;">GET</span></div>
               <div style="margin-bottom: 8px;"><strong>Status Code:</strong> <span style="background: #f0f0f0; padding: 2px 8px; border-radius: 3px; font-family: monospace;">200</span></div>
               <div style="margin-bottom: 4px;"><strong>Query Parameters:</strong></div>
               <pre style="margin: 4px 0 8px 0; background: #eef6ff; padding: 8px; border-radius: 3px; border-left: 3px solid #4a90d9; overflow-x: auto; font-family: monospace; font-size: 12px; color: #2c5d8a;">{
-  "transaction_id": "19108"
+  "transaction_id": "19162"
 }</pre>
             </div>
             <button type="button" onclick="toggleApiDetails(this)" style="width: 100%; padding: 8px 12px; background: #f5f5f5; border: 1px solid #e0e0e0; cursor: pointer; border-radius: 4px; font-size: 12px; color: #333; display: flex; justify-content: space-between; align-items: center;">
@@ -1338,21 +643,22 @@
               <div style="margin-bottom: 12px;">
                 <strong style="color: #333;">Expected Result:</strong>
                 <pre style="margin: 8px 0 0 0; background: white; padding: 8px; border-radius: 3px; overflow-x: auto; color: #0066cc;">{
+  "transactionId": 19162,
   "paymentDescription": "შპს ტესტი, GE42CD0360000062461306, 98809409129, Test Payment"
 }</pre>
               </div>
               <div>
                 <strong style="color: #333;">Actual Result:</strong>
                 <pre style="margin: 8px 0 0 0; background: white; padding: 8px; border-radius: 3px; overflow-x: auto; color: #066600;">{
-  "transactionId": 19108,
+  "transactionId": 19162,
   "status": "INITIAL",
   "statusDescription": "Initial",
   "amount": 0.02,
   "toIban": "GE54BG0000000542056887",
   "currency": "EUR",
   "paymentDescription": "შპს ტესტი, GE42CD0360000062461306, 98809409129, Test Payment",
-  "uniqueId": "8a5d21cb-96b2-4986-b7ae-dd5d5cbbf833",
-  "createdAt": "2026-06-29T17:11:27.71173",
+  "uniqueId": "99c86579-cdf8-4d04-9682-8053ad316f66",
+  "createdAt": "2026-06-29T17:56:19.729496",
   "commissionAmount": 0.01
 }</pre>
               </div>
@@ -1426,7 +732,7 @@
                 <strong style="color: #333;">Actual Result:</strong>
                 <pre style="margin: 8px 0 0 0; background: white; padding: 8px; border-radius: 3px; overflow-x: auto; color: #066600;">{
   "value": {
-    "access_token": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJmYjc2OWNkZC03ZTlkLTQzNTUtYTMzMS00MzAyODcwMGNhM2EiLCJpYXQiOjE3ODI3Mzg2ODcsImV4cCI6MTc4Mjc0MDQ4NywicGVybWlzc2lvbnMiOltdfQ.KMToifalpQJUAb2tnGcXxujZqJpnGBeaedztJdgq33jwRBtGFQPQU0VSi4Erbc7VhHkyajoDpkYTB9yBf9oR4Q",
+    "access_token": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJmYjc2OWNkZC03ZTlkLTQzNTUtYTMzMS00MzAyODcwMGNhM2EiLCJpYXQiOjE3ODI3NDEzNzksImV4cCI6MTc4Mjc0MzE3OSwicGVybWlzc2lvbnMiOltdfQ.CKJYN-b0T5JmtMhgv3K2pvjR1vYcfga3J6v_zsA6G08eCnLd2P_mg3qz4Iu26OG3JNVif5cVBmuGfy6kMCv18w",
     "expires_in": 1800,
     "token_type": "Bearer"
   }
@@ -1447,7 +753,7 @@
   "currency": "GEL",
   "description": "Test Payment",
   "toIban": "GE26TB7899045061100085",
-  "uniqueId": "91a84b58-aafe-451d-be33-9d91fd2b1338",
+  "uniqueId": "2634fee4-5834-4f94-8382-d029ce3140af",
   "debtorName": "შპს ტესტი",
   "debtorIban": "GE42CD0360000062461306",
   "debtorIdentityNumber": "98809409129"
@@ -1469,11 +775,11 @@
                 <strong style="color: #333;">Actual Result:</strong>
                 <pre style="margin: 8px 0 0 0; background: white; padding: 8px; border-radius: 3px; overflow-x: auto; color: #066600;">{
   "value": {
-    "transactionId": 19109,
+    "transactionId": 19163,
     "status": "INITIAL",
     "statusDescription": "Initial",
-    "uniqueId": "91a84b58-aafe-451d-be33-9d91fd2b1338",
-    "createdAt": "2026-06-29T17:11:27.935136459",
+    "uniqueId": "2634fee4-5834-4f94-8382-d029ce3140af",
+    "createdAt": "2026-06-29T17:56:19.95860196",
     "distributionFlow": "STANDARD"
   }
 }</pre>
@@ -1484,12 +790,12 @@
           <div style="margin-bottom: 16px; padding: 12px; background: white; border: 1px solid #e0e0e0; border-radius: 4px;">
             <div style="font-weight: 600; color: #333; margin-bottom: 12px;">API Call 3: Get Transaction Details<span style="background-color: #d4edda; color: #155724; padding: 2px 10px; border-radius: 4px; font-size: 11px; font-weight: 600; margin-left: 10px;">Passed ✓</span></div>
             <div style="font-size: 13px; color: #666; margin-bottom: 8px;">
-              <div style="margin-bottom: 4px;"><strong>Request URL:</strong> <code style="color: #0066cc; word-break: break-all;">https://distributor.dev.keepz.me/api/distributor/details?transaction_id=19109</code></div>
+              <div style="margin-bottom: 4px;"><strong>Request URL:</strong> <code style="color: #0066cc; word-break: break-all;">https://distributor.dev.keepz.me/api/distributor/details?transaction_id=19163</code></div>
               <div style="margin-bottom: 4px;"><strong>Request Method:</strong> <span style="font-weight: 500;">GET</span></div>
               <div style="margin-bottom: 8px;"><strong>Status Code:</strong> <span style="background: #f0f0f0; padding: 2px 8px; border-radius: 3px; font-family: monospace;">200</span></div>
               <div style="margin-bottom: 4px;"><strong>Query Parameters:</strong></div>
               <pre style="margin: 4px 0 8px 0; background: #eef6ff; padding: 8px; border-radius: 3px; border-left: 3px solid #4a90d9; overflow-x: auto; font-family: monospace; font-size: 12px; color: #2c5d8a;">{
-  "transaction_id": "19109"
+  "transaction_id": "19163"
 }</pre>
             </div>
             <button type="button" onclick="toggleApiDetails(this)" style="width: 100%; padding: 8px 12px; background: #f5f5f5; border: 1px solid #e0e0e0; cursor: pointer; border-radius: 4px; font-size: 12px; color: #333; display: flex; justify-content: space-between; align-items: center;">
@@ -1500,21 +806,22 @@
               <div style="margin-bottom: 12px;">
                 <strong style="color: #333;">Expected Result:</strong>
                 <pre style="margin: 8px 0 0 0; background: white; padding: 8px; border-radius: 3px; overflow-x: auto; color: #0066cc;">{
+  "transactionId": 19163,
   "paymentDescription": "შპს ტესტი, GE42CD0360000062461306, 98809409129, Test Payment"
 }</pre>
               </div>
               <div>
                 <strong style="color: #333;">Actual Result:</strong>
                 <pre style="margin: 8px 0 0 0; background: white; padding: 8px; border-radius: 3px; overflow-x: auto; color: #066600;">{
-  "transactionId": 19109,
+  "transactionId": 19163,
   "status": "INITIAL",
   "statusDescription": "Initial",
   "amount": 0.02,
   "toIban": "GE26TB7899045061100085",
   "currency": "GEL",
   "paymentDescription": "შპს ტესტი, GE42CD0360000062461306, 98809409129, Test Payment",
-  "uniqueId": "91a84b58-aafe-451d-be33-9d91fd2b1338",
-  "createdAt": "2026-06-29T17:11:27.935136",
+  "uniqueId": "2634fee4-5834-4f94-8382-d029ce3140af",
+  "createdAt": "2026-06-29T17:56:19.958602",
   "commissionAmount": 0.01
 }</pre>
               </div>
@@ -1533,7 +840,7 @@
   "currency": "USD",
   "description": "Test Payment",
   "toIban": "GE26TB7899045061100085",
-  "uniqueId": "e251bd55-11b8-497f-a5d6-2fbf78613ced",
+  "uniqueId": "140b35e6-ee5b-442b-8680-c13c66f0cda8",
   "debtorName": "შპს ტესტი",
   "debtorIban": "GE42CD0360000062461306",
   "debtorIdentityNumber": "98809409129"
@@ -1555,11 +862,11 @@
                 <strong style="color: #333;">Actual Result:</strong>
                 <pre style="margin: 8px 0 0 0; background: white; padding: 8px; border-radius: 3px; overflow-x: auto; color: #066600;">{
   "value": {
-    "transactionId": 19110,
+    "transactionId": 19164,
     "status": "INITIAL",
     "statusDescription": "Initial",
-    "uniqueId": "e251bd55-11b8-497f-a5d6-2fbf78613ced",
-    "createdAt": "2026-06-29T17:11:28.159713759",
+    "uniqueId": "140b35e6-ee5b-442b-8680-c13c66f0cda8",
+    "createdAt": "2026-06-29T17:56:20.178656927",
     "distributionFlow": "STANDARD"
   }
 }</pre>
@@ -1570,12 +877,12 @@
           <div style="margin-bottom: 16px; padding: 12px; background: white; border: 1px solid #e0e0e0; border-radius: 4px;">
             <div style="font-weight: 600; color: #333; margin-bottom: 12px;">API Call 5: Get Transaction Details<span style="background-color: #d4edda; color: #155724; padding: 2px 10px; border-radius: 4px; font-size: 11px; font-weight: 600; margin-left: 10px;">Passed ✓</span></div>
             <div style="font-size: 13px; color: #666; margin-bottom: 8px;">
-              <div style="margin-bottom: 4px;"><strong>Request URL:</strong> <code style="color: #0066cc; word-break: break-all;">https://distributor.dev.keepz.me/api/distributor/details?transaction_id=19110</code></div>
+              <div style="margin-bottom: 4px;"><strong>Request URL:</strong> <code style="color: #0066cc; word-break: break-all;">https://distributor.dev.keepz.me/api/distributor/details?transaction_id=19164</code></div>
               <div style="margin-bottom: 4px;"><strong>Request Method:</strong> <span style="font-weight: 500;">GET</span></div>
               <div style="margin-bottom: 8px;"><strong>Status Code:</strong> <span style="background: #f0f0f0; padding: 2px 8px; border-radius: 3px; font-family: monospace;">200</span></div>
               <div style="margin-bottom: 4px;"><strong>Query Parameters:</strong></div>
               <pre style="margin: 4px 0 8px 0; background: #eef6ff; padding: 8px; border-radius: 3px; border-left: 3px solid #4a90d9; overflow-x: auto; font-family: monospace; font-size: 12px; color: #2c5d8a;">{
-  "transaction_id": "19110"
+  "transaction_id": "19164"
 }</pre>
             </div>
             <button type="button" onclick="toggleApiDetails(this)" style="width: 100%; padding: 8px 12px; background: #f5f5f5; border: 1px solid #e0e0e0; cursor: pointer; border-radius: 4px; font-size: 12px; color: #333; display: flex; justify-content: space-between; align-items: center;">
@@ -1586,21 +893,22 @@
               <div style="margin-bottom: 12px;">
                 <strong style="color: #333;">Expected Result:</strong>
                 <pre style="margin: 8px 0 0 0; background: white; padding: 8px; border-radius: 3px; overflow-x: auto; color: #0066cc;">{
+  "transactionId": 19164,
   "paymentDescription": "შპს ტესტი, GE42CD0360000062461306, 98809409129, Test Payment"
 }</pre>
               </div>
               <div>
                 <strong style="color: #333;">Actual Result:</strong>
                 <pre style="margin: 8px 0 0 0; background: white; padding: 8px; border-radius: 3px; overflow-x: auto; color: #066600;">{
-  "transactionId": 19110,
+  "transactionId": 19164,
   "status": "INITIAL",
   "statusDescription": "Initial",
   "amount": 0.02,
   "toIban": "GE26TB7899045061100085",
   "currency": "USD",
   "paymentDescription": "შპს ტესტი, GE42CD0360000062461306, 98809409129, Test Payment",
-  "uniqueId": "e251bd55-11b8-497f-a5d6-2fbf78613ced",
-  "createdAt": "2026-06-29T17:11:28.159714",
+  "uniqueId": "140b35e6-ee5b-442b-8680-c13c66f0cda8",
+  "createdAt": "2026-06-29T17:56:20.178657",
   "commissionAmount": 0.01
 }</pre>
               </div>
@@ -1619,7 +927,7 @@
   "currency": "EUR",
   "description": "Test Payment",
   "toIban": "GE26TB7899045061100085",
-  "uniqueId": "bfbca410-e68b-4c58-b101-2f717bf03de3",
+  "uniqueId": "6a62453a-3a59-42e1-9db2-cfd01e5b7a4e",
   "debtorName": "შპს ტესტი",
   "debtorIban": "GE42CD0360000062461306",
   "debtorIdentityNumber": "98809409129"
@@ -1641,11 +949,11 @@
                 <strong style="color: #333;">Actual Result:</strong>
                 <pre style="margin: 8px 0 0 0; background: white; padding: 8px; border-radius: 3px; overflow-x: auto; color: #066600;">{
   "value": {
-    "transactionId": 19111,
+    "transactionId": 19165,
     "status": "INITIAL",
     "statusDescription": "Initial",
-    "uniqueId": "bfbca410-e68b-4c58-b101-2f717bf03de3",
-    "createdAt": "2026-06-29T17:11:28.380989772",
+    "uniqueId": "6a62453a-3a59-42e1-9db2-cfd01e5b7a4e",
+    "createdAt": "2026-06-29T17:56:20.407457455",
     "distributionFlow": "STANDARD"
   }
 }</pre>
@@ -1656,12 +964,12 @@
           <div style="margin-bottom: 16px; padding: 12px; background: white; border: 1px solid #e0e0e0; border-radius: 4px;">
             <div style="font-weight: 600; color: #333; margin-bottom: 12px;">API Call 7: Get Transaction Details<span style="background-color: #d4edda; color: #155724; padding: 2px 10px; border-radius: 4px; font-size: 11px; font-weight: 600; margin-left: 10px;">Passed ✓</span></div>
             <div style="font-size: 13px; color: #666; margin-bottom: 8px;">
-              <div style="margin-bottom: 4px;"><strong>Request URL:</strong> <code style="color: #0066cc; word-break: break-all;">https://distributor.dev.keepz.me/api/distributor/details?transaction_id=19111</code></div>
+              <div style="margin-bottom: 4px;"><strong>Request URL:</strong> <code style="color: #0066cc; word-break: break-all;">https://distributor.dev.keepz.me/api/distributor/details?transaction_id=19165</code></div>
               <div style="margin-bottom: 4px;"><strong>Request Method:</strong> <span style="font-weight: 500;">GET</span></div>
               <div style="margin-bottom: 8px;"><strong>Status Code:</strong> <span style="background: #f0f0f0; padding: 2px 8px; border-radius: 3px; font-family: monospace;">200</span></div>
               <div style="margin-bottom: 4px;"><strong>Query Parameters:</strong></div>
               <pre style="margin: 4px 0 8px 0; background: #eef6ff; padding: 8px; border-radius: 3px; border-left: 3px solid #4a90d9; overflow-x: auto; font-family: monospace; font-size: 12px; color: #2c5d8a;">{
-  "transaction_id": "19111"
+  "transaction_id": "19165"
 }</pre>
             </div>
             <button type="button" onclick="toggleApiDetails(this)" style="width: 100%; padding: 8px 12px; background: #f5f5f5; border: 1px solid #e0e0e0; cursor: pointer; border-radius: 4px; font-size: 12px; color: #333; display: flex; justify-content: space-between; align-items: center;">
@@ -1672,21 +980,22 @@
               <div style="margin-bottom: 12px;">
                 <strong style="color: #333;">Expected Result:</strong>
                 <pre style="margin: 8px 0 0 0; background: white; padding: 8px; border-radius: 3px; overflow-x: auto; color: #0066cc;">{
+  "transactionId": 19165,
   "paymentDescription": "შპს ტესტი, GE42CD0360000062461306, 98809409129, Test Payment"
 }</pre>
               </div>
               <div>
                 <strong style="color: #333;">Actual Result:</strong>
                 <pre style="margin: 8px 0 0 0; background: white; padding: 8px; border-radius: 3px; overflow-x: auto; color: #066600;">{
-  "transactionId": 19111,
+  "transactionId": 19165,
   "status": "INITIAL",
   "statusDescription": "Initial",
   "amount": 0.02,
   "toIban": "GE26TB7899045061100085",
   "currency": "EUR",
   "paymentDescription": "შპს ტესტი, GE42CD0360000062461306, 98809409129, Test Payment",
-  "uniqueId": "bfbca410-e68b-4c58-b101-2f717bf03de3",
-  "createdAt": "2026-06-29T17:11:28.38099",
+  "uniqueId": "6a62453a-3a59-42e1-9db2-cfd01e5b7a4e",
+  "createdAt": "2026-06-29T17:56:20.407457",
   "commissionAmount": 0.01
 }</pre>
               </div>
@@ -1760,7 +1069,7 @@
                 <strong style="color: #333;">Actual Result:</strong>
                 <pre style="margin: 8px 0 0 0; background: white; padding: 8px; border-radius: 3px; overflow-x: auto; color: #066600;">{
   "value": {
-    "access_token": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJmYjc2OWNkZC03ZTlkLTQzNTUtYTMzMS00MzAyODcwMGNhM2EiLCJpYXQiOjE3ODI3Mzg2ODcsImV4cCI6MTc4Mjc0MDQ4NywicGVybWlzc2lvbnMiOltdfQ.KMToifalpQJUAb2tnGcXxujZqJpnGBeaedztJdgq33jwRBtGFQPQU0VSi4Erbc7VhHkyajoDpkYTB9yBf9oR4Q",
+    "access_token": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJmYjc2OWNkZC03ZTlkLTQzNTUtYTMzMS00MzAyODcwMGNhM2EiLCJpYXQiOjE3ODI3NDEzNzksImV4cCI6MTc4Mjc0MzE3OSwicGVybWlzc2lvbnMiOltdfQ.CKJYN-b0T5JmtMhgv3K2pvjR1vYcfga3J6v_zsA6G08eCnLd2P_mg3qz4Iu26OG3JNVif5cVBmuGfy6kMCv18w",
     "expires_in": 1800,
     "token_type": "Bearer"
   }
@@ -1781,7 +1090,7 @@
   "currency": "GEL",
   "description": "Test Payment",
   "toIban": "GE29LB0711197559630000",
-  "uniqueId": "34205475-bd1c-41c4-8554-070c3d89bde4",
+  "uniqueId": "77104ce0-c48b-497b-8b8a-1dabd99a0244",
   "beneficiaryName": "Giorgi Lezhava",
   "debtorName": "შპს ტესტი",
   "debtorIban": "GE42CD0360000062461306",
@@ -1804,11 +1113,11 @@
                 <strong style="color: #333;">Actual Result:</strong>
                 <pre style="margin: 8px 0 0 0; background: white; padding: 8px; border-radius: 3px; overflow-x: auto; color: #066600;">{
   "value": {
-    "transactionId": 19112,
+    "transactionId": 19166,
     "status": "INITIAL",
     "statusDescription": "Initial",
-    "uniqueId": "34205475-bd1c-41c4-8554-070c3d89bde4",
-    "createdAt": "2026-06-29T17:11:28.603838908",
+    "uniqueId": "77104ce0-c48b-497b-8b8a-1dabd99a0244",
+    "createdAt": "2026-06-29T17:56:20.674268396",
     "distributionFlow": "STANDARD"
   }
 }</pre>
@@ -1819,12 +1128,12 @@
           <div style="margin-bottom: 16px; padding: 12px; background: white; border: 1px solid #e0e0e0; border-radius: 4px;">
             <div style="font-weight: 600; color: #333; margin-bottom: 12px;">API Call 3: Get Transaction Details<span style="background-color: #d4edda; color: #155724; padding: 2px 10px; border-radius: 4px; font-size: 11px; font-weight: 600; margin-left: 10px;">Passed ✓</span></div>
             <div style="font-size: 13px; color: #666; margin-bottom: 8px;">
-              <div style="margin-bottom: 4px;"><strong>Request URL:</strong> <code style="color: #0066cc; word-break: break-all;">https://distributor.dev.keepz.me/api/distributor/details?transaction_id=19112</code></div>
+              <div style="margin-bottom: 4px;"><strong>Request URL:</strong> <code style="color: #0066cc; word-break: break-all;">https://distributor.dev.keepz.me/api/distributor/details?transaction_id=19166</code></div>
               <div style="margin-bottom: 4px;"><strong>Request Method:</strong> <span style="font-weight: 500;">GET</span></div>
               <div style="margin-bottom: 8px;"><strong>Status Code:</strong> <span style="background: #f0f0f0; padding: 2px 8px; border-radius: 3px; font-family: monospace;">200</span></div>
               <div style="margin-bottom: 4px;"><strong>Query Parameters:</strong></div>
               <pre style="margin: 4px 0 8px 0; background: #eef6ff; padding: 8px; border-radius: 3px; border-left: 3px solid #4a90d9; overflow-x: auto; font-family: monospace; font-size: 12px; color: #2c5d8a;">{
-  "transaction_id": "19112"
+  "transaction_id": "19166"
 }</pre>
             </div>
             <button type="button" onclick="toggleApiDetails(this)" style="width: 100%; padding: 8px 12px; background: #f5f5f5; border: 1px solid #e0e0e0; cursor: pointer; border-radius: 4px; font-size: 12px; color: #333; display: flex; justify-content: space-between; align-items: center;">
@@ -1835,21 +1144,22 @@
               <div style="margin-bottom: 12px;">
                 <strong style="color: #333;">Expected Result:</strong>
                 <pre style="margin: 8px 0 0 0; background: white; padding: 8px; border-radius: 3px; overflow-x: auto; color: #0066cc;">{
+  "transactionId": 19166,
   "paymentDescription": "შპს ტესტი, GE42CD0360000062461306, 98809409129, Test Payment"
 }</pre>
               </div>
               <div>
                 <strong style="color: #333;">Actual Result:</strong>
                 <pre style="margin: 8px 0 0 0; background: white; padding: 8px; border-radius: 3px; overflow-x: auto; color: #066600;">{
-  "transactionId": 19112,
+  "transactionId": 19166,
   "status": "INITIAL",
   "statusDescription": "Initial",
   "amount": 0.02,
   "toIban": "GE29LB0711197559630000",
   "currency": "GEL",
   "paymentDescription": "შპს ტესტი, GE42CD0360000062461306, 98809409129, Test Payment",
-  "uniqueId": "34205475-bd1c-41c4-8554-070c3d89bde4",
-  "createdAt": "2026-06-29T17:11:28.603839",
+  "uniqueId": "77104ce0-c48b-497b-8b8a-1dabd99a0244",
+  "createdAt": "2026-06-29T17:56:20.674268",
   "commissionAmount": 0.01
 }</pre>
               </div>
@@ -1868,7 +1178,7 @@
   "currency": "USD",
   "description": "Test Payment",
   "toIban": "GE29LB0711197559630000",
-  "uniqueId": "2a50dcb2-37b7-4c48-b75b-fd6cb86107da",
+  "uniqueId": "ebbbdba5-1d51-45ef-bfd3-3e6fb4dddde0",
   "beneficiaryName": "Giorgi Lezhava",
   "debtorName": "შპს ტესტი",
   "debtorIban": "GE42CD0360000062461306",
@@ -1891,11 +1201,11 @@
                 <strong style="color: #333;">Actual Result:</strong>
                 <pre style="margin: 8px 0 0 0; background: white; padding: 8px; border-radius: 3px; overflow-x: auto; color: #066600;">{
   "value": {
-    "transactionId": 19113,
+    "transactionId": 19167,
     "status": "INITIAL",
     "statusDescription": "Initial",
-    "uniqueId": "2a50dcb2-37b7-4c48-b75b-fd6cb86107da",
-    "createdAt": "2026-06-29T17:11:28.808771777",
+    "uniqueId": "ebbbdba5-1d51-45ef-bfd3-3e6fb4dddde0",
+    "createdAt": "2026-06-29T17:56:21.003004152",
     "distributionFlow": "STANDARD"
   }
 }</pre>
@@ -1906,12 +1216,12 @@
           <div style="margin-bottom: 16px; padding: 12px; background: white; border: 1px solid #e0e0e0; border-radius: 4px;">
             <div style="font-weight: 600; color: #333; margin-bottom: 12px;">API Call 5: Get Transaction Details<span style="background-color: #d4edda; color: #155724; padding: 2px 10px; border-radius: 4px; font-size: 11px; font-weight: 600; margin-left: 10px;">Passed ✓</span></div>
             <div style="font-size: 13px; color: #666; margin-bottom: 8px;">
-              <div style="margin-bottom: 4px;"><strong>Request URL:</strong> <code style="color: #0066cc; word-break: break-all;">https://distributor.dev.keepz.me/api/distributor/details?transaction_id=19113</code></div>
+              <div style="margin-bottom: 4px;"><strong>Request URL:</strong> <code style="color: #0066cc; word-break: break-all;">https://distributor.dev.keepz.me/api/distributor/details?transaction_id=19167</code></div>
               <div style="margin-bottom: 4px;"><strong>Request Method:</strong> <span style="font-weight: 500;">GET</span></div>
               <div style="margin-bottom: 8px;"><strong>Status Code:</strong> <span style="background: #f0f0f0; padding: 2px 8px; border-radius: 3px; font-family: monospace;">200</span></div>
               <div style="margin-bottom: 4px;"><strong>Query Parameters:</strong></div>
               <pre style="margin: 4px 0 8px 0; background: #eef6ff; padding: 8px; border-radius: 3px; border-left: 3px solid #4a90d9; overflow-x: auto; font-family: monospace; font-size: 12px; color: #2c5d8a;">{
-  "transaction_id": "19113"
+  "transaction_id": "19167"
 }</pre>
             </div>
             <button type="button" onclick="toggleApiDetails(this)" style="width: 100%; padding: 8px 12px; background: #f5f5f5; border: 1px solid #e0e0e0; cursor: pointer; border-radius: 4px; font-size: 12px; color: #333; display: flex; justify-content: space-between; align-items: center;">
@@ -1922,21 +1232,22 @@
               <div style="margin-bottom: 12px;">
                 <strong style="color: #333;">Expected Result:</strong>
                 <pre style="margin: 8px 0 0 0; background: white; padding: 8px; border-radius: 3px; overflow-x: auto; color: #0066cc;">{
+  "transactionId": 19167,
   "paymentDescription": "შპს ტესტი, GE42CD0360000062461306, 98809409129, Test Payment"
 }</pre>
               </div>
               <div>
                 <strong style="color: #333;">Actual Result:</strong>
                 <pre style="margin: 8px 0 0 0; background: white; padding: 8px; border-radius: 3px; overflow-x: auto; color: #066600;">{
-  "transactionId": 19113,
+  "transactionId": 19167,
   "status": "INITIAL",
   "statusDescription": "Initial",
   "amount": 0.02,
   "toIban": "GE29LB0711197559630000",
   "currency": "USD",
   "paymentDescription": "შპს ტესტი, GE42CD0360000062461306, 98809409129, Test Payment",
-  "uniqueId": "2a50dcb2-37b7-4c48-b75b-fd6cb86107da",
-  "createdAt": "2026-06-29T17:11:28.808772",
+  "uniqueId": "ebbbdba5-1d51-45ef-bfd3-3e6fb4dddde0",
+  "createdAt": "2026-06-29T17:56:21.003004",
   "commissionAmount": 0.01
 }</pre>
               </div>
@@ -1955,7 +1266,7 @@
   "currency": "EUR",
   "description": "Test Payment",
   "toIban": "GE29LB0711197559630000",
-  "uniqueId": "6242ed8d-9b53-42c1-9a49-f0ad32bdf614",
+  "uniqueId": "76fa61af-398f-46ed-b73a-afc0a8def64f",
   "beneficiaryName": "Giorgi Lezhava",
   "debtorName": "შპს ტესტი",
   "debtorIban": "GE42CD0360000062461306",
@@ -1978,11 +1289,11 @@
                 <strong style="color: #333;">Actual Result:</strong>
                 <pre style="margin: 8px 0 0 0; background: white; padding: 8px; border-radius: 3px; overflow-x: auto; color: #066600;">{
   "value": {
-    "transactionId": 19114,
+    "transactionId": 19168,
     "status": "INITIAL",
     "statusDescription": "Initial",
-    "uniqueId": "6242ed8d-9b53-42c1-9a49-f0ad32bdf614",
-    "createdAt": "2026-06-29T17:11:29.010381149",
+    "uniqueId": "76fa61af-398f-46ed-b73a-afc0a8def64f",
+    "createdAt": "2026-06-29T17:56:21.462468947",
     "distributionFlow": "STANDARD"
   }
 }</pre>
@@ -1993,12 +1304,12 @@
           <div style="margin-bottom: 16px; padding: 12px; background: white; border: 1px solid #e0e0e0; border-radius: 4px;">
             <div style="font-weight: 600; color: #333; margin-bottom: 12px;">API Call 7: Get Transaction Details<span style="background-color: #d4edda; color: #155724; padding: 2px 10px; border-radius: 4px; font-size: 11px; font-weight: 600; margin-left: 10px;">Passed ✓</span></div>
             <div style="font-size: 13px; color: #666; margin-bottom: 8px;">
-              <div style="margin-bottom: 4px;"><strong>Request URL:</strong> <code style="color: #0066cc; word-break: break-all;">https://distributor.dev.keepz.me/api/distributor/details?transaction_id=19114</code></div>
+              <div style="margin-bottom: 4px;"><strong>Request URL:</strong> <code style="color: #0066cc; word-break: break-all;">https://distributor.dev.keepz.me/api/distributor/details?transaction_id=19168</code></div>
               <div style="margin-bottom: 4px;"><strong>Request Method:</strong> <span style="font-weight: 500;">GET</span></div>
               <div style="margin-bottom: 8px;"><strong>Status Code:</strong> <span style="background: #f0f0f0; padding: 2px 8px; border-radius: 3px; font-family: monospace;">200</span></div>
               <div style="margin-bottom: 4px;"><strong>Query Parameters:</strong></div>
               <pre style="margin: 4px 0 8px 0; background: #eef6ff; padding: 8px; border-radius: 3px; border-left: 3px solid #4a90d9; overflow-x: auto; font-family: monospace; font-size: 12px; color: #2c5d8a;">{
-  "transaction_id": "19114"
+  "transaction_id": "19168"
 }</pre>
             </div>
             <button type="button" onclick="toggleApiDetails(this)" style="width: 100%; padding: 8px 12px; background: #f5f5f5; border: 1px solid #e0e0e0; cursor: pointer; border-radius: 4px; font-size: 12px; color: #333; display: flex; justify-content: space-between; align-items: center;">
@@ -2009,21 +1320,22 @@
               <div style="margin-bottom: 12px;">
                 <strong style="color: #333;">Expected Result:</strong>
                 <pre style="margin: 8px 0 0 0; background: white; padding: 8px; border-radius: 3px; overflow-x: auto; color: #0066cc;">{
+  "transactionId": 19168,
   "paymentDescription": "შპს ტესტი, GE42CD0360000062461306, 98809409129, Test Payment"
 }</pre>
               </div>
               <div>
                 <strong style="color: #333;">Actual Result:</strong>
                 <pre style="margin: 8px 0 0 0; background: white; padding: 8px; border-radius: 3px; overflow-x: auto; color: #066600;">{
-  "transactionId": 19114,
+  "transactionId": 19168,
   "status": "INITIAL",
   "statusDescription": "Initial",
   "amount": 0.02,
   "toIban": "GE29LB0711197559630000",
   "currency": "EUR",
   "paymentDescription": "შპს ტესტი, GE42CD0360000062461306, 98809409129, Test Payment",
-  "uniqueId": "6242ed8d-9b53-42c1-9a49-f0ad32bdf614",
-  "createdAt": "2026-06-29T17:11:29.010381",
+  "uniqueId": "76fa61af-398f-46ed-b73a-afc0a8def64f",
+  "createdAt": "2026-06-29T17:56:21.462469",
   "commissionAmount": 0.01
 }</pre>
               </div>
@@ -2097,7 +1409,7 @@
                 <strong style="color: #333;">Actual Result:</strong>
                 <pre style="margin: 8px 0 0 0; background: white; padding: 8px; border-radius: 3px; overflow-x: auto; color: #066600;">{
   "value": {
-    "access_token": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJmYjc2OWNkZC03ZTlkLTQzNTUtYTMzMS00MzAyODcwMGNhM2EiLCJpYXQiOjE3ODI3Mzg2ODcsImV4cCI6MTc4Mjc0MDQ4NywicGVybWlzc2lvbnMiOltdfQ.KMToifalpQJUAb2tnGcXxujZqJpnGBeaedztJdgq33jwRBtGFQPQU0VSi4Erbc7VhHkyajoDpkYTB9yBf9oR4Q",
+    "access_token": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJmYjc2OWNkZC03ZTlkLTQzNTUtYTMzMS00MzAyODcwMGNhM2EiLCJpYXQiOjE3ODI3NDEzNzksImV4cCI6MTc4Mjc0MzE3OSwicGVybWlzc2lvbnMiOltdfQ.CKJYN-b0T5JmtMhgv3K2pvjR1vYcfga3J6v_zsA6G08eCnLd2P_mg3qz4Iu26OG3JNVif5cVBmuGfy6kMCv18w",
     "expires_in": 1800,
     "token_type": "Bearer"
   }
@@ -2118,7 +1430,7 @@
   "currency": "GEL",
   "description": "Test Payment",
   "toIban": "GE42CD0360000062461306",
-  "uniqueId": "fc48b078-b986-49b9-aca7-29021e6b396c",
+  "uniqueId": "9852a44b-886d-4c84-8d46-9b2a1ad592d6",
   "debtorName": "შპს ტესტი",
   "debtorIban": "GE42CD0360000062461306",
   "debtorIdentityNumber": "98809409129"
@@ -2140,11 +1452,11 @@
                 <strong style="color: #333;">Actual Result:</strong>
                 <pre style="margin: 8px 0 0 0; background: white; padding: 8px; border-radius: 3px; overflow-x: auto; color: #066600;">{
   "value": {
-    "transactionId": 19115,
+    "transactionId": 19169,
     "status": "INITIAL",
     "statusDescription": "Initial",
-    "uniqueId": "fc48b078-b986-49b9-aca7-29021e6b396c",
-    "createdAt": "2026-06-29T17:11:29.222973168",
+    "uniqueId": "9852a44b-886d-4c84-8d46-9b2a1ad592d6",
+    "createdAt": "2026-06-29T17:56:21.705650332",
     "distributionFlow": "STANDARD"
   }
 }</pre>
@@ -2155,12 +1467,12 @@
           <div style="margin-bottom: 16px; padding: 12px; background: white; border: 1px solid #e0e0e0; border-radius: 4px;">
             <div style="font-weight: 600; color: #333; margin-bottom: 12px;">API Call 3: Get Transaction Details<span style="background-color: #d4edda; color: #155724; padding: 2px 10px; border-radius: 4px; font-size: 11px; font-weight: 600; margin-left: 10px;">Passed ✓</span></div>
             <div style="font-size: 13px; color: #666; margin-bottom: 8px;">
-              <div style="margin-bottom: 4px;"><strong>Request URL:</strong> <code style="color: #0066cc; word-break: break-all;">https://distributor.dev.keepz.me/api/distributor/details?transaction_id=19115</code></div>
+              <div style="margin-bottom: 4px;"><strong>Request URL:</strong> <code style="color: #0066cc; word-break: break-all;">https://distributor.dev.keepz.me/api/distributor/details?transaction_id=19169</code></div>
               <div style="margin-bottom: 4px;"><strong>Request Method:</strong> <span style="font-weight: 500;">GET</span></div>
               <div style="margin-bottom: 8px;"><strong>Status Code:</strong> <span style="background: #f0f0f0; padding: 2px 8px; border-radius: 3px; font-family: monospace;">200</span></div>
               <div style="margin-bottom: 4px;"><strong>Query Parameters:</strong></div>
               <pre style="margin: 4px 0 8px 0; background: #eef6ff; padding: 8px; border-radius: 3px; border-left: 3px solid #4a90d9; overflow-x: auto; font-family: monospace; font-size: 12px; color: #2c5d8a;">{
-  "transaction_id": "19115"
+  "transaction_id": "19169"
 }</pre>
             </div>
             <button type="button" onclick="toggleApiDetails(this)" style="width: 100%; padding: 8px 12px; background: #f5f5f5; border: 1px solid #e0e0e0; cursor: pointer; border-radius: 4px; font-size: 12px; color: #333; display: flex; justify-content: space-between; align-items: center;">
@@ -2171,21 +1483,22 @@
               <div style="margin-bottom: 12px;">
                 <strong style="color: #333;">Expected Result:</strong>
                 <pre style="margin: 8px 0 0 0; background: white; padding: 8px; border-radius: 3px; overflow-x: auto; color: #0066cc;">{
+  "transactionId": 19169,
   "paymentDescription": "შპს ტესტი, GE42CD0360000062461306, 98809409129, Test Payment"
 }</pre>
               </div>
               <div>
                 <strong style="color: #333;">Actual Result:</strong>
                 <pre style="margin: 8px 0 0 0; background: white; padding: 8px; border-radius: 3px; overflow-x: auto; color: #066600;">{
-  "transactionId": 19115,
+  "transactionId": 19169,
   "status": "INITIAL",
   "statusDescription": "Initial",
   "amount": 0.02,
   "toIban": "GE42CD0360000062461306",
   "currency": "GEL",
   "paymentDescription": "შპს ტესტი, GE42CD0360000062461306, 98809409129, Test Payment",
-  "uniqueId": "fc48b078-b986-49b9-aca7-29021e6b396c",
-  "createdAt": "2026-06-29T17:11:29.222973",
+  "uniqueId": "9852a44b-886d-4c84-8d46-9b2a1ad592d6",
+  "createdAt": "2026-06-29T17:56:21.70565",
   "commissionAmount": 0.01
 }</pre>
               </div>
@@ -2204,7 +1517,7 @@
   "currency": "USD",
   "description": "Test Payment",
   "toIban": "GE42CD0360000062461306",
-  "uniqueId": "2361248a-e0dc-455e-b404-cc0e6f5b334c",
+  "uniqueId": "f8db7580-9767-41dc-954d-11b3253a069d",
   "debtorName": "შპს ტესტი",
   "debtorIban": "GE42CD0360000062461306",
   "debtorIdentityNumber": "98809409129"
@@ -2226,11 +1539,11 @@
                 <strong style="color: #333;">Actual Result:</strong>
                 <pre style="margin: 8px 0 0 0; background: white; padding: 8px; border-radius: 3px; overflow-x: auto; color: #066600;">{
   "value": {
-    "transactionId": 19116,
+    "transactionId": 19170,
     "status": "INITIAL",
     "statusDescription": "Initial",
-    "uniqueId": "2361248a-e0dc-455e-b404-cc0e6f5b334c",
-    "createdAt": "2026-06-29T17:11:29.426404637",
+    "uniqueId": "f8db7580-9767-41dc-954d-11b3253a069d",
+    "createdAt": "2026-06-29T17:56:21.918458461",
     "distributionFlow": "STANDARD"
   }
 }</pre>
@@ -2241,12 +1554,12 @@
           <div style="margin-bottom: 16px; padding: 12px; background: white; border: 1px solid #e0e0e0; border-radius: 4px;">
             <div style="font-weight: 600; color: #333; margin-bottom: 12px;">API Call 5: Get Transaction Details<span style="background-color: #d4edda; color: #155724; padding: 2px 10px; border-radius: 4px; font-size: 11px; font-weight: 600; margin-left: 10px;">Passed ✓</span></div>
             <div style="font-size: 13px; color: #666; margin-bottom: 8px;">
-              <div style="margin-bottom: 4px;"><strong>Request URL:</strong> <code style="color: #0066cc; word-break: break-all;">https://distributor.dev.keepz.me/api/distributor/details?transaction_id=19116</code></div>
+              <div style="margin-bottom: 4px;"><strong>Request URL:</strong> <code style="color: #0066cc; word-break: break-all;">https://distributor.dev.keepz.me/api/distributor/details?transaction_id=19170</code></div>
               <div style="margin-bottom: 4px;"><strong>Request Method:</strong> <span style="font-weight: 500;">GET</span></div>
               <div style="margin-bottom: 8px;"><strong>Status Code:</strong> <span style="background: #f0f0f0; padding: 2px 8px; border-radius: 3px; font-family: monospace;">200</span></div>
               <div style="margin-bottom: 4px;"><strong>Query Parameters:</strong></div>
               <pre style="margin: 4px 0 8px 0; background: #eef6ff; padding: 8px; border-radius: 3px; border-left: 3px solid #4a90d9; overflow-x: auto; font-family: monospace; font-size: 12px; color: #2c5d8a;">{
-  "transaction_id": "19116"
+  "transaction_id": "19170"
 }</pre>
             </div>
             <button type="button" onclick="toggleApiDetails(this)" style="width: 100%; padding: 8px 12px; background: #f5f5f5; border: 1px solid #e0e0e0; cursor: pointer; border-radius: 4px; font-size: 12px; color: #333; display: flex; justify-content: space-between; align-items: center;">
@@ -2257,21 +1570,22 @@
               <div style="margin-bottom: 12px;">
                 <strong style="color: #333;">Expected Result:</strong>
                 <pre style="margin: 8px 0 0 0; background: white; padding: 8px; border-radius: 3px; overflow-x: auto; color: #0066cc;">{
+  "transactionId": 19170,
   "paymentDescription": "შპს ტესტი, GE42CD0360000062461306, 98809409129, Test Payment"
 }</pre>
               </div>
               <div>
                 <strong style="color: #333;">Actual Result:</strong>
                 <pre style="margin: 8px 0 0 0; background: white; padding: 8px; border-radius: 3px; overflow-x: auto; color: #066600;">{
-  "transactionId": 19116,
+  "transactionId": 19170,
   "status": "INITIAL",
   "statusDescription": "Initial",
   "amount": 0.02,
   "toIban": "GE42CD0360000062461306",
   "currency": "USD",
   "paymentDescription": "შპს ტესტი, GE42CD0360000062461306, 98809409129, Test Payment",
-  "uniqueId": "2361248a-e0dc-455e-b404-cc0e6f5b334c",
-  "createdAt": "2026-06-29T17:11:29.426405",
+  "uniqueId": "f8db7580-9767-41dc-954d-11b3253a069d",
+  "createdAt": "2026-06-29T17:56:21.918458",
   "commissionAmount": 0.01
 }</pre>
               </div>
@@ -2290,7 +1604,7 @@
   "currency": "EUR",
   "description": "Test Payment",
   "toIban": "GE42CD0360000062461306",
-  "uniqueId": "92d71979-3921-4d4c-b6b4-a8a6be3dd5ec",
+  "uniqueId": "d8bb8afd-2179-449a-8a89-f01d459bf96c",
   "debtorName": "შპს ტესტი",
   "debtorIban": "GE42CD0360000062461306",
   "debtorIdentityNumber": "98809409129"
@@ -2312,11 +1626,11 @@
                 <strong style="color: #333;">Actual Result:</strong>
                 <pre style="margin: 8px 0 0 0; background: white; padding: 8px; border-radius: 3px; overflow-x: auto; color: #066600;">{
   "value": {
-    "transactionId": 19117,
+    "transactionId": 19171,
     "status": "INITIAL",
     "statusDescription": "Initial",
-    "uniqueId": "92d71979-3921-4d4c-b6b4-a8a6be3dd5ec",
-    "createdAt": "2026-06-29T17:11:29.642144406",
+    "uniqueId": "d8bb8afd-2179-449a-8a89-f01d459bf96c",
+    "createdAt": "2026-06-29T17:56:22.15329814",
     "distributionFlow": "STANDARD"
   }
 }</pre>
@@ -2327,12 +1641,12 @@
           <div style="margin-bottom: 16px; padding: 12px; background: white; border: 1px solid #e0e0e0; border-radius: 4px;">
             <div style="font-weight: 600; color: #333; margin-bottom: 12px;">API Call 7: Get Transaction Details<span style="background-color: #d4edda; color: #155724; padding: 2px 10px; border-radius: 4px; font-size: 11px; font-weight: 600; margin-left: 10px;">Passed ✓</span></div>
             <div style="font-size: 13px; color: #666; margin-bottom: 8px;">
-              <div style="margin-bottom: 4px;"><strong>Request URL:</strong> <code style="color: #0066cc; word-break: break-all;">https://distributor.dev.keepz.me/api/distributor/details?transaction_id=19117</code></div>
+              <div style="margin-bottom: 4px;"><strong>Request URL:</strong> <code style="color: #0066cc; word-break: break-all;">https://distributor.dev.keepz.me/api/distributor/details?transaction_id=19171</code></div>
               <div style="margin-bottom: 4px;"><strong>Request Method:</strong> <span style="font-weight: 500;">GET</span></div>
               <div style="margin-bottom: 8px;"><strong>Status Code:</strong> <span style="background: #f0f0f0; padding: 2px 8px; border-radius: 3px; font-family: monospace;">200</span></div>
               <div style="margin-bottom: 4px;"><strong>Query Parameters:</strong></div>
               <pre style="margin: 4px 0 8px 0; background: #eef6ff; padding: 8px; border-radius: 3px; border-left: 3px solid #4a90d9; overflow-x: auto; font-family: monospace; font-size: 12px; color: #2c5d8a;">{
-  "transaction_id": "19117"
+  "transaction_id": "19171"
 }</pre>
             </div>
             <button type="button" onclick="toggleApiDetails(this)" style="width: 100%; padding: 8px 12px; background: #f5f5f5; border: 1px solid #e0e0e0; cursor: pointer; border-radius: 4px; font-size: 12px; color: #333; display: flex; justify-content: space-between; align-items: center;">
@@ -2343,21 +1657,22 @@
               <div style="margin-bottom: 12px;">
                 <strong style="color: #333;">Expected Result:</strong>
                 <pre style="margin: 8px 0 0 0; background: white; padding: 8px; border-radius: 3px; overflow-x: auto; color: #0066cc;">{
+  "transactionId": 19171,
   "paymentDescription": "შპს ტესტი, GE42CD0360000062461306, 98809409129, Test Payment"
 }</pre>
               </div>
               <div>
                 <strong style="color: #333;">Actual Result:</strong>
                 <pre style="margin: 8px 0 0 0; background: white; padding: 8px; border-radius: 3px; overflow-x: auto; color: #066600;">{
-  "transactionId": 19117,
+  "transactionId": 19171,
   "status": "INITIAL",
   "statusDescription": "Initial",
   "amount": 0.02,
   "toIban": "GE42CD0360000062461306",
   "currency": "EUR",
   "paymentDescription": "შპს ტესტი, GE42CD0360000062461306, 98809409129, Test Payment",
-  "uniqueId": "92d71979-3921-4d4c-b6b4-a8a6be3dd5ec",
-  "createdAt": "2026-06-29T17:11:29.642144",
+  "uniqueId": "d8bb8afd-2179-449a-8a89-f01d459bf96c",
+  "createdAt": "2026-06-29T17:56:22.153298",
   "commissionAmount": 0.01
 }</pre>
               </div>
@@ -2377,6 +1692,107 @@
               Expected paymentDescription: "შპს ტესტი, GE42CD0360000062461306, 98809409129, Test Payment"
             </div>
         
+          </div>
+        
+        </div>
+      </div>
+    
+        </div>
+      </div>
+    
+            </div>
+          </div>
+        </div>
+      
+        </div>
+      </div>
+    
+      <div style="margin-bottom: 32px; border: 2px solid #667eea; border-radius: 8px; overflow: hidden;">
+        <button type="button" onclick="toggleSection(this)" style="width: 100%; padding: 18px; background-color: #667eea; color: white; border: none; cursor: pointer; font-weight: 700; text-align: left; font-size: 18px; display: flex; justify-content: space-between; align-items: center;">
+          <span>🔴 Negative Cases (5) — 5 passed, 0 failed</span>
+          <span style="font-size: 20px;">▼</span>
+        </button>
+        <div class="status-section" style="display: block; padding: 16px;">
+          
+        <div style="margin-bottom: 24px;">
+          <button type="button" onclick="toggleSection(this)" style="width: 100%; padding: 16px; background-color: #d4edda; border: none; cursor: pointer; border-radius: 6px; font-weight: 600; text-align: left; font-size: 16px; display: flex; justify-content: space-between; align-items: center;">
+            <span>✓ Passed Cases (5)</span>
+            <span style="font-size: 20px;">▼</span>
+          </button>
+          <div class="status-section" style="display: none; margin-top: 12px;">
+            <div style="background: white; border-radius: 6px; overflow: hidden;">
+              
+      <div style="margin-bottom: 16px;">
+        <button type="button" onclick="toggleCategory(this)" style="width: 100%; padding: 12px 16px; background: #f5f5f5; border: none; cursor: pointer; border-left: 4px solid #667eea; font-weight: 500; font-size: 14px; color: #333; display: flex; justify-content: space-between; align-items: center; text-align: left;">
+          <span>📁 Authentication Cases</span>
+          <span style="font-size: 16px; transition: transform 0.3s; transform: rotate(-90deg);">▼</span>
+        </button>
+        <div class="category-section" style="display: none; background: white; border-radius: 0 0 6px 6px; overflow: hidden;">
+          
+      <div class="test-case-row">
+        <div class="test-case-header" onclick="toggleTestCase(this)">
+          <div style="font-weight: 500; color: #333;">No Token (Authentication Failure)</div>
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <span style="background-color: #d4edda; padding: 4px 12px; border-radius: 4px; font-size: 12px; font-weight: 500;">
+              Passed ✓
+            </span>
+            <span class="arrow" style="font-size: 18px; transition: transform 0.3s; transform: rotate(-90deg);">▼</span>
+          </div>
+        </div>
+        <div class="test-case-content">
+          
+          <div style="padding: 16px;">
+            
+        <div style="margin-bottom: 16px; padding: 12px; background: #f9f9f9; border-radius: 4px; border-left: 3px solid #667eea;">
+          <button type="button" onclick="toggleDetails(this)" style="width: 100%; padding: 12px; background: none; border: none; cursor: pointer; text-align: left; font-size: 13px; font-weight: 500; color: #333; display: flex; justify-content: space-between; align-items: center;">
+            <span>📡 Details (1 API calls)</span>
+            <span class="details-arrow" style="font-size: 16px; transition: transform 0.3s; transform: rotate(-90deg);">▼</span>
+          </button>
+          <div class="details-section" style="display: none; margin-top: 12px;">
+            
+          <div style="margin-bottom: 16px; padding: 12px; background: white; border: 1px solid #e0e0e0; border-radius: 4px;">
+            <div style="font-weight: 600; color: #333; margin-bottom: 12px;">API Call 1: Create Order (No Token)<span style="background-color: #d4edda; color: #155724; padding: 2px 10px; border-radius: 4px; font-size: 11px; font-weight: 600; margin-left: 10px;">Passed ✓</span></div>
+            <div style="font-size: 13px; color: #666; margin-bottom: 8px;">
+              <div style="margin-bottom: 4px;"><strong>Request URL:</strong> <code style="color: #0066cc; word-break: break-all;">https://distributor.dev.keepz.me/api/distributor</code></div>
+              <div style="margin-bottom: 4px;"><strong>Request Method:</strong> <span style="font-weight: 500;">POST</span></div>
+              <div style="margin-bottom: 8px;"><strong>Status Code:</strong> <span style="background: #f0f0f0; padding: 2px 8px; border-radius: 3px; font-family: monospace;">401</span></div>
+              <div style="margin-bottom: 4px;"><strong>Request Body:</strong></div>
+              <pre style="margin: 4px 0 8px 0; background: #fff8e6; padding: 8px; border-radius: 3px; border-left: 3px solid #f0ad4e; overflow-x: auto; font-family: monospace; font-size: 12px; color: #8a6d3b;">{
+  "amount": 0.1,
+  "currency": "GEL",
+  "description": "Payment without authentication",
+  "toIban": "GE54BG0000000542056887"
+}</pre>
+            </div>
+            <button type="button" onclick="toggleApiDetails(this)" style="width: 100%; padding: 8px 12px; background: #f5f5f5; border: 1px solid #e0e0e0; cursor: pointer; border-radius: 4px; font-size: 12px; color: #333; display: flex; justify-content: space-between; align-items: center;">
+              <span>Expected vs Actual Response</span>
+              <span class="api-arrow" style="font-size: 14px; transition: transform 0.3s; transform: rotate(-90deg);">▼</span>
+            </button>
+            <div class="api-details" style="display: none; margin-top: 12px; padding: 12px; background: #f9f9f9; border-radius: 4px; border-left: 3px solid #667eea; font-family: monospace; font-size: 12px; line-height: 1.5; max-height: 400px; overflow-y: auto;">
+              <div style="margin-bottom: 12px;">
+                <strong style="color: #333;">Expected Result:</strong>
+                <pre style="margin: 8px 0 0 0; background: white; padding: 8px; border-radius: 3px; overflow-x: auto; color: #0066cc;">{
+  "message": "Authentication failed"
+}</pre>
+              </div>
+              <div>
+                <strong style="color: #333;">Actual Result:</strong>
+                <pre style="margin: 8px 0 0 0; background: white; padding: 8px; border-radius: 3px; overflow-x: auto; color: #066600;">{
+  "application_name": null,
+  "method_name": null,
+  "exception_name": null,
+  "status": null,
+  "message": "Authentication failed",
+  "timestamp": null
+}</pre>
+              </div>
+            </div>
+          </div>
+        
+          </div>
+        </div>
+      
+            
           </div>
         
         </div>
@@ -2441,7 +1857,7 @@
                 <strong style="color: #333;">Actual Result:</strong>
                 <pre style="margin: 8px 0 0 0; background: white; padding: 8px; border-radius: 3px; overflow-x: auto; color: #066600;">{
   "value": {
-    "access_token": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJmYjc2OWNkZC03ZTlkLTQzNTUtYTMzMS00MzAyODcwMGNhM2EiLCJpYXQiOjE3ODI3Mzg2OTAsImV4cCI6MTc4Mjc0MDQ5MCwicGVybWlzc2lvbnMiOltdfQ.Vm8IioiIvUEd_-cwHW_QprKG2XtUli0ueKn_uKNUX5WBvbYffd35S_Um8g_B3Ac1VkC1qIexLzOiF9GVh4mbLQ",
+    "access_token": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJmYjc2OWNkZC03ZTlkLTQzNTUtYTMzMS00MzAyODcwMGNhM2EiLCJpYXQiOjE3ODI3NDEzODIsImV4cCI6MTc4Mjc0MzE4MiwicGVybWlzc2lvbnMiOltdfQ.-SyWNmioTkJG0wPNL-c-be7T3Kx8s1bH6cTcP8Ddn1Hfd8Wi9wF885bAawKRHWgBlA5zjAWCFF-O_LLla7PhLA",
     "expires_in": 1800,
     "token_type": "Bearer"
   }
@@ -2462,7 +1878,7 @@
   "currency": "GEL",
   "description": "Payment to BOG - Below Minimum Amount",
   "toIban": "GE54BG0000000542056887",
-  "uniqueId": "9c400bbb-e260-48ea-9210-2af5ebe331ae"
+  "uniqueId": "70f1b3b1-dccc-451c-8157-ed60026090ef"
 }</pre>
             </div>
             <button type="button" onclick="toggleApiDetails(this)" style="width: 100%; padding: 8px 12px; background: #f5f5f5; border: 1px solid #e0e0e0; cursor: pointer; border-radius: 4px; font-size: 12px; color: #333; display: flex; justify-content: space-between; align-items: center;">
@@ -2500,7 +1916,7 @@
   "currency": "USD",
   "description": "Payment to BOG - Below Minimum Amount",
   "toIban": "GE54BG0000000542056887",
-  "uniqueId": "1bcbd977-44d2-4d92-966a-b8f0c4f77610"
+  "uniqueId": "1346ac2e-f8e2-42e6-988b-00f8be7c84ec"
 }</pre>
             </div>
             <button type="button" onclick="toggleApiDetails(this)" style="width: 100%; padding: 8px 12px; background: #f5f5f5; border: 1px solid #e0e0e0; cursor: pointer; border-radius: 4px; font-size: 12px; color: #333; display: flex; justify-content: space-between; align-items: center;">
@@ -2538,7 +1954,7 @@
   "currency": "EUR",
   "description": "Payment to BOG - Below Minimum Amount",
   "toIban": "GE54BG0000000542056887",
-  "uniqueId": "966ec5eb-e82c-4bdb-b00b-94db1dc49d58"
+  "uniqueId": "87df1122-c818-42f2-849d-7cce6c179b0a"
 }</pre>
             </div>
             <button type="button" onclick="toggleApiDetails(this)" style="width: 100%; padding: 8px 12px; background: #f5f5f5; border: 1px solid #e0e0e0; cursor: pointer; border-radius: 4px; font-size: 12px; color: #333; display: flex; justify-content: space-between; align-items: center;">
@@ -2622,7 +2038,7 @@
                 <strong style="color: #333;">Actual Result:</strong>
                 <pre style="margin: 8px 0 0 0; background: white; padding: 8px; border-radius: 3px; overflow-x: auto; color: #066600;">{
   "value": {
-    "access_token": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJmYjc2OWNkZC03ZTlkLTQzNTUtYTMzMS00MzAyODcwMGNhM2EiLCJpYXQiOjE3ODI3Mzg2OTAsImV4cCI6MTc4Mjc0MDQ5MCwicGVybWlzc2lvbnMiOltdfQ.Vm8IioiIvUEd_-cwHW_QprKG2XtUli0ueKn_uKNUX5WBvbYffd35S_Um8g_B3Ac1VkC1qIexLzOiF9GVh4mbLQ",
+    "access_token": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJmYjc2OWNkZC03ZTlkLTQzNTUtYTMzMS00MzAyODcwMGNhM2EiLCJpYXQiOjE3ODI3NDEzODIsImV4cCI6MTc4Mjc0MzE4MiwicGVybWlzc2lvbnMiOltdfQ.-SyWNmioTkJG0wPNL-c-be7T3Kx8s1bH6cTcP8Ddn1Hfd8Wi9wF885bAawKRHWgBlA5zjAWCFF-O_LLla7PhLA",
     "expires_in": 1800,
     "token_type": "Bearer"
   }
@@ -2643,7 +2059,7 @@
   "currency": "GEL",
   "description": "Payment to TBC - Below Minimum Amount",
   "toIban": "GE26TB7899045061100085",
-  "uniqueId": "6548f25c-3a19-43f4-9f26-5b7cafd8099b"
+  "uniqueId": "faeccc3d-bad6-4baa-aeef-a46a4106fee2"
 }</pre>
             </div>
             <button type="button" onclick="toggleApiDetails(this)" style="width: 100%; padding: 8px 12px; background: #f5f5f5; border: 1px solid #e0e0e0; cursor: pointer; border-radius: 4px; font-size: 12px; color: #333; display: flex; justify-content: space-between; align-items: center;">
@@ -2681,7 +2097,7 @@
   "currency": "USD",
   "description": "Payment to TBC - Below Minimum Amount",
   "toIban": "GE26TB7899045061100085",
-  "uniqueId": "17c65740-7fbd-4b1e-bbe9-c72835ede91b"
+  "uniqueId": "f4381bfa-4dbd-4c47-8bbc-06ba9908f165"
 }</pre>
             </div>
             <button type="button" onclick="toggleApiDetails(this)" style="width: 100%; padding: 8px 12px; background: #f5f5f5; border: 1px solid #e0e0e0; cursor: pointer; border-radius: 4px; font-size: 12px; color: #333; display: flex; justify-content: space-between; align-items: center;">
@@ -2719,7 +2135,7 @@
   "currency": "EUR",
   "description": "Payment to TBC - Below Minimum Amount",
   "toIban": "GE26TB7899045061100085",
-  "uniqueId": "f0a105c8-94b0-4a78-ad89-04ec3bbc8ebb"
+  "uniqueId": "a24e9dbf-9e0f-4a0a-a97b-94f806d5d51a"
 }</pre>
             </div>
             <button type="button" onclick="toggleApiDetails(this)" style="width: 100%; padding: 8px 12px; background: #f5f5f5; border: 1px solid #e0e0e0; cursor: pointer; border-radius: 4px; font-size: 12px; color: #333; display: flex; justify-content: space-between; align-items: center;">
@@ -2803,7 +2219,7 @@
                 <strong style="color: #333;">Actual Result:</strong>
                 <pre style="margin: 8px 0 0 0; background: white; padding: 8px; border-radius: 3px; overflow-x: auto; color: #066600;">{
   "value": {
-    "access_token": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJmYjc2OWNkZC03ZTlkLTQzNTUtYTMzMS00MzAyODcwMGNhM2EiLCJpYXQiOjE3ODI3Mzg2OTAsImV4cCI6MTc4Mjc0MDQ5MCwicGVybWlzc2lvbnMiOltdfQ.Vm8IioiIvUEd_-cwHW_QprKG2XtUli0ueKn_uKNUX5WBvbYffd35S_Um8g_B3Ac1VkC1qIexLzOiF9GVh4mbLQ",
+    "access_token": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJmYjc2OWNkZC03ZTlkLTQzNTUtYTMzMS00MzAyODcwMGNhM2EiLCJpYXQiOjE3ODI3NDEzODIsImV4cCI6MTc4Mjc0MzE4MiwicGVybWlzc2lvbnMiOltdfQ.-SyWNmioTkJG0wPNL-c-be7T3Kx8s1bH6cTcP8Ddn1Hfd8Wi9wF885bAawKRHWgBlA5zjAWCFF-O_LLla7PhLA",
     "expires_in": 1800,
     "token_type": "Bearer"
   }
@@ -2824,7 +2240,7 @@
   "currency": "GEL",
   "description": "Payment to Liberty - Below Minimum Amount",
   "toIban": "GE29LB0711197559630000",
-  "uniqueId": "de50f388-fc76-4ba2-b910-5bc423ec407c",
+  "uniqueId": "8044b117-8dd8-47c7-99d0-310f6b18beba",
   "beneficiaryName": "Giorgi Lezhava"
 }</pre>
             </div>
@@ -2863,7 +2279,7 @@
   "currency": "USD",
   "description": "Payment to Liberty - Below Minimum Amount",
   "toIban": "GE29LB0711197559630000",
-  "uniqueId": "20b152e1-4a67-4850-82fb-842c64cc1c4a",
+  "uniqueId": "6e440b03-e588-443b-b3d2-98844afe50d8",
   "beneficiaryName": "Giorgi Lezhava"
 }</pre>
             </div>
@@ -2902,7 +2318,7 @@
   "currency": "EUR",
   "description": "Payment to Liberty - Below Minimum Amount",
   "toIban": "GE29LB0711197559630000",
-  "uniqueId": "f3b49c09-ed02-4940-ac76-3b59dd07e9bf",
+  "uniqueId": "78040e57-49d3-468d-97b9-fe1216561fc0",
   "beneficiaryName": "Giorgi Lezhava"
 }</pre>
             </div>
@@ -2987,7 +2403,7 @@
                 <strong style="color: #333;">Actual Result:</strong>
                 <pre style="margin: 8px 0 0 0; background: white; padding: 8px; border-radius: 3px; overflow-x: auto; color: #066600;">{
   "value": {
-    "access_token": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJmYjc2OWNkZC03ZTlkLTQzNTUtYTMzMS00MzAyODcwMGNhM2EiLCJpYXQiOjE3ODI3Mzg2OTAsImV4cCI6MTc4Mjc0MDQ5MCwicGVybWlzc2lvbnMiOltdfQ.Vm8IioiIvUEd_-cwHW_QprKG2XtUli0ueKn_uKNUX5WBvbYffd35S_Um8g_B3Ac1VkC1qIexLzOiF9GVh4mbLQ",
+    "access_token": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJmYjc2OWNkZC03ZTlkLTQzNTUtYTMzMS00MzAyODcwMGNhM2EiLCJpYXQiOjE3ODI3NDEzODIsImV4cCI6MTc4Mjc0MzE4MiwicGVybWlzc2lvbnMiOltdfQ.-SyWNmioTkJG0wPNL-c-be7T3Kx8s1bH6cTcP8Ddn1Hfd8Wi9wF885bAawKRHWgBlA5zjAWCFF-O_LLla7PhLA",
     "expires_in": 1800,
     "token_type": "Bearer"
   }
@@ -3008,7 +2424,7 @@
   "currency": "GEL",
   "description": "Payment to CREDO - Below Minimum Amount",
   "toIban": "GE42CD0360000062461306",
-  "uniqueId": "66a8f135-2526-4869-aa08-a5f411e63b7c"
+  "uniqueId": "d2099f06-a3f8-4d65-aadc-679672c1cb9e"
 }</pre>
             </div>
             <button type="button" onclick="toggleApiDetails(this)" style="width: 100%; padding: 8px 12px; background: #f5f5f5; border: 1px solid #e0e0e0; cursor: pointer; border-radius: 4px; font-size: 12px; color: #333; display: flex; justify-content: space-between; align-items: center;">
@@ -3046,7 +2462,7 @@
   "currency": "USD",
   "description": "Payment to CREDO - Below Minimum Amount",
   "toIban": "GE42CD0360000062461306",
-  "uniqueId": "827a816e-aa44-42db-98f5-0119e29edbdc"
+  "uniqueId": "ab626c59-143c-4165-bb2a-361740a45a92"
 }</pre>
             </div>
             <button type="button" onclick="toggleApiDetails(this)" style="width: 100%; padding: 8px 12px; background: #f5f5f5; border: 1px solid #e0e0e0; cursor: pointer; border-radius: 4px; font-size: 12px; color: #333; display: flex; justify-content: space-between; align-items: center;">
@@ -3084,7 +2500,7 @@
   "currency": "EUR",
   "description": "Payment to CREDO - Below Minimum Amount",
   "toIban": "GE42CD0360000062461306",
-  "uniqueId": "44872dac-294c-4d81-a142-9909f93291aa"
+  "uniqueId": "bc5dab4a-c502-4cc7-a357-f70644d44c54"
 }</pre>
             </div>
             <button type="button" onclick="toggleApiDetails(this)" style="width: 100%; padding: 8px 12px; background: #f5f5f5; border: 1px solid #e0e0e0; cursor: pointer; border-radius: 4px; font-size: 12px; color: #333; display: flex; justify-content: space-between; align-items: center;">
@@ -3126,12 +2542,15 @@
           </div>
         </div>
       
+        </div>
+      </div>
+    
       </div>
     
     </div>
 
     <div class="footer">
-      Generated on 6/29/2026, 5:11:31 PM
+      Generated on 6/29/2026, 5:56:23 PM
     </div>
   </div>
 </body>

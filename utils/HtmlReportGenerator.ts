@@ -25,6 +25,7 @@ export interface TransactionRow {
   category?: string;
   uniqueId?: string;
   apiCalls?: ApiCall[];
+  testGroup?: 'positive' | 'negative';
 }
 
 export interface BalanceSummary {
@@ -66,51 +67,19 @@ export class HtmlReportGenerator {
     const failedCases = transactions.filter(tx => tx.status === 'Failed' && !tx.isExpectedError);
     const totalTestCases = passedCases.length + failedCases.length;
 
-    // Group by category
-    const groupedPassed = this.groupByCategory(passedCases);
-    const groupedFailed = this.groupByCategory(failedCases);
+    // If cases are tagged with a testGroup (regression report), split into
+    // Positive / Negative top-level sections; otherwise show one flat list.
+    const hasGroups = transactions.some(tx => tx.testGroup);
+    let testCaseSectionsHTML: string;
 
-    // Build test cases with embedded transaction details
-    const testCaseSections = [];
-
-    if (passedCases.length > 0) {
-      const passedRows = Object.entries(groupedPassed)
-        .map(([category, cases]) => this.buildCategorySection(category, cases, 'passed'))
-        .join('');
-
-      testCaseSections.push(`
-        <div style="margin-bottom: 24px;">
-          <button type="button" onclick="toggleSection(this)" style="width: 100%; padding: 16px; background-color: #d4edda; border: none; cursor: pointer; border-radius: 6px; font-weight: 600; text-align: left; font-size: 16px; display: flex; justify-content: space-between; align-items: center;">
-            <span>✓ Passed Cases (${passedCases.length})</span>
-            <span style="font-size: 20px;">▼</span>
-          </button>
-          <div class="status-section" style="display: none; margin-top: 12px;">
-            <div style="background: white; border-radius: 6px; overflow: hidden;">
-              ${passedRows}
-            </div>
-          </div>
-        </div>
-      `);
-    }
-
-    if (failedCases.length > 0) {
-      const failedRows = Object.entries(groupedFailed)
-        .map(([category, cases]) => this.buildCategorySection(category, cases, 'failed'))
-        .join('');
-
-      testCaseSections.push(`
-        <div style="margin-bottom: 24px;">
-          <button type="button" onclick="toggleSection(this)" style="width: 100%; padding: 16px; background-color: #f8d7da; border: none; cursor: pointer; border-radius: 6px; font-weight: 600; text-align: left; font-size: 16px; display: flex; justify-content: space-between; align-items: center;">
-            <span>✗ Failed Cases (${failedCases.length})</span>
-            <span style="font-size: 20px;">▼</span>
-          </button>
-          <div class="status-section" style="display: none; margin-top: 12px;">
-            <div style="background: white; border-radius: 6px; overflow: hidden;">
-              ${failedRows}
-            </div>
-          </div>
-        </div>
-      `);
+    if (hasGroups) {
+      const positiveTxs = transactions.filter(tx => tx.testGroup === 'positive');
+      const negativeTxs = transactions.filter(tx => tx.testGroup === 'negative');
+      testCaseSectionsHTML =
+        this.buildGroupSection('🟢 Positive Cases', positiveTxs) +
+        this.buildGroupSection('🔴 Negative Cases', negativeTxs);
+    } else {
+      testCaseSectionsHTML = this.buildStatusSections(transactions);
     }
 
     const testTypeLabel = testType === 'positive' ? '(Positive Cases)' : testType === 'negative' ? '(Negative Cases)' : '(Full Regression)';
@@ -129,7 +98,7 @@ export class HtmlReportGenerator {
             <strong>Success Rate:</strong> <span style="font-weight: 600; color: #333;">${totalTestCases > 0 ? ((passedCases.length / totalTestCases) * 100).toFixed(0) : 0}%</span>
           </div>
         </div>
-        ${testCaseSections.join('')}
+        ${testCaseSectionsHTML}
       </div>
     `;
 
@@ -389,6 +358,77 @@ export class HtmlReportGenerator {
     this.updateAllReportsWithBackButton();
 
     return reportPath;
+  }
+
+  // Builds the Passed Cases + Failed Cases sections (each grouped by category) for a set of cases.
+  private buildStatusSections(transactions: TransactionRow[]): string {
+    const passedCases = transactions.filter(tx => tx.status === 'Succeeded' || (tx.status === 'Failed' && tx.isExpectedError));
+    const failedCases = transactions.filter(tx => tx.status === 'Failed' && !tx.isExpectedError);
+
+    const groupedPassed = this.groupByCategory(passedCases);
+    const groupedFailed = this.groupByCategory(failedCases);
+
+    let html = '';
+
+    if (passedCases.length > 0) {
+      const passedRows = Object.entries(groupedPassed)
+        .map(([category, cases]) => this.buildCategorySection(category, cases, 'passed'))
+        .join('');
+      html += `
+        <div style="margin-bottom: 24px;">
+          <button type="button" onclick="toggleSection(this)" style="width: 100%; padding: 16px; background-color: #d4edda; border: none; cursor: pointer; border-radius: 6px; font-weight: 600; text-align: left; font-size: 16px; display: flex; justify-content: space-between; align-items: center;">
+            <span>✓ Passed Cases (${passedCases.length})</span>
+            <span style="font-size: 20px;">▼</span>
+          </button>
+          <div class="status-section" style="display: none; margin-top: 12px;">
+            <div style="background: white; border-radius: 6px; overflow: hidden;">
+              ${passedRows}
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    if (failedCases.length > 0) {
+      const failedRows = Object.entries(groupedFailed)
+        .map(([category, cases]) => this.buildCategorySection(category, cases, 'failed'))
+        .join('');
+      html += `
+        <div style="margin-bottom: 24px;">
+          <button type="button" onclick="toggleSection(this)" style="width: 100%; padding: 16px; background-color: #f8d7da; border: none; cursor: pointer; border-radius: 6px; font-weight: 600; text-align: left; font-size: 16px; display: flex; justify-content: space-between; align-items: center;">
+            <span>✗ Failed Cases (${failedCases.length})</span>
+            <span style="font-size: 20px;">▼</span>
+          </button>
+          <div class="status-section" style="display: none; margin-top: 12px;">
+            <div style="background: white; border-radius: 6px; overflow: hidden;">
+              ${failedRows}
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    return html;
+  }
+
+  // Wraps a Positive/Negative top-level group (used in the regression report).
+  private buildGroupSection(label: string, transactions: TransactionRow[]): string {
+    if (transactions.length === 0) return '';
+
+    const passed = transactions.filter(tx => tx.status === 'Succeeded' || (tx.status === 'Failed' && tx.isExpectedError)).length;
+    const failed = transactions.filter(tx => tx.status === 'Failed' && !tx.isExpectedError).length;
+
+    return `
+      <div style="margin-bottom: 32px; border: 2px solid #667eea; border-radius: 8px; overflow: hidden;">
+        <button type="button" onclick="toggleSection(this)" style="width: 100%; padding: 18px; background-color: #667eea; color: white; border: none; cursor: pointer; font-weight: 700; text-align: left; font-size: 18px; display: flex; justify-content: space-between; align-items: center;">
+          <span>${label} (${transactions.length}) — ${passed} passed, ${failed} failed</span>
+          <span style="font-size: 20px;">▼</span>
+        </button>
+        <div class="status-section" style="display: block; padding: 16px;">
+          ${this.buildStatusSections(transactions)}
+        </div>
+      </div>
+    `;
   }
 
   private groupByCategory(transactions: TransactionRow[]): { [key: string]: TransactionRow[] } {
