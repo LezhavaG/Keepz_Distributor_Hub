@@ -35,7 +35,7 @@ export interface BalanceSummary {
   finalBalance: number;
 }
 
-export type TestType = 'positive' | 'negative';
+export type TestType = 'positive' | 'negative' | 'regression';
 
 export class HtmlReportGenerator {
   private reportDir = './distributor-report';
@@ -113,7 +113,7 @@ export class HtmlReportGenerator {
       `);
     }
 
-    const testTypeLabel = testType === 'positive' ? '(Positive Cases)' : '(Negative Cases)';
+    const testTypeLabel = testType === 'positive' ? '(Positive Cases)' : testType === 'negative' ? '(Negative Cases)' : '(Full Regression)';
 
     const testCaseSummaryHTML = `
       <div style="margin-bottom: 32px;">

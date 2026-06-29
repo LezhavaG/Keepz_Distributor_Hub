@@ -3,7 +3,11 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
-  "scripts": {},
+  "scripts": {
+    "regression": "REPORT_NAME=Full-Regression npx playwright test tests/Distributor_HUB/regression.spec.ts",
+    "test:positive": "npx playwright test tests/Distributor_HUB/Positive_Cases/positive-tests.spec.ts",
+    "test:negative": "npx playwright test tests/Distributor_HUB/Negative_Cases/negative-tests.spec.ts"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
