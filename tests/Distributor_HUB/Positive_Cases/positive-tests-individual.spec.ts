@@ -2,6 +2,7 @@ import { test } from '@playwright/test';
 import * as dotenv from 'dotenv';
 import { runHappyPathTest, BOG_BANK, TBC_BANK, LIBERTY_BANK, CREDO_BANK, runAuthenticationSuccessTest, runBalanceUpdateTest, runPaymentDescriptionTest, BALANCE_UPDATE_AMOUNT } from '../helpers';
 import { HtmlReportGenerator } from '../../../utils/HtmlReportGenerator';
+import { reportFailuresToJira } from '../../../utils/JiraReporter';
 
 dotenv.config();
 
@@ -100,6 +101,7 @@ test.describe('Distributor HUB - Positive Tests (Individual Banks)', () => {
     if (allTestResults.length > 0) {
       const reportGenerator = new HtmlReportGenerator();
       reportGenerator.generateReport(allTestResults, 'Distributor HUB - Positive Tests (Individual)', balanceSummary || undefined, 'positive');
+      await reportFailuresToJira(allTestResults);
     }
   });
 });

@@ -2,6 +2,7 @@ import { test } from '@playwright/test';
 import * as dotenv from 'dotenv';
 import { runNegativeTest, runAuthenticationFailureTest, runIncorrectCredentialsTest, runIncorrectClientIdTest, BOG_INVALID, TBC_INVALID, LIBERTY_INVALID, CREDO_INVALID, BOG_BANK, TBC_BANK, LIBERTY_BANK, CREDO_BANK, runInsufficientBalanceTest, runAboveMaximumAmountTest, runBelowMinimumAmountTest } from '../helpers';
 import { HtmlReportGenerator } from '../../../utils/HtmlReportGenerator';
+import { reportFailuresToJira } from '../../../utils/JiraReporter';
 
 dotenv.config();
 
@@ -122,6 +123,7 @@ test.describe('Distributor HUB - Negative Tests (Individual Banks)', () => {
     if (allTestResults.length > 0) {
       const reportGenerator = new HtmlReportGenerator();
       reportGenerator.generateReport(allTestResults, 'Distributor HUB - Negative Tests (Individual)', balanceSummary || undefined, 'negative');
+      await reportFailuresToJira(allTestResults);
     }
   });
 });
