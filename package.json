@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "regression": "REPORT_NAME=Full-Regression npx playwright test tests/Distributor_HUB/regression.spec.ts",
+    "retest-jira": "npx playwright test tests/Distributor_HUB/retest-jira.spec.ts",
     "test:positive": "npx playwright test tests/Distributor_HUB/Positive_Cases/positive-tests.spec.ts",
     "test:negative": "npx playwright test tests/Distributor_HUB/Negative_Cases/negative-tests.spec.ts"
   },

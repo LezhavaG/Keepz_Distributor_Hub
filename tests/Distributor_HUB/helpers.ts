@@ -938,3 +938,68 @@ export async function runPaymentDescriptionTest(
 
   return { tableData, balanceSummary: [] };
 }
+
+// ---- JIRA retest resolver ----
+// Maps a bug's test-case name back to the single case to re-run.
+
+const RETEST_EXPECTED = {
+  invalidIban: 'To iban has invalid format,',
+  insufficient: "Couldn't make transaction. Insufficient balance amount",
+  aboveMax: 'Amount above maximum transaction amount.',
+  belowMin: 'Amount below minimum transaction amount.',
+};
+
+const BANKS_BY_NAME: { [k: string]: typeof BOG_BANK } = {
+  BOG: BOG_BANK, TBC: TBC_BANK, Liberty: LIBERTY_BANK, CREDO: CREDO_BANK,
+};
+const INVALID_BY_NAME: { [k: string]: typeof BOG_INVALID } = {
+  BOG: BOG_INVALID, TBC: TBC_INVALID, Liberty: LIBERTY_INVALID, CREDO: CREDO_INVALID,
+};
+
+function casePassed(c: any): boolean {
+  return !!c && (c.status === 'Succeeded' || (c.status === 'Failed' && c.isExpectedError));
+}
+
+/**
+ * Re-run ONLY the single case identified by testCaseName (parsed from a bug summary).
+ * Returns whether the case was resolved and whether it passed this time.
+ */
+export async function retestCaseByName(
+  request: any,
+  testCaseName: string
+): Promise<{ found: boolean; passed: boolean; caseData?: any }> {
+  let rows: any[] | undefined;
+  let m: RegExpMatchArray | null;
+
+  if (testCaseName === 'No Token (Authentication Failure)') {
+    rows = await runAuthenticationFailureTest(request);
+  } else if (testCaseName === 'Invalid Credentials (Authentication)') {
+    rows = await runIncorrectCredentialsTest(request);
+  } else if (testCaseName === 'Incorrect Client ID (Authentication)') {
+    rows = await runIncorrectClientIdTest(request);
+  } else if (testCaseName === 'Successful Authentication') {
+    rows = await runAuthenticationSuccessTest(request);
+  } else if ((m = testCaseName.match(/^Distributor (\w+) - Invalid IBAN$/))) {
+    rows = (await runNegativeTest(request, [INVALID_BY_NAME[m[1]]], RETEST_EXPECTED.invalidIban)).tableData;
+  } else if ((m = testCaseName.match(/^Distributor (\w+) - Insufficient Balance$/))) {
+    rows = (await runInsufficientBalanceTest(request, [BANKS_BY_NAME[m[1]]], RETEST_EXPECTED.insufficient)).tableData;
+  } else if ((m = testCaseName.match(/^Distributor (\w+) - Above Maximum Amount$/))) {
+    rows = (await runAboveMaximumAmountTest(request, [BANKS_BY_NAME[m[1]]], RETEST_EXPECTED.aboveMax)).tableData;
+  } else if ((m = testCaseName.match(/^Distributor (\w+) - Below Minimum Amount$/))) {
+    rows = (await runBelowMinimumAmountTest(request, [BANKS_BY_NAME[m[1]]], RETEST_EXPECTED.belowMin)).tableData;
+  } else if ((m = testCaseName.match(/^Distribute To (\w+)$/))) {
+    rows = (await runHappyPathTest(request, [BANKS_BY_NAME[m[1]]])).tableData;
+  } else if ((m = testCaseName.match(/^Payer Details - (\w+)$/))) {
+    rows = (await runPaymentDescriptionTest(request, [BANKS_BY_NAME[m[1]]], false, 'Payer Details', 'Payer Details Cases')).tableData;
+  } else if ((m = testCaseName.match(/^Payer \+ Beneficiary Details - (\w+)$/))) {
+    rows = (await runPaymentDescriptionTest(request, [BANKS_BY_NAME[m[1]]], true, 'Payer + Beneficiary Details', 'Payer + Beneficiary Details Cases')).tableData;
+  } else if ((m = testCaseName.match(/^Balance Update - (\w+)$/))) {
+    rows = (await runBalanceUpdateTest(request, undefined, [m[1]])).tableData;
+  } else {
+    return { found: false, passed: false };
+  }
+
+  const arr = Array.isArray(rows) ? rows : [];
+  const theCase = arr.find((c) => c.testCaseName === testCaseName) || arr[0];
+  return { found: true, passed: casePassed(theCase), caseData: theCase };
+}
