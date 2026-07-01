@@ -348,8 +348,8 @@ export class HtmlReportGenerator {
     fs.writeFileSync(reportPath, html);
     console.log(`\n📊 HTML Report generated: ${reportPath}`);
 
-    // Cleanup: Keep only last 20 reports
-    this.cleanupOldReports(20);
+    // Cleanup: keep only the last N reports (override via .env MAX_REPORTS_TO_KEEP)
+    this.cleanupOldReports(parseInt(process.env.MAX_REPORTS_TO_KEEP || '20', 10));
 
     // Update report index
     this.updateReportIndex();

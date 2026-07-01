@@ -9,7 +9,10 @@ import { request as playwrightRequest, APIRequestContext } from '@playwright/tes
  */
 
 const LABEL = 'automated-test-failure';
-const TODO_STATUS = 'To Do';
+// Target column for new bugs and the statusCategory considered "closed".
+// Override per-board via .env (boards may use "Open"/"Backlog", "Completed", etc.).
+const TODO_STATUS = process.env.JIRA_TODO_STATUS || 'To Do';
+const DONE_STATUS_CATEGORY = process.env.JIRA_DONE_STATUS_CATEGORY || 'Done';
 
 function authHeader(): string {
   const token = Buffer.from(`${process.env.JIRA_EMAIL}:${process.env.JIRA_API_TOKEN}`).toString('base64');
@@ -62,7 +65,7 @@ function buildSummary(testCase: any): string {
 
 /** Returns the key of an existing open bug with the same summary, or null. */
 async function findExistingBug(ctx: APIRequestContext, base: string, summary: string): Promise<string | null> {
-  const jql = `project = ${process.env.JIRA_PROJECT_KEY} AND labels = "${LABEL}" AND summary ~ ${JSON.stringify(summary)} AND statusCategory != Done`;
+  const jql = `project = ${process.env.JIRA_PROJECT_KEY} AND labels = "${LABEL}" AND summary ~ ${JSON.stringify(summary)} AND statusCategory != "${DONE_STATUS_CATEGORY}"`;
   const resp = await ctx.get(`${base}/rest/api/3/search/jql?jql=${encodeURIComponent(jql)}&maxResults=1&fields=key`, {
     headers: { Authorization: authHeader(), Accept: 'application/json' },
   });

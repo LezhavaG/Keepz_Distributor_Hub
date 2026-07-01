@@ -28,13 +28,24 @@ export const INVALID_IBANS = [
   { name: 'CREDO', iban: process.env.CREDO_INVALID_IBAN! },
 ];
 
+// Display-only amount shown in auth/no-token report rows (those cases don't
+// create an order, so this is just a nominal value for the report table).
+// All REAL transaction amounts/limits come live from DistributorConfig.
 export const TRANSACTION_AMOUNT = parseFloat(process.env.TRANSACTION_AMOUNT || '0.02');
-export const MIN_ALLOWED_AMOUNT = parseFloat(process.env.MIN_ALLOWED_AMOUNT || '0.02');
-export const MAX_TRANSACTION_AMOUNT = parseFloat(process.env.MAX_TRANSACTION_AMOUNT || '100000');
-export const BELOW_MIN_AMOUNT = parseFloat(process.env.BELOW_MIN_AMOUNT || '0.01');
-export const INSUFFICIENT_BALANCE_AMOUNT = parseFloat(process.env.INSUFFICIENT_BALANCE_AMOUNT || '99999');
-export const ABOVE_MAX_AMOUNT = parseFloat(process.env.ABOVE_MAX_AMOUNT || '999999');
 export const CURRENCIES = ['GEL', 'USD', 'EUR'];
+
+// Base URL of the Distributor HUB API (override per-environment via .env).
+export const BASE_URL = process.env.DISTRIBUTOR_BASE_URL || 'https://distributor.dev.keepz.me';
+
+// Transaction completion polling (tune per observed processing time).
+export const POLL_MAX_RETRIES = parseInt(process.env.TRANSACTION_POLL_MAX_RETRIES || '15', 10);
+export const POLL_INTERVAL_SECONDS = parseInt(process.env.TRANSACTION_POLL_INTERVAL_SECONDS || '60', 10);
+
+// Banks that require beneficiaryName on order creation (even when not otherwise sent).
+const BANKS_REQUIRING_BENEFICIARY = ['Liberty'];
+export function requiresBeneficiaryName(bankName: string): boolean {
+  return BANKS_REQUIRING_BENEFICIARY.includes(bankName);
+}
 
 // Test fixtures for payer-details / paymentDescription tests (configurable via .env)
 export const PAYER_DEBTOR_NAME = process.env.PAYER_DEBTOR_NAME || 'შპს ტესტი';
@@ -56,7 +67,7 @@ export async function runAuthenticationSuccessTest(request: any) {
   };
 
   try {
-    const url = 'https://distributor.dev.keepz.me/api/auth';
+    const url = `${BASE_URL}/api/auth`;
     const response = await request.post(url, { data: payload });
 
     const statusCode = response.status();
@@ -155,8 +166,8 @@ export async function runHappyPathTest(request: any, banksToTest: typeof ALL_BAN
         uniqueId: uniqueId,
       };
 
-      // LIBERTY requires beneficiaryName
-      if (bank.name === 'Liberty') {
+      // Some banks (e.g. Liberty) require beneficiaryName
+      if (requiresBeneficiaryName(bank.name)) {
         payload.beneficiaryName = BENEFICIARY_NAME;
       }
 
@@ -193,7 +204,7 @@ export async function runHappyPathTest(request: any, banksToTest: typeof ALL_BAN
   const pollPromises = transactions
     .filter(tx => tx.id !== 0)
     .map(tx =>
-      hub.waitForTransactionCompletion(tx.id, 15, 60)
+      hub.waitForTransactionCompletion(tx.id, POLL_MAX_RETRIES, POLL_INTERVAL_SECONDS)
         .then(details => {
           const txIndex = transactions.findIndex(t => t.id === details.transactionId);
           if (txIndex !== -1) {
@@ -371,7 +382,7 @@ export async function runIncorrectClientIdTest(request: any) {
 
   try {
     const response = await request.post(
-      'https://distributor.dev.keepz.me/api/auth',
+      `${BASE_URL}/api/auth`,
       { data: payload }
     );
 
@@ -400,7 +411,7 @@ export async function runIncorrectClientIdTest(request: any) {
         apiCalls: [
           {
             name: 'Get Token',
-            url: 'https://distributor.dev.keepz.me/api/auth',
+            url: `${BASE_URL}/api/auth`,
             method: 'POST',
             requestBody: { ...payload, client_secret: '***' },
             statusCode: statusCode,
@@ -441,7 +452,7 @@ export async function runIncorrectCredentialsTest(request: any) {
 
   try {
     const response = await request.post(
-      'https://distributor.dev.keepz.me/api/auth',
+      `${BASE_URL}/api/auth`,
       { data: payload }
     );
 
@@ -470,7 +481,7 @@ export async function runIncorrectCredentialsTest(request: any) {
         apiCalls: [
           {
             name: 'Get Token',
-            url: 'https://distributor.dev.keepz.me/api/auth',
+            url: `${BASE_URL}/api/auth`,
             method: 'POST',
             requestBody: { ...payload, client_secret: '***' },
             statusCode: statusCode,
@@ -512,7 +523,7 @@ export async function runAuthenticationFailureTest(request: any) {
 
   // Use the REAL Create Order endpoint (same as createTransaction) so we
   // actually verify that endpoint requires authentication.
-  const url = 'https://distributor.dev.keepz.me/api/distributor';
+  const url = `${BASE_URL}/api/distributor`;
   let result = {
     statusCode: 0,
     responseBody: {} as any,
@@ -694,8 +705,8 @@ async function runBankGroupedNegativeTest(
         uniqueId: uniqueId,
       };
 
-      // LIBERTY requires beneficiaryName
-      if (bank.name === 'Liberty') {
+      // Some banks (e.g. Liberty) require beneficiaryName
+      if (requiresBeneficiaryName(bank.name)) {
         payload.beneficiaryName = BENEFICIARY_NAME;
       }
 
@@ -877,7 +888,7 @@ export async function runPaymentDescriptionTest(
         payload.beneficiaryIdentityNumber = BENEFICIARY_IDENTITY;
         payload.beneficiaryAddress = BENEFICIARY_ADDRESS;
         payload.beneficiaryBirthDate = BENEFICIARY_BIRTHDATE;
-      } else if (bank.name === 'Liberty') {
+      } else if (requiresBeneficiaryName(bank.name)) {
         // Liberty requires beneficiaryName even when we only test payer details.
         // (It still must NOT appear in paymentDescription.)
         payload.beneficiaryName = BENEFICIARY_NAME;
@@ -910,7 +921,7 @@ export async function runPaymentDescriptionTest(
         call.passed = call.statusCode === 200 || call.statusCode === 201;
       } else if (call.name === 'Get Transaction Details') {
         // Returned transactionId must equal the requested transaction_id (from the URL)
-        const reqId = Number((call.url.split('transaction_id=')[1] || '').split('&')[0]);
+        const reqId = Number(new URL(call.url).searchParams.get('transaction_id') || '0');
         call.expectedResult = { transactionId: reqId, paymentDescription: expectedPaymentDescription };
         const pd = call.actualResult?.paymentDescription || '';
         const idMatches = call.actualResult?.transactionId === reqId;

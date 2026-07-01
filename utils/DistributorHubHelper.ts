@@ -55,7 +55,7 @@ export interface ApiCall {
 }
 
 export class DistributorHubHelper {
-  private baseUrl = 'https://distributor.dev.keepz.me';
+  private baseUrl = process.env.DISTRIBUTOR_BASE_URL || 'https://distributor.dev.keepz.me';
   private clientId = process.env.DISTRIBUTOR_CLIENT_ID!;
   private clientSecret = process.env.DISTRIBUTOR_CLIENT_SECRET!;
   private accessToken: string = '';
@@ -68,7 +68,7 @@ export class DistributorHubHelper {
     const requestBody = {
       client_id: this.clientId,
       client_secret: this.clientSecret,
-      grant_type: 'client_credentials',
+      grant_type: process.env.DISTRIBUTOR_GRANT_TYPE || 'client_credentials',
     };
     const response = await this.request.post(url, {
       data: requestBody,
@@ -263,7 +263,11 @@ export class DistributorHubHelper {
     retryIntervalSeconds: number = 30
   ): Promise<TransactionDetailsResponse> {
     let attempts = 0;
-    const finalStatuses = ['COMPLETED', 'SUCCESS', 'FAILED', 'REJECTED', 'CANCELLED'];
+    // Terminal statuses that end polling (override via .env if the API adds more).
+    const finalStatuses = (process.env.TRANSACTION_FINAL_STATUSES || 'COMPLETED,SUCCESS,FAILED,REJECTED,CANCELLED')
+      .split(',')
+      .map((s) => s.trim())
+      .filter(Boolean);
 
     while (attempts < maxRetries) {
       const url = `${this.baseUrl}/api/distributor/details?transaction_id=${transactionId}`;

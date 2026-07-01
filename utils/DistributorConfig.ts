@@ -17,6 +17,15 @@ interface CurrencyConfig {
 
 let liveConfig: { currencies: { [key: string]: CurrencyConfig } } | null = null;
 
+// Whether the amounts/commission used this run came from the admin panel ('live')
+// or from the .env fallback ('fallback'). Surfaced so reports can flag stale config.
+let configSource: 'live' | 'fallback' = 'fallback';
+
+/** How the current config was sourced: live admin panel or .env fallback. */
+export function getConfigSource(): 'live' | 'fallback' {
+  return configSource;
+}
+
 const NEWADMIN_BASE_URL = process.env.NEWADMIN_BASE_URL || 'https://newadmin.dev.keepz.me';
 
 /**
@@ -59,13 +68,16 @@ export async function loadDistributorConfig(request: APIRequestContext): Promise
     }
 
     liveConfig = { currencies };
+    configSource = 'live';
     console.log('✅ Loaded live config from admin panel:');
     for (const [cur, c] of Object.entries(currencies)) {
       console.log(`   ${cur}: min=${c.min} max=${c.max} commission=${c.commission} (${c.commissionType})`);
     }
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
+    configSource = 'fallback';
     console.log(`⚠️  Could not load admin config, using .env fallback: ${msg}`);
+    console.log('⚠️  WARNING: tests are running against STALE .env limits/commission, not live admin config.');
   }
 }
 
