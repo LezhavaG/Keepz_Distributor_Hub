@@ -5,10 +5,15 @@
   "main": "index.js",
   "scripts": {
     "regression": "REPORT_NAME=Full-Regression npx playwright test tests/Distributor_HUB/regression.spec.ts",
-    "retest-jira": "npx playwright test tests/Distributor_HUB/retest-jira.spec.ts",
-    "retest-watch": "node scripts/retest-scheduler.js",
+    "regression:jira": "CREATE_JIRA_BUGS=true REPORT_NAME=Full-Regression npx playwright test tests/Distributor_HUB/regression.spec.ts",
     "test:positive": "npx playwright test tests/Distributor_HUB/Positive_Cases/positive-tests.spec.ts",
-    "test:negative": "npx playwright test tests/Distributor_HUB/Negative_Cases/negative-tests.spec.ts"
+    "test:positive:jira": "CREATE_JIRA_BUGS=true npx playwright test tests/Distributor_HUB/Positive_Cases/positive-tests.spec.ts",
+    "test:negative": "npx playwright test tests/Distributor_HUB/Negative_Cases/negative-tests.spec.ts",
+    "test:negative:jira": "CREATE_JIRA_BUGS=true npx playwright test tests/Distributor_HUB/Negative_Cases/negative-tests.spec.ts",
+    "test:positive:individual:jira": "CREATE_JIRA_BUGS=true npx playwright test tests/Distributor_HUB/Positive_Cases/positive-tests-individual.spec.ts",
+    "test:negative:individual:jira": "CREATE_JIRA_BUGS=true npx playwright test tests/Distributor_HUB/Negative_Cases/negative-tests-individual.spec.ts",
+    "retest-jira": "npx playwright test tests/Distributor_HUB/retest-jira.spec.ts",
+    "retest-watch": "node scripts/retest-scheduler.js"
   },
   "keywords": [],
   "author": "",
