@@ -71,6 +71,31 @@ async function findExistingBug(ctx: APIRequestContext, base: string, summary: st
   return data.issues && data.issues.length > 0 ? data.issues[0].key : null;
 }
 
+/**
+ * Add the issue to the board's ACTIVE sprint (Scrum boards only).
+ * Without this, API-created issues sit in the Backlog and don't appear on the
+ * "Active sprints" board view. No-op for Kanban boards / if no active sprint.
+ */
+async function addIssueToActiveSprint(ctx: APIRequestContext, base: string, key: string): Promise<void> {
+  const boardId = process.env.JIRA_BOARD_ID;
+  if (!boardId) return;
+  try {
+    const sprintResp = await ctx.get(`${base}/rest/agile/1.0/board/${boardId}/sprint?state=active`, {
+      headers: { Authorization: authHeader(), Accept: 'application/json' },
+    });
+    if (!sprintResp.ok()) return; // Kanban board or no access
+    const sprints = (await sprintResp.json()).values || [];
+    if (sprints.length === 0) return; // no active sprint
+    const sprintId = sprints[0].id;
+    await ctx.post(`${base}/rest/agile/1.0/sprint/${sprintId}/issue`, {
+      headers: { Authorization: authHeader(), 'Content-Type': 'application/json' },
+      data: { issues: [key] },
+    });
+  } catch {
+    // ignore - issue still exists in backlog
+  }
+}
+
 /** Move a newly created issue to the "To Do" column. */
 async function transitionToToDo(ctx: APIRequestContext, base: string, key: string): Promise<void> {
   const tResp = await ctx.get(`${base}/rest/api/3/issue/${key}/transitions`, {
@@ -133,8 +158,9 @@ export async function createBugsForFailedCases(failedCases: any[]): Promise<void
       }
 
       const key = (await createResp.json()).key;
+      await addIssueToActiveSprint(ctx, base, key); // put it on the active sprint board
       await transitionToToDo(ctx, base, key);
-      console.log(`   ✅ Created ${key} (To Do): ${summary}`);
+      console.log(`   ✅ Created ${key} (To Do, active sprint): ${summary}`);
     } catch (e) {
       const msg = e instanceof Error ? e.message : String(e);
       console.log(`   ❌ Error creating bug for "${summary}": ${msg}`);
