@@ -15,7 +15,37 @@ Confirm (ask only what is genuinely ambiguous):
 - **Positive or negative?** → determines which pair of spec files + report `type`.
 - **Category** (report grouping), e.g. `Invalid IBAN Cases`, `Amount Validation Cases`, `Balance Update Cases`, `Transactions`. Reuse an existing category name if one fits.
 - **Scope**: single bank, all banks, single currency, all currencies?
-- **Expected result**: for negative cases, the exact backend error string to assert.
+- **Expected result**:
+  - *Negative cases* — ASK for the exact backend error string/status to assert
+    (e.g. `'To iban has invalid format,'`). It's arbitrary backend wording you
+    cannot guess; getting it wrong makes the test pass when it shouldn't.
+  - *Positive cases* — usually DERIVE it from the flow/config (order reaches
+    COMPLETED/SUCCESS, balance == amount + expected commission, paymentDescription
+    matches the formula, etc.). Only ask when "what counts as success" is genuinely
+    ambiguous for a novel scenario.
+
+## 0.5. Check for an existing / similar case FIRST (do not skip)
+
+Before writing anything, actively search for a case that already covers this —
+don't rely on noticing it by accident. Search all spec files AND `helpers.ts`:
+
+```bash
+# by category, expected error text, bank/currency, and helper name
+grep -rniE "<category|error string|bank|currency|helper name>" tests/Distributor_HUB
+```
+
+Then decide:
+- **Exact match exists** (same category + scope + expected result) → STOP. Tell the
+  user it already exists, citing the `testCaseName` and `file:line`. Do not duplicate.
+- **Similar case exists** (same category, different scope/error — e.g. the check
+  already runs for BOG and they want TBC, or a helper already exists and only a new
+  `test(...)` per bank is needed) → surface it and ASK whether to: (a) extend the
+  existing helper/add the missing per-bank `test(...)`, (b) add a distinct variant,
+  or (c) skip. Prefer reusing the existing helper over writing a new one.
+- **No match** → proceed to step 1.
+
+Remember cases are duplicated across BOTH the combined and individual spec files by
+design — finding a name twice is expected and is NOT a duplicate to remove.
 
 ## 1. The architecture (read `tests/Distributor_HUB/helpers.ts` first)
 
