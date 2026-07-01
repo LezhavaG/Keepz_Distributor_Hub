@@ -85,6 +85,29 @@ export function getCommission(currency: string): number {
   return parseFloat(process.env[`COMMISSION_${currency}`] || '0.01');
 }
 
+export function getCommissionType(currency: string): string {
+  return (
+    liveConfig?.currencies[currency]?.commissionType ||
+    process.env[`COMMISSION_TYPE_${currency}`] ||
+    process.env.COMMISSION_TYPE ||
+    'FIXED'
+  );
+}
+
+/**
+ * Expected commission for a given amount, per the admin-panel config.
+ * FIXED -> flat commission; PERCENTAGE -> amount * rate / 100.
+ * Used to verify the back-end deducted the CORRECT commission.
+ */
+export function computeExpectedCommission(currency: string, amount: number): number {
+  const type = getCommissionType(currency);
+  const commission = getCommission(currency);
+  if (type === 'PERCENTAGE') {
+    return (amount * commission) / 100;
+  }
+  return commission; // FIXED
+}
+
 // ---- Derived test amounts (computed from the live limits, so they auto-adapt) ----
 
 /** A normal valid amount (uses the minimum allowed). */

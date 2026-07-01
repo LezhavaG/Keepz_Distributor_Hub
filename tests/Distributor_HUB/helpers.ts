@@ -6,6 +6,7 @@ import {
   getBelowMinAmount,
   getAboveMaxAmount,
   getInsufficientAmount,
+  computeExpectedCommission,
 } from '../../utils/DistributorConfig';
 
 export const BOG_BANK = { name: 'BOG', iban: process.env.BOG_IBAN! };
@@ -282,18 +283,30 @@ export async function runHappyPathTest(request: any, banksToTest: typeof ALL_BAN
     return finalTx && (finalTx.status === 'COMPLETED' || finalTx.status === 'SUCCESS');
   });
 
-  // Calculate detailed balance information for each currency
-  const totalTransactionsGEL = getTransactionAmount('GEL') * succeededTxs.filter(tx => tx.currency === 'GEL').length;
-  const totalCommissionGEL = succeededTxs.filter(tx => tx.currency === 'GEL').reduce((sum, tx) => sum + (tx.commission || 0), 0);
-  const totalDeductedGEL = totalTransactionsGEL + totalCommissionGEL;
+  // Calculate detailed balance info per currency.
+  // Commission is verified against the EXPECTED value from the admin-panel config
+  // (not the value the API reported) so a wrong back-end commission is caught.
+  const perCurrency = (currency: string) => {
+    const txs = succeededTxs.filter(tx => tx.currency === currency);
+    const amount = getTransactionAmount(currency);
+    const totalTransactions = amount * txs.length;
+    const actualCommission = txs.reduce((sum, tx) => sum + (tx.commission || 0), 0);
+    const expectedCommissionPerTx = computeExpectedCommission(currency, amount);
+    const expectedCommission = expectedCommissionPerTx * txs.length;
+    const commissionCorrect = Math.abs(actualCommission - expectedCommission) < 0.001;
+    const totalDeducted = totalTransactions + expectedCommission; // expected, not actual
+    return { totalTransactions, actualCommission, expectedCommission, expectedCommissionPerTx, commissionCorrect, totalDeducted };
+  };
 
-  const totalTransactionsUSD = getTransactionAmount('USD') * succeededTxs.filter(tx => tx.currency === 'USD').length;
-  const totalCommissionUSD = succeededTxs.filter(tx => tx.currency === 'USD').reduce((sum, tx) => sum + (tx.commission || 0), 0);
-  const totalDeductedUSD = totalTransactionsUSD + totalCommissionUSD;
+  const gel = perCurrency('GEL');
+  const usd = perCurrency('USD');
+  const eur = perCurrency('EUR');
 
-  const totalTransactionsEUR = getTransactionAmount('EUR') * succeededTxs.filter(tx => tx.currency === 'EUR').length;
-  const totalCommissionEUR = succeededTxs.filter(tx => tx.currency === 'EUR').reduce((sum, tx) => sum + (tx.commission || 0), 0);
-  const totalDeductedEUR = totalTransactionsEUR + totalCommissionEUR;
+  const totalDeductedGEL = gel.totalDeducted;
+  const totalDeductedUSD = usd.totalDeducted;
+  const totalDeductedEUR = eur.totalDeducted;
+
+  const allCommissionsCorrect = gel.commissionCorrect && usd.commissionCorrect && eur.commissionCorrect;
 
   // Step 6: Create Balance Check test cases (with their own API calls in Details)
   const balanceCheckTestCases: any[] = [
@@ -311,13 +324,23 @@ export async function runHappyPathTest(request: any, banksToTest: typeof ALL_BAN
     },
   ];
 
-  // Add Final Balance Verification test case
-  const balanceVerificationCorrect =
+  // Final Balance Verification: balance math must be correct AND every
+  // commission must match the expected (admin-config) commission.
+  const balanceMathCorrect =
     Math.abs((initialBalanceGEL.amount - finalBalanceGEL.amount) - totalDeductedGEL) < 0.001 &&
     Math.abs((initialBalanceUSD.amount - finalBalanceUSD.amount) - totalDeductedUSD) < 0.001 &&
     Math.abs((initialBalanceEUR.amount - finalBalanceEUR.amount) - totalDeductedEUR) < 0.001;
 
-  const balanceDetails = `GEL: Initial: ${initialBalanceGEL.amount.toFixed(2)} | Transactions: -${totalTransactionsGEL.toFixed(2)} | Commission: -${totalCommissionGEL.toFixed(2)} | Final: ${finalBalanceGEL.amount.toFixed(2)}\nUSD: Initial: ${initialBalanceUSD.amount.toFixed(2)} | Transactions: -${totalTransactionsUSD.toFixed(2)} | Commission: -${totalCommissionUSD.toFixed(2)} | Final: ${finalBalanceUSD.amount.toFixed(2)}\nEUR: Initial: ${initialBalanceEUR.amount.toFixed(2)} | Transactions: -${totalTransactionsEUR.toFixed(2)} | Commission: -${totalCommissionEUR.toFixed(2)} | Final: ${finalBalanceEUR.amount.toFixed(2)}`;
+  const balanceVerificationCorrect = balanceMathCorrect && allCommissionsCorrect;
+
+  const line = (cur: string, init: number, fin: number, c: ReturnType<typeof perCurrency>) =>
+    `${cur}: Initial: ${init.toFixed(2)} | Transactions: -${c.totalTransactions.toFixed(2)} | Commission expected: -${c.expectedCommission.toFixed(2)} | Commission actual: -${c.actualCommission.toFixed(2)} | Commission OK: ${c.commissionCorrect ? '✓' : '✗'} | Final: ${fin.toFixed(2)}`;
+
+  const balanceDetails = [
+    line('GEL', initialBalanceGEL.amount, finalBalanceGEL.amount, gel),
+    line('USD', initialBalanceUSD.amount, finalBalanceUSD.amount, usd),
+    line('EUR', initialBalanceEUR.amount, finalBalanceEUR.amount, eur),
+  ].join('\n');
 
   balanceCheckTestCases.push({
     transactionId: 0,
