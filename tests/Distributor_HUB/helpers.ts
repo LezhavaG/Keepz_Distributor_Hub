@@ -1,5 +1,12 @@
 import { DistributorHubHelper } from '../../utils/DistributorHubHelper';
 import { randomUUID } from 'crypto';
+import {
+  loadDistributorConfig,
+  getTransactionAmount,
+  getBelowMinAmount,
+  getAboveMaxAmount,
+  getInsufficientAmount,
+} from '../../utils/DistributorConfig';
 
 export const BOG_BANK = { name: 'BOG', iban: process.env.BOG_IBAN! };
 export const TBC_BANK = { name: 'TBC', iban: process.env.TBC_IBAN! };
@@ -110,6 +117,9 @@ export async function runAuthenticationSuccessTest(request: any) {
 export async function runHappyPathTest(request: any, banksToTest: typeof ALL_BANKS) {
   const hub = new DistributorHubHelper(request);
 
+  // Load live config from admin panel (limits/commission) before using amounts
+  await loadDistributorConfig(request);
+
   // Step 1: Authenticate and get token
   await hub.authenticate();
   console.log('✅ Token successfully taken\n');
@@ -137,7 +147,7 @@ export async function runHappyPathTest(request: any, banksToTest: typeof ALL_BAN
       const uniqueId = randomUUID();
 
       const payload: any = {
-        amount: TRANSACTION_AMOUNT,
+        amount: getTransactionAmount(currency),
         currency: currency,
         description: `Payment to ${bank.name}`,
         toIban: bank.iban,
@@ -273,15 +283,15 @@ export async function runHappyPathTest(request: any, banksToTest: typeof ALL_BAN
   });
 
   // Calculate detailed balance information for each currency
-  const totalTransactionsGEL = TRANSACTION_AMOUNT * succeededTxs.filter(tx => tx.currency === 'GEL').length;
+  const totalTransactionsGEL = getTransactionAmount('GEL') * succeededTxs.filter(tx => tx.currency === 'GEL').length;
   const totalCommissionGEL = succeededTxs.filter(tx => tx.currency === 'GEL').reduce((sum, tx) => sum + (tx.commission || 0), 0);
   const totalDeductedGEL = totalTransactionsGEL + totalCommissionGEL;
 
-  const totalTransactionsUSD = TRANSACTION_AMOUNT * succeededTxs.filter(tx => tx.currency === 'USD').length;
+  const totalTransactionsUSD = getTransactionAmount('USD') * succeededTxs.filter(tx => tx.currency === 'USD').length;
   const totalCommissionUSD = succeededTxs.filter(tx => tx.currency === 'USD').reduce((sum, tx) => sum + (tx.commission || 0), 0);
   const totalDeductedUSD = totalTransactionsUSD + totalCommissionUSD;
 
-  const totalTransactionsEUR = TRANSACTION_AMOUNT * succeededTxs.filter(tx => tx.currency === 'EUR').length;
+  const totalTransactionsEUR = getTransactionAmount('EUR') * succeededTxs.filter(tx => tx.currency === 'EUR').length;
   const totalCommissionEUR = succeededTxs.filter(tx => tx.currency === 'EUR').reduce((sum, tx) => sum + (tx.commission || 0), 0);
   const totalDeductedEUR = totalTransactionsEUR + totalCommissionEUR;
 
@@ -551,7 +561,7 @@ export async function runInsufficientBalanceTest(
   return runBankGroupedNegativeTest(
     request,
     banksToTest,
-    INSUFFICIENT_BALANCE_AMOUNT,
+    getInsufficientAmount,
     expectedErrorMessage,
     'Insufficient Balance',
     'Insufficient Balance Cases'
@@ -566,7 +576,7 @@ export async function runAboveMaximumAmountTest(
   return runBankGroupedNegativeTest(
     request,
     banksToTest,
-    ABOVE_MAX_AMOUNT,
+    getAboveMaxAmount,
     expectedErrorMessage,
     'Above Maximum Amount',
     'Amount Validation Cases'
@@ -581,7 +591,7 @@ export async function runBelowMinimumAmountTest(
   return runBankGroupedNegativeTest(
     request,
     banksToTest,
-    BELOW_MIN_AMOUNT,
+    getBelowMinAmount,
     expectedErrorMessage,
     'Below Minimum Amount',
     'Amount Validation Cases'
@@ -596,7 +606,7 @@ export async function runNegativeTest(
   return runBankGroupedNegativeTest(
     request,
     banksToTest,
-    TRANSACTION_AMOUNT,
+    getTransactionAmount,
     expectedErrorMessage,
     'Invalid IBAN',
     'Invalid IBAN Cases'
@@ -624,12 +634,15 @@ export function fixNegativeTestExpectedResults(apiCalls: any[], errorMessage: st
 async function runBankGroupedNegativeTest(
   request: any,
   banksToTest: typeof ALL_BANKS,
-  amount: number,
+  amountFn: (currency: string) => number,
   expectedErrorMessage: string,
   testCaseSuffix: string,
   category: string
 ) {
   const hub = new DistributorHubHelper(request);
+
+  // Load live config from admin panel (limits/commission) before using amounts
+  await loadDistributorConfig(request);
 
   await hub.authenticate();
   console.log('✅ Token successfully taken\n');
@@ -651,7 +664,7 @@ async function runBankGroupedNegativeTest(
       const uniqueId = randomUUID();
 
       const payload: any = {
-        amount: amount,
+        amount: amountFn(currency),
         currency: currency,
         description: `Payment to ${bank.name} - ${testCaseSuffix}`,
         toIban: bank.iban,
@@ -706,7 +719,7 @@ async function runBankGroupedNegativeTest(
     tableData.push({
       transactionId: 0,
       bank: bank.name,
-      amount: amount,
+      amount: amountFn(CURRENCIES[0]),
       currency: 'ALL',
       status: 'Failed' as const,
       isExpectedError: allExpected,
@@ -805,6 +818,9 @@ export async function runPaymentDescriptionTest(
 ) {
   const hub = new DistributorHubHelper(request);
 
+  // Load live config from admin panel (limits/commission) before using amounts
+  await loadDistributorConfig(request);
+
   await hub.authenticate();
   console.log('✅ Token successfully taken\n');
 
@@ -824,7 +840,7 @@ export async function runPaymentDescriptionTest(
 
     for (const currency of CURRENCIES) {
       const payload: any = {
-        amount: TRANSACTION_AMOUNT,
+        amount: getTransactionAmount(currency),
         currency: currency,
         description: PAYER_DESCRIPTION,
         toIban: bank.iban,
@@ -886,7 +902,7 @@ export async function runPaymentDescriptionTest(
     tableData.push({
       transactionId: 0,
       bank: bank.name,
-      amount: TRANSACTION_AMOUNT,
+      amount: getTransactionAmount(CURRENCIES[0]),
       currency: 'ALL',
       status: allMatch ? ('Succeeded' as const) : ('Failed' as const),
       errorMessage: summary,
