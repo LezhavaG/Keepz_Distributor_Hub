@@ -254,14 +254,14 @@
               
       <div style="margin-bottom: 16px;">
         <button type="button" onclick="toggleCategory(this)" style="width: 100%; padding: 12px 16px; background: #f5f5f5; border: none; cursor: pointer; border-left: 4px solid #667eea; font-weight: 500; font-size: 14px; color: #333; display: flex; justify-content: space-between; align-items: center; text-align: left;">
-          <span>📁 Amount Validation Cases</span>
+          <span>📁 Invalid IBAN Cases</span>
           <span style="font-size: 16px; transition: transform 0.3s; transform: rotate(-90deg);">▼</span>
         </button>
         <div class="category-section" style="display: none; background: white; border-radius: 0 0 6px 6px; overflow: hidden;">
           
       <div class="test-case-row">
         <div class="test-case-header" onclick="toggleTestCase(this)">
-          <div style="font-weight: 500; color: #333;">Distributor BOG - Below Minimum Amount</div>
+          <div style="font-weight: 500; color: #333;">Distributor BOG - Invalid IBAN</div>
           <div style="display: flex; align-items: center; gap: 12px;">
             <span style="background-color: #d4edda; padding: 4px 12px; border-radius: 4px; font-size: 12px; font-weight: 500;">
               Passed ✓
@@ -308,7 +308,7 @@
                 <strong style="color: #333;">Actual Result:</strong>
                 <pre style="margin: 8px 0 0 0; background: white; padding: 8px; border-radius: 3px; overflow-x: auto; color: #066600;">{
   "value": {
-    "access_token": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJmYjc2OWNkZC03ZTlkLTQzNTUtYTMzMS00MzAyODcwMGNhM2EiLCJpYXQiOjE3ODI4OTE2ODQsImV4cCI6MTc4Mjg5MzQ4NCwicGVybWlzc2lvbnMiOltdfQ.-eOfyQ_eFu9iOaAtyJw3ZviIzqzmGPJn5rrvh3uJs1tGm2u0yPI5wTo-POQg6QnPJemx-gynAHLSj6pMVsQY7w",
+    "access_token": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJmYjc2OWNkZC03ZTlkLTQzNTUtYTMzMS00MzAyODcwMGNhM2EiLCJpYXQiOjE3ODI4OTcxNTAsImV4cCI6MTc4Mjg5ODk1MCwicGVybWlzc2lvbnMiOltdfQ.BL79mXv9a5rxh47RzcI_yZjZYwg36IlGdjansGRwOl1pATL4Jvv63sq-d_Gpiun4GPRX1-1AmET9EJgmIgHjrQ",
     "expires_in": 1800,
     "token_type": "Bearer"
   }
@@ -325,11 +325,11 @@
               <div style="margin-bottom: 8px;"><strong>Status Code:</strong> <span style="background: #f0f0f0; padding: 2px 8px; border-radius: 3px; font-family: monospace;">400</span></div>
               <div style="margin-bottom: 4px;"><strong>Request Body:</strong></div>
               <pre style="margin: 4px 0 8px 0; background: #fff8e6; padding: 8px; border-radius: 3px; border-left: 3px solid #f0ad4e; overflow-x: auto; font-family: monospace; font-size: 12px; color: #8a6d3b;">{
-  "amount": 0.01,
+  "amount": 0.02,
   "currency": "GEL",
-  "description": "Payment to BOG - Below Minimum Amount",
-  "toIban": "GE54BG0000000542056887",
-  "uniqueId": "80a72d6c-ec9b-489a-acc3-71a005900707"
+  "description": "Payment to BOG - Invalid IBAN",
+  "toIban": "GE00INVALID000000001",
+  "uniqueId": "54dd468a-5047-4130-aa51-cdb34e0e5bc6"
 }</pre>
             </div>
             <button type="button" onclick="toggleApiDetails(this)" style="width: 100%; padding: 8px 12px; background: #f5f5f5; border: 1px solid #e0e0e0; cursor: pointer; border-radius: 4px; font-size: 12px; color: #333; display: flex; justify-content: space-between; align-items: center;">
@@ -340,15 +340,15 @@
               <div style="margin-bottom: 12px;">
                 <strong style="color: #333;">Expected Result:</strong>
                 <pre style="margin: 8px 0 0 0; background: white; padding: 8px; border-radius: 3px; overflow-x: auto; color: #0066cc;">{
-  "message": "Amount below minimum transaction amount.",
+  "message": "To iban has invalid format,",
   "statusCode": "number"
 }</pre>
               </div>
               <div>
                 <strong style="color: #333;">Actual Result:</strong>
                 <pre style="margin: 8px 0 0 0; background: white; padding: 8px; border-radius: 3px; overflow-x: auto; color: #066600;">{
-  "message": "Amount below minimum transaction amount.",
-  "statusCode": 5045,
+  "message": "To iban has invalid format, ",
+  "statusCode": 5023,
   "exceptionGroup": 1
 }</pre>
               </div>
@@ -363,11 +363,11 @@
               <div style="margin-bottom: 8px;"><strong>Status Code:</strong> <span style="background: #f0f0f0; padding: 2px 8px; border-radius: 3px; font-family: monospace;">400</span></div>
               <div style="margin-bottom: 4px;"><strong>Request Body:</strong></div>
               <pre style="margin: 4px 0 8px 0; background: #fff8e6; padding: 8px; border-radius: 3px; border-left: 3px solid #f0ad4e; overflow-x: auto; font-family: monospace; font-size: 12px; color: #8a6d3b;">{
-  "amount": 0.01,
+  "amount": 0.02,
   "currency": "USD",
-  "description": "Payment to BOG - Below Minimum Amount",
-  "toIban": "GE54BG0000000542056887",
-  "uniqueId": "7fbc4c7d-8506-4691-bb26-57a7176d8835"
+  "description": "Payment to BOG - Invalid IBAN",
+  "toIban": "GE00INVALID000000001",
+  "uniqueId": "e1ef8593-6e4d-4efe-9dd7-93dc81b4beca"
 }</pre>
             </div>
             <button type="button" onclick="toggleApiDetails(this)" style="width: 100%; padding: 8px 12px; background: #f5f5f5; border: 1px solid #e0e0e0; cursor: pointer; border-radius: 4px; font-size: 12px; color: #333; display: flex; justify-content: space-between; align-items: center;">
@@ -378,15 +378,15 @@
               <div style="margin-bottom: 12px;">
                 <strong style="color: #333;">Expected Result:</strong>
                 <pre style="margin: 8px 0 0 0; background: white; padding: 8px; border-radius: 3px; overflow-x: auto; color: #0066cc;">{
-  "message": "Amount below minimum transaction amount.",
+  "message": "To iban has invalid format,",
   "statusCode": "number"
 }</pre>
               </div>
               <div>
                 <strong style="color: #333;">Actual Result:</strong>
                 <pre style="margin: 8px 0 0 0; background: white; padding: 8px; border-radius: 3px; overflow-x: auto; color: #066600;">{
-  "message": "Amount below minimum transaction amount.",
-  "statusCode": 5045,
+  "message": "To iban has invalid format, ",
+  "statusCode": 5023,
   "exceptionGroup": 1
 }</pre>
               </div>
@@ -401,11 +401,11 @@
               <div style="margin-bottom: 8px;"><strong>Status Code:</strong> <span style="background: #f0f0f0; padding: 2px 8px; border-radius: 3px; font-family: monospace;">400</span></div>
               <div style="margin-bottom: 4px;"><strong>Request Body:</strong></div>
               <pre style="margin: 4px 0 8px 0; background: #fff8e6; padding: 8px; border-radius: 3px; border-left: 3px solid #f0ad4e; overflow-x: auto; font-family: monospace; font-size: 12px; color: #8a6d3b;">{
-  "amount": 0.01,
+  "amount": 0.02,
   "currency": "EUR",
-  "description": "Payment to BOG - Below Minimum Amount",
-  "toIban": "GE54BG0000000542056887",
-  "uniqueId": "19f7eec3-2460-49df-b7e6-c8a26c0b5f71"
+  "description": "Payment to BOG - Invalid IBAN",
+  "toIban": "GE00INVALID000000001",
+  "uniqueId": "bbf08589-0815-434f-aa6c-9c18f2e5cdf8"
 }</pre>
             </div>
             <button type="button" onclick="toggleApiDetails(this)" style="width: 100%; padding: 8px 12px; background: #f5f5f5; border: 1px solid #e0e0e0; cursor: pointer; border-radius: 4px; font-size: 12px; color: #333; display: flex; justify-content: space-between; align-items: center;">
@@ -416,15 +416,15 @@
               <div style="margin-bottom: 12px;">
                 <strong style="color: #333;">Expected Result:</strong>
                 <pre style="margin: 8px 0 0 0; background: white; padding: 8px; border-radius: 3px; overflow-x: auto; color: #0066cc;">{
-  "message": "Amount below minimum transaction amount.",
+  "message": "To iban has invalid format,",
   "statusCode": "number"
 }</pre>
               </div>
               <div>
                 <strong style="color: #333;">Actual Result:</strong>
                 <pre style="margin: 8px 0 0 0; background: white; padding: 8px; border-radius: 3px; overflow-x: auto; color: #066600;">{
-  "message": "Amount below minimum transaction amount.",
-  "statusCode": 5045,
+  "message": "To iban has invalid format, ",
+  "statusCode": 5023,
   "exceptionGroup": 1
 }</pre>
               </div>
@@ -442,7 +442,7 @@
     
       <div class="test-case-row">
         <div class="test-case-header" onclick="toggleTestCase(this)">
-          <div style="font-weight: 500; color: #333;">Distributor TBC - Below Minimum Amount</div>
+          <div style="font-weight: 500; color: #333;">Distributor TBC - Invalid IBAN</div>
           <div style="display: flex; align-items: center; gap: 12px;">
             <span style="background-color: #d4edda; padding: 4px 12px; border-radius: 4px; font-size: 12px; font-weight: 500;">
               Passed ✓
@@ -489,7 +489,7 @@
                 <strong style="color: #333;">Actual Result:</strong>
                 <pre style="margin: 8px 0 0 0; background: white; padding: 8px; border-radius: 3px; overflow-x: auto; color: #066600;">{
   "value": {
-    "access_token": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJmYjc2OWNkZC03ZTlkLTQzNTUtYTMzMS00MzAyODcwMGNhM2EiLCJpYXQiOjE3ODI4OTE2ODQsImV4cCI6MTc4Mjg5MzQ4NCwicGVybWlzc2lvbnMiOltdfQ.-eOfyQ_eFu9iOaAtyJw3ZviIzqzmGPJn5rrvh3uJs1tGm2u0yPI5wTo-POQg6QnPJemx-gynAHLSj6pMVsQY7w",
+    "access_token": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJmYjc2OWNkZC03ZTlkLTQzNTUtYTMzMS00MzAyODcwMGNhM2EiLCJpYXQiOjE3ODI4OTcxNTAsImV4cCI6MTc4Mjg5ODk1MCwicGVybWlzc2lvbnMiOltdfQ.BL79mXv9a5rxh47RzcI_yZjZYwg36IlGdjansGRwOl1pATL4Jvv63sq-d_Gpiun4GPRX1-1AmET9EJgmIgHjrQ",
     "expires_in": 1800,
     "token_type": "Bearer"
   }
@@ -506,11 +506,11 @@
               <div style="margin-bottom: 8px;"><strong>Status Code:</strong> <span style="background: #f0f0f0; padding: 2px 8px; border-radius: 3px; font-family: monospace;">400</span></div>
               <div style="margin-bottom: 4px;"><strong>Request Body:</strong></div>
               <pre style="margin: 4px 0 8px 0; background: #fff8e6; padding: 8px; border-radius: 3px; border-left: 3px solid #f0ad4e; overflow-x: auto; font-family: monospace; font-size: 12px; color: #8a6d3b;">{
-  "amount": 0.01,
+  "amount": 0.02,
   "currency": "GEL",
-  "description": "Payment to TBC - Below Minimum Amount",
-  "toIban": "GE26TB7899045061100085",
-  "uniqueId": "0750d634-8260-4f05-b5e9-16d6a702e28d"
+  "description": "Payment to TBC - Invalid IBAN",
+  "toIban": "GE00INVALID000000002",
+  "uniqueId": "4ce24f9b-cfa6-417a-b2cf-18f246f61c1f"
 }</pre>
             </div>
             <button type="button" onclick="toggleApiDetails(this)" style="width: 100%; padding: 8px 12px; background: #f5f5f5; border: 1px solid #e0e0e0; cursor: pointer; border-radius: 4px; font-size: 12px; color: #333; display: flex; justify-content: space-between; align-items: center;">
@@ -521,15 +521,15 @@
               <div style="margin-bottom: 12px;">
                 <strong style="color: #333;">Expected Result:</strong>
                 <pre style="margin: 8px 0 0 0; background: white; padding: 8px; border-radius: 3px; overflow-x: auto; color: #0066cc;">{
-  "message": "Amount below minimum transaction amount.",
+  "message": "To iban has invalid format,",
   "statusCode": "number"
 }</pre>
               </div>
               <div>
                 <strong style="color: #333;">Actual Result:</strong>
                 <pre style="margin: 8px 0 0 0; background: white; padding: 8px; border-radius: 3px; overflow-x: auto; color: #066600;">{
-  "message": "Amount below minimum transaction amount.",
-  "statusCode": 5045,
+  "message": "To iban has invalid format, ",
+  "statusCode": 5023,
   "exceptionGroup": 1
 }</pre>
               </div>
@@ -544,11 +544,11 @@
               <div style="margin-bottom: 8px;"><strong>Status Code:</strong> <span style="background: #f0f0f0; padding: 2px 8px; border-radius: 3px; font-family: monospace;">400</span></div>
               <div style="margin-bottom: 4px;"><strong>Request Body:</strong></div>
               <pre style="margin: 4px 0 8px 0; background: #fff8e6; padding: 8px; border-radius: 3px; border-left: 3px solid #f0ad4e; overflow-x: auto; font-family: monospace; font-size: 12px; color: #8a6d3b;">{
-  "amount": 0.01,
+  "amount": 0.02,
   "currency": "USD",
-  "description": "Payment to TBC - Below Minimum Amount",
-  "toIban": "GE26TB7899045061100085",
-  "uniqueId": "f7a6e5d1-5495-44c0-ac5d-f5d3373a59eb"
+  "description": "Payment to TBC - Invalid IBAN",
+  "toIban": "GE00INVALID000000002",
+  "uniqueId": "7b68c0dd-02af-41be-9f78-aaf820b49a23"
 }</pre>
             </div>
             <button type="button" onclick="toggleApiDetails(this)" style="width: 100%; padding: 8px 12px; background: #f5f5f5; border: 1px solid #e0e0e0; cursor: pointer; border-radius: 4px; font-size: 12px; color: #333; display: flex; justify-content: space-between; align-items: center;">
@@ -559,15 +559,15 @@
               <div style="margin-bottom: 12px;">
                 <strong style="color: #333;">Expected Result:</strong>
                 <pre style="margin: 8px 0 0 0; background: white; padding: 8px; border-radius: 3px; overflow-x: auto; color: #0066cc;">{
-  "message": "Amount below minimum transaction amount.",
+  "message": "To iban has invalid format,",
   "statusCode": "number"
 }</pre>
               </div>
               <div>
                 <strong style="color: #333;">Actual Result:</strong>
                 <pre style="margin: 8px 0 0 0; background: white; padding: 8px; border-radius: 3px; overflow-x: auto; color: #066600;">{
-  "message": "Amount below minimum transaction amount.",
-  "statusCode": 5045,
+  "message": "To iban has invalid format, ",
+  "statusCode": 5023,
   "exceptionGroup": 1
 }</pre>
               </div>
@@ -582,11 +582,11 @@
               <div style="margin-bottom: 8px;"><strong>Status Code:</strong> <span style="background: #f0f0f0; padding: 2px 8px; border-radius: 3px; font-family: monospace;">400</span></div>
               <div style="margin-bottom: 4px;"><strong>Request Body:</strong></div>
               <pre style="margin: 4px 0 8px 0; background: #fff8e6; padding: 8px; border-radius: 3px; border-left: 3px solid #f0ad4e; overflow-x: auto; font-family: monospace; font-size: 12px; color: #8a6d3b;">{
-  "amount": 0.01,
+  "amount": 0.02,
   "currency": "EUR",
-  "description": "Payment to TBC - Below Minimum Amount",
-  "toIban": "GE26TB7899045061100085",
-  "uniqueId": "90ef3b00-f47b-4be7-92a7-d6000008cf9b"
+  "description": "Payment to TBC - Invalid IBAN",
+  "toIban": "GE00INVALID000000002",
+  "uniqueId": "330da767-fed6-4579-af1a-0873df8a8100"
 }</pre>
             </div>
             <button type="button" onclick="toggleApiDetails(this)" style="width: 100%; padding: 8px 12px; background: #f5f5f5; border: 1px solid #e0e0e0; cursor: pointer; border-radius: 4px; font-size: 12px; color: #333; display: flex; justify-content: space-between; align-items: center;">
@@ -597,15 +597,15 @@
               <div style="margin-bottom: 12px;">
                 <strong style="color: #333;">Expected Result:</strong>
                 <pre style="margin: 8px 0 0 0; background: white; padding: 8px; border-radius: 3px; overflow-x: auto; color: #0066cc;">{
-  "message": "Amount below minimum transaction amount.",
+  "message": "To iban has invalid format,",
   "statusCode": "number"
 }</pre>
               </div>
               <div>
                 <strong style="color: #333;">Actual Result:</strong>
                 <pre style="margin: 8px 0 0 0; background: white; padding: 8px; border-radius: 3px; overflow-x: auto; color: #066600;">{
-  "message": "Amount below minimum transaction amount.",
-  "statusCode": 5045,
+  "message": "To iban has invalid format, ",
+  "statusCode": 5023,
   "exceptionGroup": 1
 }</pre>
               </div>
@@ -623,7 +623,7 @@
     
       <div class="test-case-row">
         <div class="test-case-header" onclick="toggleTestCase(this)">
-          <div style="font-weight: 500; color: #333;">Distributor Liberty - Below Minimum Amount</div>
+          <div style="font-weight: 500; color: #333;">Distributor Liberty - Invalid IBAN</div>
           <div style="display: flex; align-items: center; gap: 12px;">
             <span style="background-color: #d4edda; padding: 4px 12px; border-radius: 4px; font-size: 12px; font-weight: 500;">
               Passed ✓
@@ -670,7 +670,7 @@
                 <strong style="color: #333;">Actual Result:</strong>
                 <pre style="margin: 8px 0 0 0; background: white; padding: 8px; border-radius: 3px; overflow-x: auto; color: #066600;">{
   "value": {
-    "access_token": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJmYjc2OWNkZC03ZTlkLTQzNTUtYTMzMS00MzAyODcwMGNhM2EiLCJpYXQiOjE3ODI4OTE2ODQsImV4cCI6MTc4Mjg5MzQ4NCwicGVybWlzc2lvbnMiOltdfQ.-eOfyQ_eFu9iOaAtyJw3ZviIzqzmGPJn5rrvh3uJs1tGm2u0yPI5wTo-POQg6QnPJemx-gynAHLSj6pMVsQY7w",
+    "access_token": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJmYjc2OWNkZC03ZTlkLTQzNTUtYTMzMS00MzAyODcwMGNhM2EiLCJpYXQiOjE3ODI4OTcxNTAsImV4cCI6MTc4Mjg5ODk1MCwicGVybWlzc2lvbnMiOltdfQ.BL79mXv9a5rxh47RzcI_yZjZYwg36IlGdjansGRwOl1pATL4Jvv63sq-d_Gpiun4GPRX1-1AmET9EJgmIgHjrQ",
     "expires_in": 1800,
     "token_type": "Bearer"
   }
@@ -687,11 +687,11 @@
               <div style="margin-bottom: 8px;"><strong>Status Code:</strong> <span style="background: #f0f0f0; padding: 2px 8px; border-radius: 3px; font-family: monospace;">400</span></div>
               <div style="margin-bottom: 4px;"><strong>Request Body:</strong></div>
               <pre style="margin: 4px 0 8px 0; background: #fff8e6; padding: 8px; border-radius: 3px; border-left: 3px solid #f0ad4e; overflow-x: auto; font-family: monospace; font-size: 12px; color: #8a6d3b;">{
-  "amount": 0.01,
+  "amount": 0.02,
   "currency": "GEL",
-  "description": "Payment to Liberty - Below Minimum Amount",
-  "toIban": "GE29LB0711197559630000",
-  "uniqueId": "ec69440e-b9aa-4d2c-9f86-10da7e8ecf2f",
+  "description": "Payment to Liberty - Invalid IBAN",
+  "toIban": "GE00INVALID000000003",
+  "uniqueId": "b7285adf-0994-4901-9677-78b04db136df",
   "beneficiaryName": "Giorgi Lezhava"
 }</pre>
             </div>
@@ -703,15 +703,15 @@
               <div style="margin-bottom: 12px;">
                 <strong style="color: #333;">Expected Result:</strong>
                 <pre style="margin: 8px 0 0 0; background: white; padding: 8px; border-radius: 3px; overflow-x: auto; color: #0066cc;">{
-  "message": "Amount below minimum transaction amount.",
+  "message": "To iban has invalid format,",
   "statusCode": "number"
 }</pre>
               </div>
               <div>
                 <strong style="color: #333;">Actual Result:</strong>
                 <pre style="margin: 8px 0 0 0; background: white; padding: 8px; border-radius: 3px; overflow-x: auto; color: #066600;">{
-  "message": "Amount below minimum transaction amount.",
-  "statusCode": 5045,
+  "message": "To iban has invalid format, ",
+  "statusCode": 5023,
   "exceptionGroup": 1
 }</pre>
               </div>
@@ -726,11 +726,11 @@
               <div style="margin-bottom: 8px;"><strong>Status Code:</strong> <span style="background: #f0f0f0; padding: 2px 8px; border-radius: 3px; font-family: monospace;">400</span></div>
               <div style="margin-bottom: 4px;"><strong>Request Body:</strong></div>
               <pre style="margin: 4px 0 8px 0; background: #fff8e6; padding: 8px; border-radius: 3px; border-left: 3px solid #f0ad4e; overflow-x: auto; font-family: monospace; font-size: 12px; color: #8a6d3b;">{
-  "amount": 0.01,
+  "amount": 0.02,
   "currency": "USD",
-  "description": "Payment to Liberty - Below Minimum Amount",
-  "toIban": "GE29LB0711197559630000",
-  "uniqueId": "f57b4d37-308b-4a9f-8690-76e910f568e2",
+  "description": "Payment to Liberty - Invalid IBAN",
+  "toIban": "GE00INVALID000000003",
+  "uniqueId": "f92854b5-6c99-4805-9be6-ae21fdfface0",
   "beneficiaryName": "Giorgi Lezhava"
 }</pre>
             </div>
@@ -742,15 +742,15 @@
               <div style="margin-bottom: 12px;">
                 <strong style="color: #333;">Expected Result:</strong>
                 <pre style="margin: 8px 0 0 0; background: white; padding: 8px; border-radius: 3px; overflow-x: auto; color: #0066cc;">{
-  "message": "Amount below minimum transaction amount.",
+  "message": "To iban has invalid format,",
   "statusCode": "number"
 }</pre>
               </div>
               <div>
                 <strong style="color: #333;">Actual Result:</strong>
                 <pre style="margin: 8px 0 0 0; background: white; padding: 8px; border-radius: 3px; overflow-x: auto; color: #066600;">{
-  "message": "Amount below minimum transaction amount.",
-  "statusCode": 5045,
+  "message": "To iban has invalid format, ",
+  "statusCode": 5023,
   "exceptionGroup": 1
 }</pre>
               </div>
@@ -765,11 +765,11 @@
               <div style="margin-bottom: 8px;"><strong>Status Code:</strong> <span style="background: #f0f0f0; padding: 2px 8px; border-radius: 3px; font-family: monospace;">400</span></div>
               <div style="margin-bottom: 4px;"><strong>Request Body:</strong></div>
               <pre style="margin: 4px 0 8px 0; background: #fff8e6; padding: 8px; border-radius: 3px; border-left: 3px solid #f0ad4e; overflow-x: auto; font-family: monospace; font-size: 12px; color: #8a6d3b;">{
-  "amount": 0.01,
+  "amount": 0.02,
   "currency": "EUR",
-  "description": "Payment to Liberty - Below Minimum Amount",
-  "toIban": "GE29LB0711197559630000",
-  "uniqueId": "75a58e55-a239-4ece-b739-fafa67485891",
+  "description": "Payment to Liberty - Invalid IBAN",
+  "toIban": "GE00INVALID000000003",
+  "uniqueId": "ff1955fc-d575-45f3-82bf-0ba94ebb2208",
   "beneficiaryName": "Giorgi Lezhava"
 }</pre>
             </div>
@@ -781,15 +781,15 @@
               <div style="margin-bottom: 12px;">
                 <strong style="color: #333;">Expected Result:</strong>
                 <pre style="margin: 8px 0 0 0; background: white; padding: 8px; border-radius: 3px; overflow-x: auto; color: #0066cc;">{
-  "message": "Amount below minimum transaction amount.",
+  "message": "To iban has invalid format,",
   "statusCode": "number"
 }</pre>
               </div>
               <div>
                 <strong style="color: #333;">Actual Result:</strong>
                 <pre style="margin: 8px 0 0 0; background: white; padding: 8px; border-radius: 3px; overflow-x: auto; color: #066600;">{
-  "message": "Amount below minimum transaction amount.",
-  "statusCode": 5045,
+  "message": "To iban has invalid format, ",
+  "statusCode": 5023,
   "exceptionGroup": 1
 }</pre>
               </div>
@@ -807,7 +807,7 @@
     
       <div class="test-case-row">
         <div class="test-case-header" onclick="toggleTestCase(this)">
-          <div style="font-weight: 500; color: #333;">Distributor CREDO - Below Minimum Amount</div>
+          <div style="font-weight: 500; color: #333;">Distributor CREDO - Invalid IBAN</div>
           <div style="display: flex; align-items: center; gap: 12px;">
             <span style="background-color: #d4edda; padding: 4px 12px; border-radius: 4px; font-size: 12px; font-weight: 500;">
               Passed ✓
@@ -854,7 +854,7 @@
                 <strong style="color: #333;">Actual Result:</strong>
                 <pre style="margin: 8px 0 0 0; background: white; padding: 8px; border-radius: 3px; overflow-x: auto; color: #066600;">{
   "value": {
-    "access_token": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJmYjc2OWNkZC03ZTlkLTQzNTUtYTMzMS00MzAyODcwMGNhM2EiLCJpYXQiOjE3ODI4OTE2ODQsImV4cCI6MTc4Mjg5MzQ4NCwicGVybWlzc2lvbnMiOltdfQ.-eOfyQ_eFu9iOaAtyJw3ZviIzqzmGPJn5rrvh3uJs1tGm2u0yPI5wTo-POQg6QnPJemx-gynAHLSj6pMVsQY7w",
+    "access_token": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJmYjc2OWNkZC03ZTlkLTQzNTUtYTMzMS00MzAyODcwMGNhM2EiLCJpYXQiOjE3ODI4OTcxNTAsImV4cCI6MTc4Mjg5ODk1MCwicGVybWlzc2lvbnMiOltdfQ.BL79mXv9a5rxh47RzcI_yZjZYwg36IlGdjansGRwOl1pATL4Jvv63sq-d_Gpiun4GPRX1-1AmET9EJgmIgHjrQ",
     "expires_in": 1800,
     "token_type": "Bearer"
   }
@@ -871,11 +871,11 @@
               <div style="margin-bottom: 8px;"><strong>Status Code:</strong> <span style="background: #f0f0f0; padding: 2px 8px; border-radius: 3px; font-family: monospace;">400</span></div>
               <div style="margin-bottom: 4px;"><strong>Request Body:</strong></div>
               <pre style="margin: 4px 0 8px 0; background: #fff8e6; padding: 8px; border-radius: 3px; border-left: 3px solid #f0ad4e; overflow-x: auto; font-family: monospace; font-size: 12px; color: #8a6d3b;">{
-  "amount": 0.01,
+  "amount": 0.02,
   "currency": "GEL",
-  "description": "Payment to CREDO - Below Minimum Amount",
-  "toIban": "GE42CD0360000062461306",
-  "uniqueId": "eb9d90ec-17fe-4698-a3b3-d71a6911947a"
+  "description": "Payment to CREDO - Invalid IBAN",
+  "toIban": "GE00INVALID000000004",
+  "uniqueId": "5a8c8d2c-44e7-42b7-b0bd-3622a085b59d"
 }</pre>
             </div>
             <button type="button" onclick="toggleApiDetails(this)" style="width: 100%; padding: 8px 12px; background: #f5f5f5; border: 1px solid #e0e0e0; cursor: pointer; border-radius: 4px; font-size: 12px; color: #333; display: flex; justify-content: space-between; align-items: center;">
@@ -886,15 +886,15 @@
               <div style="margin-bottom: 12px;">
                 <strong style="color: #333;">Expected Result:</strong>
                 <pre style="margin: 8px 0 0 0; background: white; padding: 8px; border-radius: 3px; overflow-x: auto; color: #0066cc;">{
-  "message": "Amount below minimum transaction amount.",
+  "message": "To iban has invalid format,",
   "statusCode": "number"
 }</pre>
               </div>
               <div>
                 <strong style="color: #333;">Actual Result:</strong>
                 <pre style="margin: 8px 0 0 0; background: white; padding: 8px; border-radius: 3px; overflow-x: auto; color: #066600;">{
-  "message": "Amount below minimum transaction amount.",
-  "statusCode": 5045,
+  "message": "To iban has invalid format, ",
+  "statusCode": 5023,
   "exceptionGroup": 1
 }</pre>
               </div>
@@ -909,11 +909,11 @@
               <div style="margin-bottom: 8px;"><strong>Status Code:</strong> <span style="background: #f0f0f0; padding: 2px 8px; border-radius: 3px; font-family: monospace;">400</span></div>
               <div style="margin-bottom: 4px;"><strong>Request Body:</strong></div>
               <pre style="margin: 4px 0 8px 0; background: #fff8e6; padding: 8px; border-radius: 3px; border-left: 3px solid #f0ad4e; overflow-x: auto; font-family: monospace; font-size: 12px; color: #8a6d3b;">{
-  "amount": 0.01,
+  "amount": 0.02,
   "currency": "USD",
-  "description": "Payment to CREDO - Below Minimum Amount",
-  "toIban": "GE42CD0360000062461306",
-  "uniqueId": "e5172a89-46bc-43f9-b387-65b7b0ba8ecb"
+  "description": "Payment to CREDO - Invalid IBAN",
+  "toIban": "GE00INVALID000000004",
+  "uniqueId": "0981abc7-e098-4a89-8dbc-bede5704749e"
 }</pre>
             </div>
             <button type="button" onclick="toggleApiDetails(this)" style="width: 100%; padding: 8px 12px; background: #f5f5f5; border: 1px solid #e0e0e0; cursor: pointer; border-radius: 4px; font-size: 12px; color: #333; display: flex; justify-content: space-between; align-items: center;">
@@ -924,15 +924,15 @@
               <div style="margin-bottom: 12px;">
                 <strong style="color: #333;">Expected Result:</strong>
                 <pre style="margin: 8px 0 0 0; background: white; padding: 8px; border-radius: 3px; overflow-x: auto; color: #0066cc;">{
-  "message": "Amount below minimum transaction amount.",
+  "message": "To iban has invalid format,",
   "statusCode": "number"
 }</pre>
               </div>
               <div>
                 <strong style="color: #333;">Actual Result:</strong>
                 <pre style="margin: 8px 0 0 0; background: white; padding: 8px; border-radius: 3px; overflow-x: auto; color: #066600;">{
-  "message": "Amount below minimum transaction amount.",
-  "statusCode": 5045,
+  "message": "To iban has invalid format, ",
+  "statusCode": 5023,
   "exceptionGroup": 1
 }</pre>
               </div>
@@ -947,11 +947,11 @@
               <div style="margin-bottom: 8px;"><strong>Status Code:</strong> <span style="background: #f0f0f0; padding: 2px 8px; border-radius: 3px; font-family: monospace;">400</span></div>
               <div style="margin-bottom: 4px;"><strong>Request Body:</strong></div>
               <pre style="margin: 4px 0 8px 0; background: #fff8e6; padding: 8px; border-radius: 3px; border-left: 3px solid #f0ad4e; overflow-x: auto; font-family: monospace; font-size: 12px; color: #8a6d3b;">{
-  "amount": 0.01,
+  "amount": 0.02,
   "currency": "EUR",
-  "description": "Payment to CREDO - Below Minimum Amount",
-  "toIban": "GE42CD0360000062461306",
-  "uniqueId": "bbc79794-6e75-46bd-ae7e-8a32bd30407f"
+  "description": "Payment to CREDO - Invalid IBAN",
+  "toIban": "GE00INVALID000000004",
+  "uniqueId": "cc2360df-014a-412e-b2ab-9ea01cfc80a2"
 }</pre>
             </div>
             <button type="button" onclick="toggleApiDetails(this)" style="width: 100%; padding: 8px 12px; background: #f5f5f5; border: 1px solid #e0e0e0; cursor: pointer; border-radius: 4px; font-size: 12px; color: #333; display: flex; justify-content: space-between; align-items: center;">
@@ -962,15 +962,15 @@
               <div style="margin-bottom: 12px;">
                 <strong style="color: #333;">Expected Result:</strong>
                 <pre style="margin: 8px 0 0 0; background: white; padding: 8px; border-radius: 3px; overflow-x: auto; color: #0066cc;">{
-  "message": "Amount below minimum transaction amount.",
+  "message": "To iban has invalid format,",
   "statusCode": "number"
 }</pre>
               </div>
               <div>
                 <strong style="color: #333;">Actual Result:</strong>
                 <pre style="margin: 8px 0 0 0; background: white; padding: 8px; border-radius: 3px; overflow-x: auto; color: #066600;">{
-  "message": "Amount below minimum transaction amount.",
-  "statusCode": 5045,
+  "message": "To iban has invalid format, ",
+  "statusCode": 5023,
   "exceptionGroup": 1
 }</pre>
               </div>
@@ -998,7 +998,7 @@
     </div>
 
     <div class="footer">
-      Generated on 7/1/2026, 11:41:25 AM
+      Generated on 7/1/2026, 1:12:31 PM
     </div>
   </div>
 </body>

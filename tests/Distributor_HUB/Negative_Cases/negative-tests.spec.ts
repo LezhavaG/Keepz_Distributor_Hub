@@ -2,6 +2,7 @@ import { test } from '@playwright/test';
 import * as dotenv from 'dotenv';
 import { runNegativeTest, INVALID_IBANS, runAuthenticationFailureTest, runIncorrectCredentialsTest, runIncorrectClientIdTest, ALL_BANKS, runInsufficientBalanceTest, runAboveMaximumAmountTest, runBelowMinimumAmountTest } from '../helpers';
 import { HtmlReportGenerator } from '../../../utils/HtmlReportGenerator';
+import { reportFailuresToJira } from '../../../utils/JiraReporter';
 
 dotenv.config();
 
@@ -54,6 +55,7 @@ test.describe('Distributor HUB - Negative Tests (Combined)', () => {
     if (allTestResults.length > 0) {
       const reportGenerator = new HtmlReportGenerator();
       reportGenerator.generateReport(allTestResults, 'Distributor HUB - Negative Tests', balanceSummary || undefined, 'negative');
+      await reportFailuresToJira(allTestResults);
     }
   });
 });

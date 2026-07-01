@@ -19,6 +19,7 @@ import {
   INVALID_IBANS,
 } from './helpers';
 import { HtmlReportGenerator } from '../../utils/HtmlReportGenerator';
+import { reportFailuresToJira } from '../../utils/JiraReporter';
 
 dotenv.config();
 
@@ -97,6 +98,8 @@ test.describe('Distributor HUB - Full Regression', () => {
     if (allTestResults.length > 0) {
       const reportGenerator = new HtmlReportGenerator();
       reportGenerator.generateReport(allTestResults, 'Distributor HUB - Full Regression', undefined, 'regression');
+      // Opt-in: create JIRA bugs for failed cases when CREATE_JIRA_BUGS=true
+      await reportFailuresToJira(allTestResults);
     }
   });
 });
