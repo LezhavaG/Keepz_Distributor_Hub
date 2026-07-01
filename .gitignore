@@ -12,3 +12,6 @@ node_modules/
 retest-cron.log
 retest-loop.log
 test-results/
+
+# Local-only Excel exports
+*.xlsx
