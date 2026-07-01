@@ -7,3 +7,8 @@ node_modules/
 /blob-report/
 /playwright/.cache/
 /playwright/.auth/
+
+# Retest logs
+retest-cron.log
+retest-loop.log
+test-results/
