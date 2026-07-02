@@ -32,7 +32,12 @@ export const INVALID_IBANS = [
 // create an order, so this is just a nominal value for the report table).
 // All REAL transaction amounts/limits come live from DistributorConfig.
 export const TRANSACTION_AMOUNT = parseFloat(process.env.TRANSACTION_AMOUNT || '0.02');
-export const CURRENCIES = ['GEL', 'USD', 'EUR'];
+// Currencies to test. Defaults to all three; override via .env to run a subset,
+// e.g. TEST_CURRENCIES=GEL (single) or TEST_CURRENCIES=GEL,USD (multiple).
+export const CURRENCIES = (process.env.TEST_CURRENCIES || 'GEL,USD,EUR')
+  .split(',')
+  .map((c) => c.trim().toUpperCase())
+  .filter(Boolean);
 
 // Base URL of the Distributor HUB API (override per-environment via .env).
 export const BASE_URL = process.env.DISTRIBUTOR_BASE_URL || 'https://distributor.dev.keepz.me';
