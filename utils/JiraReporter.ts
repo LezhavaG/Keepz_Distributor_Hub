@@ -19,39 +19,111 @@ function authHeader(): string {
   return `Basic ${token}`;
 }
 
-function jsonBlock(label: string, value: any): string {
-  const body = typeof value === 'string' ? value : JSON.stringify(value, null, 2);
-  return `*${label}:*\n{code}\n${body}\n{code}\n`;
+// Max length for the compact Expected/Actual values before truncation.
+const MAX_RESULT_LEN = parseInt(process.env.JIRA_DESC_MAX_LEN || '400', 10);
+
+/** Single-line, length-capped rendering of a value for the bug description. */
+function compact(value: any): string {
+  if (value === undefined || value === null) return 'N/A';
+  const s = typeof value === 'string' ? value : JSON.stringify(value);
+  return s.length > MAX_RESULT_LEN ? `${s.slice(0, MAX_RESULT_LEN)}… (truncated)` : s;
 }
 
-/** Build a wiki-markup description from a failed test case's API calls. */
+/** Pull the transaction uniqueId from a single call's request/response data. */
+function callUniqueId(call: any): string | null {
+  return (
+    call?.requestBody?.uniqueId ||
+    call?.actualResult?.uniqueId ||
+    call?.actualResult?.value?.uniqueId ||
+    call?.expectedResult?.uniqueId ||
+    call?.expectedResult?.value?.uniqueId ||
+    null
+  );
+}
+
+/**
+ * Trim the actual result down to only the fields the test actually validates,
+ * i.e. the keys present in the expected result. Keeps the bug focused on what
+ * was checked (e.g. transactionId + status) instead of the whole response.
+ */
+function projectToExpected(expected: any, actual: any): any {
+  if (
+    expected && actual &&
+    typeof expected === 'object' && typeof actual === 'object' &&
+    !Array.isArray(expected) && !Array.isArray(actual)
+  ) {
+    // Only trim when the actual response contains every validated key. If any is
+    // missing (e.g. the API returned an error object), show the full actual so
+    // the real response isn't hidden behind an empty/partial projection.
+    if (!Object.keys(expected).every((k) => k in actual)) return actual;
+    const out: any = {};
+    for (const key of Object.keys(expected)) {
+      const ev = expected[key];
+      out[key] =
+        ev && typeof ev === 'object' && !Array.isArray(ev)
+          ? projectToExpected(ev, actual[key])
+          : actual[key];
+    }
+    return out;
+  }
+  return actual;
+}
+
+/** Inline "key=value, key=value" from a URL query string, or null if none. */
+function queryParams(url: string): string | null {
+  if (!url.includes('?')) return null;
+  return url
+    .substring(url.indexOf('?') + 1)
+    .split('&')
+    .map((p) => {
+      const [k, v] = p.split('=');
+      return `${decodeURIComponent(k)}=${decodeURIComponent(v ?? '')}`;
+    })
+    .join(', ');
+}
+
+/** Short human-readable sentence summarising what actually failed. */
+function buildFailureText(testCase: any, calls: any[]): string {
+  const first = calls[0];
+  const where = testCase.bank && testCase.bank !== 'N/A' ? `${testCase.bank} — ` : '';
+  if (!first) return `${where}${testCase.testCaseName} failed.`;
+
+  const exp = first.expectedResult;
+  const act = first.actualResult;
+  // Transaction cases: the request usually succeeds (HTTP 200) but the
+  // transaction status doesn't reach the expected state — call that out.
+  if (act && typeof act === 'object' && 'status' in act && exp && typeof exp === 'object' && 'status' in exp) {
+    const id = act.transactionId ?? '';
+    return `${where}Transaction ${id} returned status "${act.status}", but "${exp.status}" was expected.`.replace(/\s+/g, ' ');
+  }
+  return `${where}The "${first.name}" result did not match the expected result.`;
+}
+
+/** Build a compact wiki-markup description from a failed test case's API calls. */
 function buildDescription(testCase: any): string {
-  const failingCalls = (testCase.apiCalls || []).filter((c: any) => c.passed === false);
-  const calls = failingCalls.length > 0 ? failingCalls : (testCase.apiCalls || []);
+  const allCalls = testCase.apiCalls || [];
+  const failingCalls = allCalls.filter((c: any) => c.passed === false);
+  const calls = failingCalls.length > 0 ? failingCalls : allCalls;
 
   let desc = `h3. Automated test failure\n\n`;
   desc += `*Test case:* ${testCase.testCaseName}\n`;
   desc += `*Category:* ${testCase.category || 'N/A'}\n`;
   if (testCase.bank && testCase.bank !== 'N/A') desc += `*Bank:* ${testCase.bank}\n`;
+  desc += `\n*Description:* ${buildFailureText(testCase, calls)}\n`;
   desc += `\n----\n\n`;
 
   for (const call of calls) {
+    const baseUrl = call.url.includes('?') ? call.url.substring(0, call.url.indexOf('?')) : call.url;
     desc += `h4. ${call.name}\n`;
-    desc += `*Request URL:* ${call.url}\n`;
-    desc += `*Request Method:* ${call.method}\n`;
+    desc += `*URL:* ${baseUrl}\n`;
+    desc += `*Method:* ${call.method}\n`;
     desc += `*Status Code:* ${call.statusCode}\n`;
-    if (call.method === 'GET' && call.url.includes('?')) {
-      const qp: { [k: string]: string } = {};
-      call.url.substring(call.url.indexOf('?') + 1).split('&').forEach((p: string) => {
-        const [k, v] = p.split('=');
-        qp[decodeURIComponent(k)] = decodeURIComponent(v ?? '');
-      });
-      desc += jsonBlock('Query Parameters', qp);
-    } else if (call.requestBody !== undefined) {
-      desc += jsonBlock('Request Body', call.requestBody);
-    }
-    desc += jsonBlock('Expected Result', call.expectedResult);
-    desc += jsonBlock('Actual Result', call.actualResult);
+    const qp = queryParams(call.url);
+    if (qp) desc += `*Query Parameters:* ${qp}\n`;
+    const uniqueId = callUniqueId(call);
+    if (uniqueId) desc += `*Unique ID:* ${uniqueId}\n`;
+    desc += `*Expected Result:* ${compact(call.expectedResult)}\n`;
+    desc += `*Actual Result:* ${compact(projectToExpected(call.expectedResult, call.actualResult))}\n`;
     desc += `\n`;
   }
 
