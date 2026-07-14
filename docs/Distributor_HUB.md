@@ -223,12 +223,35 @@ Authorization: Bearer <access_token>
 
 | Status | Description |
 |--------|-------------|
-| PENDING | Transaction created, awaiting processing |
+| PENDING | Transaction created, awaiting processing (may show `statusDescription: "To be Signed"`) |
 | PROCESSING | Transaction is being processed |
-| COMPLETED | Transaction completed successfully |
+| COMPLETED / SUCCESS | Transaction completed successfully |
 | FAILED | Transaction failed |
 | REJECTED | Transaction rejected |
 | CANCELLED | Transaction cancelled |
+
+### Signing & status lifecycle
+
+Some distribution transactions require a **signature/authorization** step before they complete:
+
+- **BOG** and **Liberty** distribution transactions are created in **PENDING** with
+  `statusDescription: "To be Signed"` — they must be signed before they can proceed.
+- A **signing bot** signs these pending transactions automatically (roughly every **1–2 minutes**).
+  Separate **schedulers** then check and update transaction statuses.
+- As a result, a freshly created BOG/Liberty transaction can sit in **PENDING / "To be Signed"**
+  for a short window before it reaches **COMPLETED / SUCCESS**.
+- **TBC** and **CREDO** distributions do **not** require signing and settle without this step.
+
+**Force a status refresh:**
+
+```
+PUT {NEWADMIN_BASE_URL}/api/distributor-hub-transaction/update-status?id=<transactionId>
+```
+
+Admin-authenticated (Bearer token from the admin login); returns **204** when triggered. This
+asks the back-end to re-check and update the transaction's status immediately, rather than
+waiting for the next scheduler cycle. (Useful when polling a BOG/Liberty transaction: refresh
+the status before each read so a just-signed transaction is seen right away.)
 
 ---
 
@@ -263,6 +286,11 @@ grant_type: client_credentials
 2. **TBC** (TBC Bank)
 3. **Liberty Bank**
 4. **CREDO Bank**
+
+> **Environment note (dev):** CREDO distribution is **disabled in the dev environment by
+> policy** — CREDO distribution transactions will not complete in dev. BOG, TBC, and Liberty
+> distributions work in dev (BOG/Liberty via the signing flow described in
+> [Transaction Statuses](#transaction-statuses)).
 
 ---
 
