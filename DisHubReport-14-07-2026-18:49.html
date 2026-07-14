@@ -82,6 +82,7 @@
       display: inline-block; padding: 10px 16px; background: #667eea; color: white;
       text-decoration: none; border-radius: 6px; font-weight: 500; margin-bottom: 16px;
     }
+    .case-panel { display: none; }
     .case-panel-head { display: flex; align-items: center; gap: 12px; border-bottom: 2px solid #eee; padding-bottom: 12px; margin-bottom: 16px; }
     .case-panel-head h2 { font-size: 20px; color: #333; }
     .empty-state { color: #888; text-align: center; padding: 48px 16px; }
@@ -294,10 +295,10 @@
               <div style="margin-bottom: 8px;"><strong>Status Code:</strong> <span style="background: #f0f0f0; padding: 2px 8px; border-radius: 3px; font-family: monospace;">401</span></div>
               <div style="margin-bottom: 4px;"><strong>Request Body:</strong></div>
               <pre style="margin: 4px 0 8px 0; background: #fff8e6; padding: 8px; border-radius: 3px; border-left: 3px solid #f0ad4e; overflow-x: auto; font-family: monospace; font-size: 12px; color: #8a6d3b;">{
-  "amount": 0.02,
-  "currency": "GEL",
-  "description": "Payment without authentication",
-  "toIban": "GE54BG0000000542056887"
+  &quot;amount&quot;: 0.02,
+  &quot;currency&quot;: &quot;GEL&quot;,
+  &quot;description&quot;: &quot;Payment without authentication&quot;,
+  &quot;toIban&quot;: &quot;GE54BG0000000542056887&quot;
 }</pre>
             </div>
             <button type="button" onclick="toggleApiDetails(this)" style="width: 100%; padding: 8px 12px; background: #f5f5f5; border: 1px solid #e0e0e0; cursor: pointer; border-radius: 4px; font-size: 12px; color: #333; display: flex; justify-content: space-between; align-items: center;">
@@ -308,18 +309,18 @@
               <div style="margin-bottom: 12px;">
                 <strong style="color: #333;">Expected Result:</strong>
                 <pre style="margin: 8px 0 0 0; background: white; padding: 8px; border-radius: 3px; overflow-x: auto; color: #0066cc;">{
-  "message": "Authentication failed"
+  &quot;message&quot;: &quot;Authentication failed&quot;
 }</pre>
               </div>
               <div>
                 <strong style="color: #333;">Actual Result:</strong>
                 <pre style="margin: 8px 0 0 0; background: white; padding: 8px; border-radius: 3px; overflow-x: auto; color: #066600;">{
-  "application_name": null,
-  "method_name": null,
-  "exception_name": null,
-  "status": null,
-  "message": "Authentication failed",
-  "timestamp": null
+  &quot;application_name&quot;: null,
+  &quot;method_name&quot;: null,
+  &quot;exception_name&quot;: null,
+  &quot;status&quot;: null,
+  &quot;message&quot;: &quot;Authentication failed&quot;,
+  &quot;timestamp&quot;: null
 }</pre>
               </div>
             </div>
@@ -355,9 +356,9 @@
               <div style="margin-bottom: 8px;"><strong>Status Code:</strong> <span style="background: #f0f0f0; padding: 2px 8px; border-radius: 3px; font-family: monospace;">400</span></div>
               <div style="margin-bottom: 4px;"><strong>Request Body:</strong></div>
               <pre style="margin: 4px 0 8px 0; background: #fff8e6; padding: 8px; border-radius: 3px; border-left: 3px solid #f0ad4e; overflow-x: auto; font-family: monospace; font-size: 12px; color: #8a6d3b;">{
-  "client_id": "fb769cdd-7e9d-4355-a331-43028700ca3a",
-  "client_secret": "***",
-  "grant_type": "client_credentials"
+  &quot;client_id&quot;: &quot;fb769cdd-7e9d-4355-a331-43028700ca3a&quot;,
+  &quot;client_secret&quot;: &quot;***&quot;,
+  &quot;grant_type&quot;: &quot;client_credentials&quot;
 }</pre>
             </div>
             <button type="button" onclick="toggleApiDetails(this)" style="width: 100%; padding: 8px 12px; background: #f5f5f5; border: 1px solid #e0e0e0; cursor: pointer; border-radius: 4px; font-size: 12px; color: #333; display: flex; justify-content: space-between; align-items: center;">
@@ -368,15 +369,15 @@
               <div style="margin-bottom: 12px;">
                 <strong style="color: #333;">Expected Result:</strong>
                 <pre style="margin: 8px 0 0 0; background: white; padding: 8px; border-radius: 3px; overflow-x: auto; color: #0066cc;">{
-  "message": "Incorrect credentials"
+  &quot;message&quot;: &quot;Incorrect credentials&quot;
 }</pre>
               </div>
               <div>
                 <strong style="color: #333;">Actual Result:</strong>
                 <pre style="margin: 8px 0 0 0; background: white; padding: 8px; border-radius: 3px; overflow-x: auto; color: #066600;">{
-  "message": "Incorrect credentials",
-  "statusCode": 5021,
-  "exceptionGroup": 3
+  &quot;message&quot;: &quot;Incorrect credentials&quot;,
+  &quot;statusCode&quot;: 5021,
+  &quot;exceptionGroup&quot;: 3
 }</pre>
               </div>
             </div>
@@ -412,9 +413,9 @@
               <div style="margin-bottom: 8px;"><strong>Status Code:</strong> <span style="background: #f0f0f0; padding: 2px 8px; border-radius: 3px; font-family: monospace;">400</span></div>
               <div style="margin-bottom: 4px;"><strong>Request Body:</strong></div>
               <pre style="margin: 4px 0 8px 0; background: #fff8e6; padding: 8px; border-radius: 3px; border-left: 3px solid #f0ad4e; overflow-x: auto; font-family: monospace; font-size: 12px; color: #8a6d3b;">{
-  "client_id": "fb769cdd-7e9d-4355-a331-43028700ca32",
-  "client_secret": "***",
-  "grant_type": "client_credentials"
+  &quot;client_id&quot;: &quot;fb769cdd-7e9d-4355-a331-43028700ca32&quot;,
+  &quot;client_secret&quot;: &quot;***&quot;,
+  &quot;grant_type&quot;: &quot;client_credentials&quot;
 }</pre>
             </div>
             <button type="button" onclick="toggleApiDetails(this)" style="width: 100%; padding: 8px 12px; background: #f5f5f5; border: 1px solid #e0e0e0; cursor: pointer; border-radius: 4px; font-size: 12px; color: #333; display: flex; justify-content: space-between; align-items: center;">
@@ -425,15 +426,15 @@
               <div style="margin-bottom: 12px;">
                 <strong style="color: #333;">Expected Result:</strong>
                 <pre style="margin: 8px 0 0 0; background: white; padding: 8px; border-radius: 3px; overflow-x: auto; color: #0066cc;">{
-  "message": "Client not found for given id."
+  &quot;message&quot;: &quot;Client not found for given id.&quot;
 }</pre>
               </div>
               <div>
                 <strong style="color: #333;">Actual Result:</strong>
                 <pre style="margin: 8px 0 0 0; background: white; padding: 8px; border-radius: 3px; overflow-x: auto; color: #066600;">{
-  "message": "Client not found for given id.",
-  "statusCode": 5003,
-  "exceptionGroup": 5
+  &quot;message&quot;: &quot;Client not found for given id.&quot;,
+  &quot;statusCode&quot;: 5003,
+  &quot;exceptionGroup&quot;: 5
 }</pre>
               </div>
             </div>
@@ -452,7 +453,7 @@
   </div>
 
   <div class="footer">
-    Generated on 7/14/2026, 6:38:48 PM
+    Generated on 7/14/2026, 6:49:17 PM
   </div>
 </body>
 </html>
