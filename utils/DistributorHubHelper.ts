@@ -13,6 +13,7 @@ export interface TransactionPayload {
   debtorName?: string;
   debtorIban?: string;
   debtorIdentityNumber?: string;
+  debtorBirthDate?: string;
   birthDate?: string;
 }
 
@@ -191,6 +192,10 @@ export class DistributorHubHelper {
 
     if (payload.debtorIdentityNumber) {
       requestBody.debtorIdentityNumber = payload.debtorIdentityNumber;
+    }
+
+    if (payload.debtorBirthDate) {
+      requestBody.debtorBirthDate = payload.debtorBirthDate;
     }
 
     if (payload.birthDate) {

@@ -56,6 +56,7 @@ export function requiresBeneficiaryName(bankName: string): boolean {
 export const PAYER_DEBTOR_NAME = process.env.PAYER_DEBTOR_NAME || 'შპს ტესტი';
 export const PAYER_DEBTOR_IBAN = process.env.PAYER_DEBTOR_IBAN || 'GE42CD0360000062461306';
 export const PAYER_DEBTOR_IDENTITY = process.env.PAYER_DEBTOR_IDENTITY || '98809409129';
+export const PAYER_DEBTOR_BIRTHDATE = process.env.PAYER_DEBTOR_BIRTHDATE || '1990-01-01';
 export const PAYER_DESCRIPTION = process.env.PAYER_DESCRIPTION || 'Test Payment';
 export const BALANCE_UPDATE_AMOUNT = parseFloat(process.env.BALANCE_UPDATE_AMOUNT || '0.22');
 export const BENEFICIARY_NAME = process.env.BENEFICIARY_NAME || 'Giorgi Lezhava';
@@ -868,8 +869,10 @@ export async function runPaymentDescriptionTest(
     tokenCall.passed = tokenCall.statusCode === 200;
   }
 
-  // Expected paymentDescription is ALWAYS payer details + description (never beneficiary)
-  const expectedPaymentDescription = `${PAYER_DEBTOR_NAME}, ${PAYER_DEBTOR_IBAN}, ${PAYER_DEBTOR_IDENTITY}, ${PAYER_DESCRIPTION}`;
+  // Expected paymentDescription is ALWAYS payer details + description (never beneficiary).
+  // The back-end prepends the payer fields in this exact order (verified live):
+  //   {debtorName}, {debtorIban}, {debtorIdentityNumber}, {debtorBirthDate}, {description}
+  const expectedPaymentDescription = `${PAYER_DEBTOR_NAME}, ${PAYER_DEBTOR_IBAN}, ${PAYER_DEBTOR_IDENTITY}, ${PAYER_DEBTOR_BIRTHDATE}, ${PAYER_DESCRIPTION}`;
 
   const tableData: any[] = [];
 
@@ -886,6 +889,7 @@ export async function runPaymentDescriptionTest(
         debtorName: PAYER_DEBTOR_NAME,
         debtorIban: PAYER_DEBTOR_IBAN,
         debtorIdentityNumber: PAYER_DEBTOR_IDENTITY,
+        debtorBirthDate: PAYER_DEBTOR_BIRTHDATE,
       };
 
       if (includeBeneficiary) {
@@ -977,7 +981,11 @@ function casePassed(c: any): boolean {
 }
 
 /**
- * Re-run ONLY the single case identified by testCaseName (parsed from a bug summary).
+ * Re-run the case identified by testCaseName (parsed from a bug summary).
+ *
+ * Bug summaries are bank-agnostic (per-bank failures are combined into one bug),
+ * so the bank suffix is optional: when present we re-run just that bank, when
+ * absent we re-run ALL banks and pass only if every affected bank now passes.
  * Returns whether the case was resolved and whether it passed this time.
  */
 export async function retestCaseByName(
@@ -985,7 +993,12 @@ export async function retestCaseByName(
   testCaseName: string
 ): Promise<{ found: boolean; passed: boolean; caseData?: any }> {
   let rows: any[] | undefined;
+  let filterRe: RegExp | null = null;
   let m: RegExpMatchArray | null;
+
+  // The bank(s) to re-run: the named bank if the summary carries one, else all.
+  const banksFrom = (name?: string) => (name ? [BANKS_BY_NAME[name]] : ALL_BANKS);
+  const invalidsFrom = (name?: string) => (name ? [INVALID_BY_NAME[name]] : INVALID_IBANS);
 
   if (testCaseName === 'No Token (Authentication Failure)') {
     rows = await runAuthenticationFailureTest(request);
@@ -995,20 +1008,27 @@ export async function retestCaseByName(
     rows = await runIncorrectClientIdTest(request);
   } else if (testCaseName === 'Successful Authentication') {
     rows = await runAuthenticationSuccessTest(request);
-  } else if ((m = testCaseName.match(/^Distributor (\w+) - Invalid IBAN$/))) {
-    rows = (await runNegativeTest(request, [INVALID_BY_NAME[m[1]]], RETEST_EXPECTED.invalidIban)).tableData;
-  } else if ((m = testCaseName.match(/^Distributor (\w+) - Insufficient Balance$/))) {
-    rows = (await runInsufficientBalanceTest(request, [BANKS_BY_NAME[m[1]]], RETEST_EXPECTED.insufficient)).tableData;
-  } else if ((m = testCaseName.match(/^Distributor (\w+) - Above Maximum Amount$/))) {
-    rows = (await runAboveMaximumAmountTest(request, [BANKS_BY_NAME[m[1]]], RETEST_EXPECTED.aboveMax)).tableData;
-  } else if ((m = testCaseName.match(/^Distributor (\w+) - Below Minimum Amount$/))) {
-    rows = (await runBelowMinimumAmountTest(request, [BANKS_BY_NAME[m[1]]], RETEST_EXPECTED.belowMin)).tableData;
-  } else if ((m = testCaseName.match(/^Distribute To (\w+)$/))) {
-    rows = (await runHappyPathTest(request, [BANKS_BY_NAME[m[1]]])).tableData;
-  } else if ((m = testCaseName.match(/^Payer Details - (\w+)$/))) {
-    rows = (await runPaymentDescriptionTest(request, [BANKS_BY_NAME[m[1]]], false, 'Payer Details', 'Payer Details Cases')).tableData;
-  } else if ((m = testCaseName.match(/^Payer \+ Beneficiary Details - (\w+)$/))) {
-    rows = (await runPaymentDescriptionTest(request, [BANKS_BY_NAME[m[1]]], true, 'Payer + Beneficiary Details', 'Payer + Beneficiary Details Cases')).tableData;
+  } else if ((m = testCaseName.match(/^Distributor(?: (\w+))? - Invalid IBAN$/))) {
+    rows = (await runNegativeTest(request, invalidsFrom(m[1]), RETEST_EXPECTED.invalidIban)).tableData;
+    filterRe = / - Invalid IBAN$/;
+  } else if ((m = testCaseName.match(/^Distributor(?: (\w+))? - Insufficient Balance$/))) {
+    rows = (await runInsufficientBalanceTest(request, banksFrom(m[1]), RETEST_EXPECTED.insufficient)).tableData;
+    filterRe = / - Insufficient Balance$/;
+  } else if ((m = testCaseName.match(/^Distributor(?: (\w+))? - Above Maximum Amount$/))) {
+    rows = (await runAboveMaximumAmountTest(request, banksFrom(m[1]), RETEST_EXPECTED.aboveMax)).tableData;
+    filterRe = / - Above Maximum Amount$/;
+  } else if ((m = testCaseName.match(/^Distributor(?: (\w+))? - Below Minimum Amount$/))) {
+    rows = (await runBelowMinimumAmountTest(request, banksFrom(m[1]), RETEST_EXPECTED.belowMin)).tableData;
+    filterRe = / - Below Minimum Amount$/;
+  } else if ((m = testCaseName.match(/^Distribute To(?: (\w+))?$/))) {
+    rows = (await runHappyPathTest(request, banksFrom(m[1]))).tableData;
+    filterRe = /^Distribute To /;
+  } else if ((m = testCaseName.match(/^Payer Details(?: - (\w+))?$/))) {
+    rows = (await runPaymentDescriptionTest(request, banksFrom(m[1]), false, 'Payer Details', 'Payer Details Cases')).tableData;
+    filterRe = /^Payer Details - /;
+  } else if ((m = testCaseName.match(/^Payer \+ Beneficiary Details(?: - (\w+))?$/))) {
+    rows = (await runPaymentDescriptionTest(request, banksFrom(m[1]), true, 'Payer + Beneficiary Details', 'Payer + Beneficiary Details Cases')).tableData;
+    filterRe = /^Payer \+ Beneficiary Details - /;
   } else if ((m = testCaseName.match(/^Balance Update - (\w+)$/))) {
     rows = (await runBalanceUpdateTest(request, undefined, [m[1]])).tableData;
   } else {
@@ -1016,6 +1036,11 @@ export async function retestCaseByName(
   }
 
   const arr = Array.isArray(rows) ? rows : [];
-  const theCase = arr.find((c) => c.testCaseName === testCaseName) || arr[0];
-  return { found: true, passed: casePassed(theCase), caseData: theCase };
+  // Rows that belong to this case: matched by pattern (multi-bank cases) or by
+  // exact name (single, non-bank cases like auth / balance update).
+  const relevant = filterRe ? arr.filter((c) => filterRe!.test(c.testCaseName)) : arr.filter((c) => c.testCaseName === testCaseName);
+  const pool = relevant.length > 0 ? relevant : arr;
+  // Combined bug passes only when EVERY affected case passes.
+  const passed = pool.length > 0 && pool.every(casePassed);
+  return { found: true, passed, caseData: pool[0] };
 }
