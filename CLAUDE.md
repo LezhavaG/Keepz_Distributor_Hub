@@ -142,8 +142,10 @@ For complete API technical details, request/response examples, error codes, and 
 ### Published reports (GitHub Pages)
 
 - **Live link:** https://lezhavag.github.io/Keepz_Distributor_Hub/ (served from the `gh-pages` branch)
-- **Publish latest report:** after a test run, `npm run publish-report` pushes `distributor-report/` to `gh-pages`; the link updates within ~1 min.
-- The link is stable/reusable — share it once; every publish refreshes it.
+- **Automatic:** every test run auto-publishes the report at the end (Playwright `globalTeardown`), so the link always reflects the latest run. Publishing never fails the test run.
+- **Opt out:** run with `PUBLISH_REPORT=false` to skip publishing (e.g. quick local debugging).
+- **Manual publish:** `npm run publish-report` pushes `distributor-report/` to `gh-pages` on demand.
+- The link is stable/reusable — share it once; every run refreshes it (within ~1 min).
 
 ---
 

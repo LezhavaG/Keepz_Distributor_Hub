@@ -7,6 +7,10 @@ import { defineConfig } from '@playwright/test';
 export default defineConfig({
   testDir: './tests',
 
+  /* After every run, publish the generated HTML report to GitHub Pages.
+     Skip with PUBLISH_REPORT=false. */
+  globalTeardown: './scripts/global-teardown.ts',
+
   /* Maximum time one test can run */
   timeout: 0, // No timeout for interactive tests
 
