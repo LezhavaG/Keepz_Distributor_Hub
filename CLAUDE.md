@@ -135,10 +135,15 @@ For complete API technical details, request/response examples, error codes, and 
 
 ## Reports
 
-- **Location:** `test-results/html-reports/`
-- **Format:** Static HTML (self-contained, shareable)
+- **Location:** `distributor-report/` (generated locally; gitignored)
+- **Format:** Static HTML (self-contained, shareable) — `index.html` portal + timestamped `DisHubReport-*.html`
 - **Content:** Test cases grouped by category, showing exact API responses
-- **Automatic cleanup:** Keeps last 5 reports
+
+### Published reports (GitHub Pages)
+
+- **Live link:** https://lezhavag.github.io/Keepz_Distributor_Hub/ (served from the `gh-pages` branch)
+- **Publish latest report:** after a test run, `npm run publish-report` pushes `distributor-report/` to `gh-pages`; the link updates within ~1 min.
+- The link is stable/reusable — share it once; every publish refreshes it.
 
 ---
 

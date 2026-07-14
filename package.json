@@ -13,7 +13,8 @@
     "test:positive:individual:jira": "CREATE_JIRA_BUGS=true npx playwright test tests/Distributor_HUB/Positive_Cases/positive-tests-individual.spec.ts",
     "test:negative:individual:jira": "CREATE_JIRA_BUGS=true npx playwright test tests/Distributor_HUB/Negative_Cases/negative-tests-individual.spec.ts",
     "retest-jira": "npx playwright test tests/Distributor_HUB/retest-jira.spec.ts",
-    "retest-watch": "node scripts/retest-scheduler.js"
+    "retest-watch": "node scripts/retest-scheduler.js",
+    "publish-report": "gh-pages -d distributor-report -b gh-pages -t -m \"Update Distributor HUB test report\""
   },
   "keywords": [],
   "author": "",
@@ -22,7 +23,8 @@
   "devDependencies": {
     "@playwright/test": "^1.61.0",
     "@types/node": "^25.9.4",
-    "@types/uuid": "^10.0.0"
+    "@types/uuid": "^10.0.0",
+    "gh-pages": "^6.3.0"
   },
   "dependencies": {
     "dotenv": "^17.4.2",

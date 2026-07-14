@@ -45,6 +45,10 @@ export class HtmlReportGenerator {
     if (!fs.existsSync(this.reportDir)) {
       fs.mkdirSync(this.reportDir, { recursive: true });
     }
+    // Tell GitHub Pages to serve these files as-is (no Jekyll processing) when
+    // the folder is published via `npm run publish-report`.
+    const noJekyll = path.join(this.reportDir, '.nojekyll');
+    if (!fs.existsSync(noJekyll)) fs.writeFileSync(noJekyll, '');
   }
 
   generateReport(transactions: TransactionRow[], testName: string, balanceSummary?: BalanceSummary[], testType: TestType = 'positive'): string {
