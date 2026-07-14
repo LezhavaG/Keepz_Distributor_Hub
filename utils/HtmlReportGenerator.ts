@@ -51,6 +51,20 @@ export class HtmlReportGenerator {
     if (!fs.existsSync(noJekyll)) fs.writeFileSync(noJekyll, '');
   }
 
+  /**
+   * Escape HTML so dynamic values (case names, URLs, and especially live API
+   * response bodies) can't inject markup/scripts into the published report.
+   */
+  private esc(value: any): string {
+    const s = typeof value === 'string' ? value : JSON.stringify(value, null, 2);
+    return (s ?? '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
+  }
+
   generateReport(transactions: TransactionRow[], testName: string, balanceSummary?: BalanceSummary[], testType: TestType = 'positive'): string {
     const now = new Date();
     const day = String(now.getDate()).padStart(2, '0');
@@ -71,38 +85,23 @@ export class HtmlReportGenerator {
     const failedCases = transactions.filter(tx => tx.status === 'Failed' && !tx.isExpectedError);
     const totalTestCases = passedCases.length + failedCases.length;
 
-    // If cases are tagged with a testGroup (regression report), split into
-    // Positive / Negative top-level sections; otherwise show one flat list.
-    const hasGroups = transactions.some(tx => tx.testGroup);
-    let testCaseSectionsHTML: string;
-
-    if (hasGroups) {
-      const positiveTxs = transactions.filter(tx => tx.testGroup === 'positive');
-      const negativeTxs = transactions.filter(tx => tx.testGroup === 'negative');
-      testCaseSectionsHTML =
-        this.buildGroupSection('🟢 Positive Cases', positiveTxs) +
-        this.buildGroupSection('🔴 Negative Cases', negativeTxs);
-    } else {
-      testCaseSectionsHTML = this.buildStatusSections(transactions);
-    }
-
     const testTypeLabel = testType === 'positive' ? '(Positive Cases)' : testType === 'negative' ? '(Negative Cases)' : '(Full Regression)';
 
+    // Left-nav case tree + right-side detail panels (two-column layout).
+    const { nav: navHTML, panels: panelsHTML } = this.buildNavAndPanels(transactions);
+
     const testCaseSummaryHTML = `
-      <div style="margin-bottom: 32px;">
-        <h2 style="font-size: 20px; font-weight: 600; color: #333; margin-bottom: 16px;">Test Case Summary - ${testTypeLabel}</h2>
-        <div style="padding: 16px; background: #f5f5f5; border-radius: 8px; border-left: 4px solid #667eea; margin-bottom: 24px;">
-          <div style="font-size: 14px; color: #666;">
-            <strong>Total Test Cases:</strong> <span style="font-weight: 600; color: #333;">${totalTestCases}</span>
-            <span style="margin: 0 8px;">|</span>
-            <strong>Passed:</strong> <span style="font-weight: 600; color: #2e7d32;">${passedCases.length}</span>
-            <span style="margin: 0 8px;">|</span>
-            <strong>Failed:</strong> <span style="font-weight: 600; color: #c62828;">${failedCases.length}</span>
-            <span style="margin: 0 8px;">|</span>
-            <strong>Success Rate:</strong> <span style="font-weight: 600; color: #333;">${totalTestCases > 0 ? ((passedCases.length / totalTestCases) * 100).toFixed(0) : 0}%</span>
-          </div>
+      <h2 style="font-size: 20px; font-weight: 600; color: #333; margin-bottom: 12px;">Test Case Summary - ${testTypeLabel}</h2>
+      <div style="padding: 16px; background: #f5f5f5; border-radius: 8px; border-left: 4px solid #667eea;">
+        <div style="font-size: 14px; color: #666;">
+          <strong>Total Test Cases:</strong> <span style="font-weight: 600; color: #333;">${totalTestCases}</span>
+          <span style="margin: 0 8px;">|</span>
+          <strong>Passed:</strong> <span style="font-weight: 600; color: #2e7d32;">${passedCases.length}</span>
+          <span style="margin: 0 8px;">|</span>
+          <strong>Failed:</strong> <span style="font-weight: 600; color: #c62828;">${failedCases.length}</span>
+          <span style="margin: 0 8px;">|</span>
+          <strong>Success Rate:</strong> <span style="font-weight: 600; color: #333;">${totalTestCases > 0 ? ((passedCases.length / totalTestCases) * 100).toFixed(0) : 0}%</span>
         </div>
-        ${testCaseSectionsHTML}
       </div>
     `;
 
@@ -123,39 +122,82 @@ export class HtmlReportGenerator {
 
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background: #eef0f6;
       min-height: 100vh;
-      padding: 40px 20px;
     }
 
-    .container {
-      max-width: 900px;
-      margin: 0 auto;
-      background: white;
-      border-radius: 12px;
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-      overflow: hidden;
-    }
-
-    .header {
+    /* Full-width top bar */
+    .topbar {
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       color: white;
-      padding: 40px;
+      padding: 22px 32px;
       text-align: center;
     }
+    .topbar h1 { font-size: 24px; margin-bottom: 4px; }
+    .topbar p { font-size: 13px; opacity: 0.9; }
 
-    .header h1 {
-      font-size: 28px;
-      margin-bottom: 8px;
+    /* Two-column layout: nav (20%) + main (80%) */
+    .layout { display: flex; align-items: flex-start; }
+
+    .nav {
+      width: 20%;
+      min-width: 240px;
+      max-width: 360px;
+      background: white;
+      border-right: 1px solid #e5e5e5;
+      padding: 16px 12px;
+      position: sticky;
+      top: 0;
+      align-self: flex-start;
+      max-height: 100vh;
+      overflow-y: auto;
     }
 
-    .header p {
-      font-size: 14px;
-      opacity: 0.9;
+    .main {
+      flex: 1;
+      min-width: 0;
+      background: white;
+      padding: 24px 32px;
     }
 
-    .content {
-      padding: 40px;
+    /* Nav tree */
+    .nav-group-btn {
+      width: 100%; text-align: left; background: #667eea; color: white; border: none;
+      padding: 10px 12px; border-radius: 6px; font-weight: 600; font-size: 14px; cursor: pointer;
+      display: flex; justify-content: space-between; align-items: center; margin-top: 10px;
+    }
+    .nav-cat-btn {
+      width: 100%; text-align: left; background: #f2f2f7; border: none; border-left: 3px solid #667eea;
+      padding: 8px 10px; font-weight: 500; font-size: 13px; color: #333; cursor: pointer;
+      display: flex; justify-content: space-between; align-items: center; margin: 8px 0 4px;
+    }
+    .nav-group-body, .nav-cat-body { overflow: hidden; }
+    .nav-cat-body { padding-left: 6px; }
+    .nav-case {
+      width: 100%; text-align: left; background: white; border: none; border-bottom: 1px solid #eee;
+      padding: 8px 10px; cursor: pointer; font-size: 13px; color: #333;
+      display: flex; justify-content: space-between; align-items: center; gap: 8px;
+    }
+    .nav-case:hover { background: #f7f8ff; }
+    .nav-case.active { background: #eef0ff; border-left: 3px solid #667eea; font-weight: 600; }
+    .nav-case-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .nav-badge { padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; white-space: nowrap; color: #333; }
+    .nav-arrow { font-size: 12px; transition: transform 0.2s; }
+
+    /* Main / detail panels */
+    .main-top { margin-bottom: 20px; }
+    .back-btn {
+      display: inline-block; padding: 10px 16px; background: #667eea; color: white;
+      text-decoration: none; border-radius: 6px; font-weight: 500; margin-bottom: 16px;
+    }
+    .case-panel { display: none; }
+    .case-panel-head { display: flex; align-items: center; gap: 12px; border-bottom: 2px solid #eee; padding-bottom: 12px; margin-bottom: 16px; }
+    .case-panel-head h2 { font-size: 20px; color: #333; }
+    .empty-state { color: #888; text-align: center; padding: 48px 16px; }
+
+    @media (max-width: 768px) {
+      .layout { flex-direction: column; }
+      .nav { width: 100%; max-width: none; position: static; max-height: none; border-right: none; border-bottom: 1px solid #e5e5e5; }
     }
 
     button {
@@ -165,40 +207,6 @@ export class HtmlReportGenerator {
     button:hover {
       transform: translateY(-2px);
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    }
-
-    .status-section {
-      border-radius: 6px;
-      overflow: hidden;
-    }
-
-    .test-case-row {
-      border-bottom: 1px solid #e0e0e0;
-      background: white;
-    }
-
-    .test-case-header {
-      padding: 16px;
-      cursor: pointer;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background: #fafafa;
-      border-bottom: 1px solid #e0e0e0;
-    }
-
-    .test-case-header:hover {
-      background: #f0f0f0;
-    }
-
-    .test-case-content {
-      display: none;
-      padding: 16px;
-      background: white;
-    }
-
-    .test-case-content.expanded {
-      display: block;
     }
 
     table {
@@ -248,25 +256,31 @@ export class HtmlReportGenerator {
     }
   </style>
   <script>
-    function toggleSection(button) {
-      const section = button.nextElementSibling;
-      const arrow = button.querySelector('span:last-child');
-
-      if (section.style.display === 'none') {
-        section.style.display = 'block';
-        arrow.style.transform = 'rotate(0deg)';
-      } else {
-        section.style.display = 'none';
-        arrow.style.transform = 'rotate(-90deg)';
-      }
+    // Collapse/expand a nav group or category (button + following body element).
+    function toggleNav(button) {
+      const body = button.nextElementSibling;
+      const arrow = button.querySelector('.nav-arrow');
+      const hidden = body.style.display === 'none';
+      body.style.display = hidden ? 'block' : 'none';
+      if (arrow) arrow.style.transform = hidden ? 'rotate(0deg)' : 'rotate(-90deg)';
     }
 
-    function toggleTestCase(element) {
-      const content = element.nextElementSibling;
-      const arrow = element.querySelector('.arrow');
-      content.classList.toggle('expanded');
-      arrow.style.transform = content.classList.contains('expanded') ? 'rotate(0deg)' : 'rotate(-90deg)';
+    // Show one case's detail panel in the right column and highlight its nav item.
+    function selectCase(id, el) {
+      document.querySelectorAll('.case-panel').forEach(function (p) { p.style.display = 'none'; });
+      const panel = document.getElementById(id);
+      if (panel) panel.style.display = 'block';
+      document.querySelectorAll('.nav-case').forEach(function (n) { n.classList.remove('active'); });
+      if (el) el.classList.add('active');
+      const empty = document.getElementById('empty-state');
+      if (empty) empty.style.display = 'none';
     }
+
+    // Auto-select the first case so the report opens on real content.
+    document.addEventListener('DOMContentLoaded', function () {
+      const first = document.querySelector('.nav-case');
+      if (first) first.click();
+    });
 
     function toggleError(button) {
       const errorDetail = button.parentElement.querySelector('.error-detail');
@@ -278,20 +292,6 @@ export class HtmlReportGenerator {
         arrow.style.transform = 'rotate(0deg)';
       } else {
         errorDetail.style.display = 'none';
-        arrow.style.transform = 'rotate(-90deg)';
-      }
-    }
-
-    function toggleCategory(button) {
-      const categorySection = button.nextElementSibling;
-      const arrow = button.querySelector('span:last-child');
-      const isHidden = window.getComputedStyle(categorySection).display === 'none';
-
-      if (isHidden) {
-        categorySection.style.display = 'block';
-        arrow.style.transform = 'rotate(0deg)';
-      } else {
-        categorySection.style.display = 'none';
         arrow.style.transform = 'rotate(-90deg)';
       }
     }
@@ -326,24 +326,30 @@ export class HtmlReportGenerator {
   </script>
 </head>
 <body>
-  <div class="container">
-    <div class="header">
-      <h1>Distributor HUB Test Report</h1>
-      <p>${testName}</p>
-    </div>
+  <div class="topbar">
+    <h1>Distributor HUB Test Report</h1>
+    <p>${testName}</p>
+  </div>
 
-    <div class="content">
-      <div style="margin-bottom: 24px;">
-        <a href="./index.html" style="display: inline-block; padding: 10px 16px; background: #667eea; color: white; text-decoration: none; border-radius: 6px; font-weight: 500; transition: background 0.2s;">
-          ← Back to Portal
-        </a>
+  <div class="layout">
+    <aside class="nav">
+      ${navHTML}
+    </aside>
+
+    <main class="main">
+      <div class="main-top">
+        <a href="./index.html" class="back-btn">← Back to Portal</a>
+        ${testCaseSummaryHTML}
       </div>
-      ${testCaseSummaryHTML}
-    </div>
+      <div class="panels">
+        ${panelsHTML}
+        <div class="case-panel empty-state" id="empty-state">Select a test case from the left to view its details.</div>
+      </div>
+    </main>
+  </div>
 
-    <div class="footer">
-      Generated on ${new Date().toLocaleString()}
-    </div>
+  <div class="footer">
+    Generated on ${new Date().toLocaleString()}
   </div>
 </body>
 </html>
@@ -358,81 +364,79 @@ export class HtmlReportGenerator {
     // Update report index
     this.updateReportIndex();
 
-    // Add back button to all existing reports
-    this.updateAllReportsWithBackButton();
-
     return reportPath;
   }
 
-  // Builds the Passed Cases + Failed Cases sections (each grouped by category) for a set of cases.
-  private buildStatusSections(transactions: TransactionRow[]): string {
-    const passedCases = transactions.filter(tx => tx.status === 'Succeeded' || (tx.status === 'Failed' && tx.isExpectedError));
-    const failedCases = transactions.filter(tx => tx.status === 'Failed' && !tx.isExpectedError);
+  // Builds the left-nav case tree and the matching right-side detail panels.
+  // Each case in the nav has data-target pointing at its hidden panel; clicking
+  // it (selectCase) reveals that panel in the 80% content column.
+  private buildNavAndPanels(transactions: TransactionRow[]): { nav: string; panels: string } {
+    const isPassed = (tx: TransactionRow) => tx.status === 'Succeeded' || (tx.status === 'Failed' && tx.isExpectedError);
+    const hasGroups = transactions.some(tx => tx.testGroup);
 
-    const groupedPassed = this.groupByCategory(passedCases);
-    const groupedFailed = this.groupByCategory(failedCases);
+    const groups = hasGroups
+      ? [
+          { label: '🟢 Positive Cases', txs: transactions.filter(tx => tx.testGroup === 'positive') },
+          { label: '🔴 Negative Cases', txs: transactions.filter(tx => tx.testGroup === 'negative') },
+        ]
+      : [
+          { label: '✓ Passed Cases', txs: transactions.filter(isPassed) },
+          { label: '✗ Failed Cases', txs: transactions.filter(tx => !isPassed(tx)) },
+        ];
 
-    let html = '';
+    let nav = '';
+    let panels = '';
+    let id = 0;
 
-    if (passedCases.length > 0) {
-      const passedRows = Object.entries(groupedPassed)
-        .map(([category, cases]) => this.buildCategorySection(category, cases, 'passed'))
-        .join('');
-      html += `
-        <div style="margin-bottom: 24px;">
-          <button type="button" onclick="toggleSection(this)" style="width: 100%; padding: 16px; background-color: #d4edda; border: none; cursor: pointer; border-radius: 6px; font-weight: 600; text-align: left; font-size: 16px; display: flex; justify-content: space-between; align-items: center;">
-            <span>✓ Passed Cases (${passedCases.length})</span>
-            <span style="font-size: 20px;">▼</span>
+    for (const group of groups) {
+      if (group.txs.length === 0) continue;
+      const byCat = this.groupByCategory(group.txs);
+
+      let cats = '';
+      for (const [category, cases] of Object.entries(byCat)) {
+        let items = '';
+        for (const tx of cases) {
+          const caseId = `case-${id++}`;
+          const passed = isPassed(tx);
+          const name = tx.testCaseName || `${tx.bank} - ${tx.currency}`;
+          const badge = passed ? 'Passed ✓' : 'Failed ✗';
+          const badgeColor = passed ? '#d4edda' : '#f8d7da';
+
+          items += `
+            <button type="button" class="nav-case" data-target="${caseId}" onclick="selectCase('${caseId}', this)">
+              <span class="nav-case-name">${this.esc(name)}</span>
+              <span class="nav-badge" style="background:${badgeColor};">${badge}</span>
+            </button>`;
+
+          panels += `
+            <section class="case-panel" id="${caseId}" style="display:none;">
+              <div class="case-panel-head">
+                <h2>${this.esc(name)}</h2>
+                <span class="nav-badge" style="background:${badgeColor};">${badge}</span>
+              </div>
+              ${this.buildCaseDetailContent(tx)}
+            </section>`;
+        }
+
+        cats += `
+          <div class="nav-cat">
+            <button type="button" class="nav-cat-btn" onclick="toggleNav(this)">
+              <span>📁 ${this.esc(category)}</span><span class="nav-arrow">▼</span>
+            </button>
+            <div class="nav-cat-body">${items}</div>
+          </div>`;
+      }
+
+      nav += `
+        <div class="nav-group">
+          <button type="button" class="nav-group-btn" onclick="toggleNav(this)">
+            <span>${group.label} (${group.txs.length})</span><span class="nav-arrow">▼</span>
           </button>
-          <div class="status-section" style="display: none; margin-top: 12px;">
-            <div style="background: white; border-radius: 6px; overflow: hidden;">
-              ${passedRows}
-            </div>
-          </div>
-        </div>
-      `;
+          <div class="nav-group-body">${cats}</div>
+        </div>`;
     }
 
-    if (failedCases.length > 0) {
-      const failedRows = Object.entries(groupedFailed)
-        .map(([category, cases]) => this.buildCategorySection(category, cases, 'failed'))
-        .join('');
-      html += `
-        <div style="margin-bottom: 24px;">
-          <button type="button" onclick="toggleSection(this)" style="width: 100%; padding: 16px; background-color: #f8d7da; border: none; cursor: pointer; border-radius: 6px; font-weight: 600; text-align: left; font-size: 16px; display: flex; justify-content: space-between; align-items: center;">
-            <span>✗ Failed Cases (${failedCases.length})</span>
-            <span style="font-size: 20px;">▼</span>
-          </button>
-          <div class="status-section" style="display: none; margin-top: 12px;">
-            <div style="background: white; border-radius: 6px; overflow: hidden;">
-              ${failedRows}
-            </div>
-          </div>
-        </div>
-      `;
-    }
-
-    return html;
-  }
-
-  // Wraps a Positive/Negative top-level group (used in the regression report).
-  private buildGroupSection(label: string, transactions: TransactionRow[]): string {
-    if (transactions.length === 0) return '';
-
-    const passed = transactions.filter(tx => tx.status === 'Succeeded' || (tx.status === 'Failed' && tx.isExpectedError)).length;
-    const failed = transactions.filter(tx => tx.status === 'Failed' && !tx.isExpectedError).length;
-
-    return `
-      <div style="margin-bottom: 32px; border: 2px solid #667eea; border-radius: 8px; overflow: hidden;">
-        <button type="button" onclick="toggleSection(this)" style="width: 100%; padding: 18px; background-color: #667eea; color: white; border: none; cursor: pointer; font-weight: 700; text-align: left; font-size: 18px; display: flex; justify-content: space-between; align-items: center;">
-          <span>${label} (${transactions.length}) — ${passed} passed, ${failed} failed</span>
-          <span style="font-size: 20px; transition: transform 0.3s; transform: rotate(-90deg);">▼</span>
-        </button>
-        <div class="status-section" style="display: none; padding: 16px;">
-          ${this.buildStatusSections(transactions)}
-        </div>
-      </div>
-    `;
+    return { nav, panels };
   }
 
   private groupByCategory(transactions: TransactionRow[]): { [key: string]: TransactionRow[] } {
@@ -446,28 +450,11 @@ export class HtmlReportGenerator {
     }, {} as { [key: string]: TransactionRow[] });
   }
 
-  private buildCategorySection(category: string, cases: TransactionRow[], type: 'passed' | 'failed'): string {
-    const categoryRows = cases
-      .map((tx, idx) => this.buildTestCaseRow(tx, idx, type))
-      .join('');
-
-    return `
-      <div style="margin-bottom: 16px;">
-        <button type="button" onclick="toggleCategory(this)" style="width: 100%; padding: 12px 16px; background: #f5f5f5; border: none; cursor: pointer; border-left: 4px solid #667eea; font-weight: 500; font-size: 14px; color: #333; display: flex; justify-content: space-between; align-items: center; text-align: left;">
-          <span>📁 ${category}</span>
-          <span style="font-size: 16px; transition: transform 0.3s; transform: rotate(-90deg);">▼</span>
-        </button>
-        <div class="category-section" style="display: none; background: white; border-radius: 0 0 6px 6px; overflow: hidden;">
-          ${categoryRows}
-        </div>
-      </div>
-    `;
-  }
-
-  private buildTestCaseRow(tx: TransactionRow, idx: number, type: 'passed' | 'failed'): string {
+  // Builds just the detail content for one case (API calls, tables, responses).
+  // Rendered inside a right-side panel; the nav supplies the case title/badge.
+  private buildCaseDetailContent(tx: TransactionRow): string {
     const badgeColor = tx.status === 'Succeeded' || tx.isExpectedError ? '#d4edda' : '#f8d7da';
     const statusText = tx.status === 'Succeeded' || tx.isExpectedError ? 'Passed ✓' : 'Failed ✗';
-    const testCaseName = tx.testCaseName || `${tx.bank} - ${tx.currency}`;
 
     let contentHTML = '';
 
@@ -490,18 +477,18 @@ export class HtmlReportGenerator {
               queryParams[decodeURIComponent(k)] = decodeURIComponent(v ?? '');
             });
             bodyOrParamsHTML = `<div style="margin-bottom: 4px;"><strong>Query Parameters:</strong></div>
-              <pre style="margin: 4px 0 8px 0; background: #eef6ff; padding: 8px; border-radius: 3px; border-left: 3px solid #4a90d9; overflow-x: auto; font-family: monospace; font-size: 12px; color: #2c5d8a;">${JSON.stringify(queryParams, null, 2)}</pre>`;
+              <pre style="margin: 4px 0 8px 0; background: #eef6ff; padding: 8px; border-radius: 3px; border-left: 3px solid #4a90d9; overflow-x: auto; font-family: monospace; font-size: 12px; color: #2c5d8a;">${this.esc(queryParams)}</pre>`;
           } else if (call.method !== 'GET' && call.requestBody !== undefined) {
             bodyOrParamsHTML = `<div style="margin-bottom: 4px;"><strong>Request Body:</strong></div>
-              <pre style="margin: 4px 0 8px 0; background: #fff8e6; padding: 8px; border-radius: 3px; border-left: 3px solid #f0ad4e; overflow-x: auto; font-family: monospace; font-size: 12px; color: #8a6d3b;">${typeof call.requestBody === 'string' ? call.requestBody : JSON.stringify(call.requestBody, null, 2)}</pre>`;
+              <pre style="margin: 4px 0 8px 0; background: #fff8e6; padding: 8px; border-radius: 3px; border-left: 3px solid #f0ad4e; overflow-x: auto; font-family: monospace; font-size: 12px; color: #8a6d3b;">${this.esc(call.requestBody)}</pre>`;
           }
 
           return `
           <div style="margin-bottom: 16px; padding: 12px; background: white; border: 1px solid #e0e0e0; border-radius: 4px;">
-            <div style="font-weight: 600; color: #333; margin-bottom: 12px;">API Call ${idx + 1}: ${call.name}${callBadge}</div>
+            <div style="font-weight: 600; color: #333; margin-bottom: 12px;">API Call ${idx + 1}: ${this.esc(call.name)}${callBadge}</div>
             <div style="font-size: 13px; color: #666; margin-bottom: 8px;">
-              <div style="margin-bottom: 4px;"><strong>Request URL:</strong> <code style="color: #0066cc; word-break: break-all;">${call.url}</code></div>
-              <div style="margin-bottom: 4px;"><strong>Request Method:</strong> <span style="font-weight: 500;">${call.method}</span></div>
+              <div style="margin-bottom: 4px;"><strong>Request URL:</strong> <code style="color: #0066cc; word-break: break-all;">${this.esc(call.url)}</code></div>
+              <div style="margin-bottom: 4px;"><strong>Request Method:</strong> <span style="font-weight: 500;">${this.esc(call.method)}</span></div>
               <div style="margin-bottom: 8px;"><strong>Status Code:</strong> <span style="background: #f0f0f0; padding: 2px 8px; border-radius: 3px; font-family: monospace;">${call.statusCode}</span></div>
               ${bodyOrParamsHTML}
             </div>
@@ -512,11 +499,11 @@ export class HtmlReportGenerator {
             <div class="api-details" style="display: none; margin-top: 12px; padding: 12px; background: #f9f9f9; border-radius: 4px; border-left: 3px solid #667eea; font-family: monospace; font-size: 12px; line-height: 1.5; max-height: 400px; overflow-y: auto;">
               <div style="margin-bottom: 12px;">
                 <strong style="color: #333;">Expected Result:</strong>
-                <pre style="margin: 8px 0 0 0; background: white; padding: 8px; border-radius: 3px; overflow-x: auto; color: #0066cc;">${JSON.stringify(call.expectedResult, null, 2)}</pre>
+                <pre style="margin: 8px 0 0 0; background: white; padding: 8px; border-radius: 3px; overflow-x: auto; color: #0066cc;">${this.esc(call.expectedResult)}</pre>
               </div>
               <div>
                 <strong style="color: #333;">Actual Result:</strong>
-                <pre style="margin: 8px 0 0 0; background: white; padding: 8px; border-radius: 3px; overflow-x: auto; color: #066600;">${JSON.stringify(call.actualResult, null, 2)}</pre>
+                <pre style="margin: 8px 0 0 0; background: white; padding: 8px; border-radius: 3px; overflow-x: auto; color: #066600;">${this.esc(call.actualResult)}</pre>
               </div>
             </div>
           </div>
@@ -558,17 +545,17 @@ export class HtmlReportGenerator {
               const parts = line.split(' | ');
               if (parts.length > 1) {
                 return `<div style="margin-bottom: 12px; padding: 12px; background: white; border-radius: 4px; border-left: 3px solid #667eea;">
-                  <strong style="color: #333;">${parts[0]}</strong><br>
-                  ${parts.slice(1).map(p => `<span style="color: #666; font-size: 13px;">${p}</span>`).join('<br>')}
+                  <strong style="color: #333;">${this.esc(parts[0])}</strong><br>
+                  ${parts.slice(1).map(p => `<span style="color: #666; font-size: 13px;">${this.esc(p)}</span>`).join('<br>')}
                 </div>`;
               }
-              return line;
+              return this.esc(line);
             })
             .join('');
         }
 
         // Add uniqueId to response if available
-        const uniqueIdSection = tx.uniqueId ? `<div style="margin-bottom: 12px; padding: 12px; background: #f0f0f0; border-radius: 4px; border-left: 3px solid #667eea;"><strong style="color: #333;">Unique ID:</strong> <code style="color: #0066cc; font-family: monospace; word-break: break-all; font-size: 12px;">${tx.uniqueId}</code></div>` : '';
+        const uniqueIdSection = tx.uniqueId ? `<div style="margin-bottom: 12px; padding: 12px; background: #f0f0f0; border-radius: 4px; border-left: 3px solid #667eea;"><strong style="color: #333;">Unique ID:</strong> <code style="color: #0066cc; font-family: monospace; word-break: break-all; font-size: 12px;">${this.esc(tx.uniqueId)}</code></div>` : '';
 
         responseSection = `
             <button type="button" onclick="toggleError(this)" style="width: 100%; padding: 12px 16px; background: none; border: none; cursor: pointer; text-align: left; font-size: 13px; color: ${textColor}; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #e0e0e0;">
@@ -577,7 +564,7 @@ export class HtmlReportGenerator {
             </button>
             <div class="error-detail" style="background-color: ${backgroundColor}; color: ${textColor}; ${isBalanceCheck ? 'background: white; border: none; color: #333;' : ''}">
               ${uniqueIdSection}
-              ${isBalanceCheck ? formattedMessage : tx.errorMessage}
+              ${isBalanceCheck ? formattedMessage : this.esc(tx.errorMessage)}
             </div>
         `;
       }
@@ -605,9 +592,9 @@ export class HtmlReportGenerator {
           <tbody>
             <tr>
               <td>${tx.transactionId}</td>
-              <td>${tx.bank}</td>
+              <td>${this.esc(tx.bank)}</td>
               <td>${tx.amount.toFixed(2)}</td>
-              <td>${tx.currency}</td>
+              <td>${this.esc(tx.currency)}</td>
               <td>
                 <span style="background-color: ${badgeColor}; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: 500; display: inline-block;">
                   ${statusText}
@@ -621,7 +608,7 @@ export class HtmlReportGenerator {
             <tr>
               <td colspan="5" style="padding: 0;">
                 <div style="padding: 12px 16px; background: #f0f0f0; border-top: 1px solid #e0e0e0;">
-                  <strong style="color: #333;">Unique ID:</strong> <code style="color: #0066cc; font-family: monospace; word-break: break-all; font-size: 12px;">${tx.uniqueId}</code>
+                  <strong style="color: #333;">Unique ID:</strong> <code style="color: #0066cc; font-family: monospace; word-break: break-all; font-size: 12px;">${this.esc(tx.uniqueId)}</code>
                 </div>
               </td>
             </tr>
@@ -637,7 +624,7 @@ export class HtmlReportGenerator {
                   <span style="font-size: 16px;">▼</span>
                 </button>
                 <div class="error-detail">
-                  ${tx.errorMessage}
+                  ${this.esc(tx.errorMessage)}
                 </div>
               </td>
             </tr>
@@ -652,22 +639,7 @@ export class HtmlReportGenerator {
       contentHTML = transactionDetailsHTML;
     }
 
-    return `
-      <div class="test-case-row">
-        <div class="test-case-header" onclick="toggleTestCase(this)">
-          <div style="font-weight: 500; color: #333;">${testCaseName}</div>
-          <div style="display: flex; align-items: center; gap: 12px;">
-            <span style="background-color: ${badgeColor}; padding: 4px 12px; border-radius: 4px; font-size: 12px; font-weight: 500;">
-              ${statusText}
-            </span>
-            <span class="arrow" style="font-size: 18px; transition: transform 0.3s; transform: rotate(-90deg);">▼</span>
-          </div>
-        </div>
-        <div class="test-case-content">
-          ${contentHTML}
-        </div>
-      </div>
-    `;
+    return contentHTML;
   }
 
   private cleanupOldReports(maxReports: number): void {
@@ -881,40 +853,4 @@ export class HtmlReportGenerator {
     }
   }
 
-  private updateAllReportsWithBackButton(): void {
-    try {
-      if (!fs.existsSync(this.reportDir)) {
-        return;
-      }
-
-      const files = fs.readdirSync(this.reportDir)
-        .filter(file => file.startsWith('DisHubReport-') && file.endsWith('.html'));
-
-      files.forEach(file => {
-        const filePath = path.join(this.reportDir, file);
-        let content = fs.readFileSync(filePath, 'utf-8');
-
-        // Check if back button already exists
-        if (content.includes('Back to Portal')) {
-          return; // Already has back button
-        }
-
-        // Add back button after <div class="content">
-        const backButtonHTML = `<div style="margin-bottom: 24px;">
-        <a href="./index.html" style="display: inline-block; padding: 10px 16px; background: #667eea; color: white; text-decoration: none; border-radius: 6px; font-weight: 500; transition: background 0.2s;">
-          ← Back to Portal
-        </a>
-      </div>`;
-
-        content = content.replace(
-          '<div class="content">',
-          `<div class="content">\n      ${backButtonHTML}`
-        );
-
-        fs.writeFileSync(filePath, content);
-      });
-    } catch (error) {
-      console.error('Error updating reports with back button:', error);
-    }
-  }
 }
