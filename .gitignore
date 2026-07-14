@@ -1,0 +1,23 @@
+# Environment variables (SENSITIVE - DO NOT COMMIT!)
+.env
+
+# Playwright
+node_modules/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+/playwright/.auth/
+
+# Retest logs
+retest-cron.log
+retest-loop.log
+test-results/
+
+# Local-only Excel exports
+*.xlsx
+
+# Generated HTML reports (regenerated on every run)
+/distributor-report/
+
+# macOS
+.DS_Store
