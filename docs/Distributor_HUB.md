@@ -253,6 +253,18 @@ asks the back-end to re-check and update the transaction's status immediately, r
 waiting for the next scheduler cycle. (Useful when polling a BOG/Liberty transaction: refresh
 the status before each read so a just-signed transaction is seen right away.)
 
+### Balance deduction (⚠️ load-bearing rule for tests)
+
+- The integrator **balance is deducted at ORDER CREATION** — `amount + commission` leaves the
+  balance immediately, while the transaction is still `INITIAL`/`PENDING` (verified live).
+- **The balance is NOT refunded if the transaction later fails.** Money spent equals orders
+  *created*, regardless of their final status.
+
+Because of this, balance reconciliation in the tests is computed from the orders that were
+successfully **created** (`initial − created × (amount + commission)`), **not** from the orders
+that reached `COMPLETED`. Do **not** change it back to a completed-based calculation — a created
+order that ends up `PENDING`/`FAILED` still spent its money, so completed-based math would be wrong.
+
 ---
 
 ## Common Error Codes
