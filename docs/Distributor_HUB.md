@@ -257,13 +257,20 @@ the status before each read so a just-signed transaction is seen right away.)
 
 - The integrator **balance is deducted at ORDER CREATION** — `amount + commission` leaves the
   balance immediately, while the transaction is still `INITIAL`/`PENDING` (verified live).
-- **The balance is NOT refunded if the transaction later fails.** Money spent equals orders
-  *created*, regardless of their final status.
+- **A FAILED transaction is REFUNDED** — its `amount + commission` is returned to the balance.
+  So only **SUCCEEDED** transactions change the balance permanently.
 
-Because of this, balance reconciliation in the tests is computed from the orders that were
-successfully **created** (`initial − created × (amount + commission)`), **not** from the orders
-that reached `COMPLETED`. Do **not** change it back to a completed-based calculation — a created
-order that ends up `PENDING`/`FAILED` still spent its money, so completed-based math would be wrong.
+Because of this, balance reconciliation is computed from the orders that ultimately
+**succeeded**:
+
+```
+final = initial − (succeeded orders × (amount + commission))
+```
+
+This is only valid once **every** transaction has reached a **terminal** status (SUCCESS/FAILED),
+so the tests must wait for all transactions to resolve before reading the final balance (and
+trigger `update-status` for BOG/Liberty so signed transactions resolve promptly). A transaction
+still in `PENDING` at that point means the balance can't be verified yet.
 
 ---
 

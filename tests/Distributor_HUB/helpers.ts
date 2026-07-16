@@ -330,18 +330,23 @@ export async function runHappyPathTest(request: any, banksToTest: typeof ALL_BAN
     };
   });
 
-  // Balance is deducted at ORDER CREATION (verified: amount + commission leaves
-  // the balance immediately, before the transaction reaches COMPLETED). So the
-  // balance must reconcile against every order we successfully CREATED (id != 0),
-  // regardless of its later PENDING/COMPLETED status — this matches the simple
-  // model: initial − (created orders × (amount + commission)) = final.
-  const createdTxs = transactions.filter(tx => tx.id !== 0);
+  // Balance is deducted at order creation, but a FAILED transaction is REFUNDED
+  // (amount + commission returned). So only SUCCEEDED transactions permanently
+  // change the balance. Reconcile against succeeded transactions:
+  //   final = initial − (succeeded orders × (amount + commission)).
+  // This is only valid once EVERY transaction has reached a terminal status
+  // (SUCCESS/FAILED) — the poll above waits for that (triggering update-status
+  // for BOG/Liberty so signed transactions resolve promptly).
+  const succeededTxs = transactions.filter(tx => {
+    const finalTx = finalStatuses.find(f => f.id === tx.id);
+    return finalTx && (finalTx.status === 'COMPLETED' || finalTx.status === 'SUCCESS');
+  });
 
   // Calculate detailed balance info per currency.
   // Commission is verified against the EXPECTED value from the admin-panel config
   // (not the value the API reported) so a wrong back-end commission is caught.
   const perCurrency = (currency: string) => {
-    const txs = createdTxs.filter(tx => tx.currency === currency);
+    const txs = succeededTxs.filter(tx => tx.currency === currency);
     const amount = getTransactionAmount(currency);
     const totalTransactions = amount * txs.length;
     const actualCommission = txs.reduce((sum, tx) => sum + (tx.commission || 0), 0);
