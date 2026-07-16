@@ -311,17 +311,18 @@ export async function runHappyPathTest(request: any, banksToTest: typeof ALL_BAN
     };
   });
 
-  // Get succeeded transactions from the original transactions array (which has commission data)
-  const succeededTxs = transactions.filter(tx => {
-    const finalTx = finalStatuses.find(f => f.id === tx.id);
-    return finalTx && (finalTx.status === 'COMPLETED' || finalTx.status === 'SUCCESS');
-  });
+  // Balance is deducted at ORDER CREATION (verified: amount + commission leaves
+  // the balance immediately, before the transaction reaches COMPLETED). So the
+  // balance must reconcile against every order we successfully CREATED (id != 0),
+  // regardless of its later PENDING/COMPLETED status — this matches the simple
+  // model: initial − (created orders × (amount + commission)) = final.
+  const createdTxs = transactions.filter(tx => tx.id !== 0);
 
   // Calculate detailed balance info per currency.
   // Commission is verified against the EXPECTED value from the admin-panel config
   // (not the value the API reported) so a wrong back-end commission is caught.
   const perCurrency = (currency: string) => {
-    const txs = succeededTxs.filter(tx => tx.currency === currency);
+    const txs = createdTxs.filter(tx => tx.currency === currency);
     const amount = getTransactionAmount(currency);
     const totalTransactions = amount * txs.length;
     const actualCommission = txs.reduce((sum, tx) => sum + (tx.commission || 0), 0);
@@ -339,6 +340,24 @@ export async function runHappyPathTest(request: any, banksToTest: typeof ALL_BAN
   const totalDeductedGEL = gel.totalDeducted;
   const totalDeductedUSD = usd.totalDeducted;
   const totalDeductedEUR = eur.totalDeducted;
+
+  // Show the SPECIFIC expected final balance per currency on the final-balance
+  // calls (expected = initial − amount×succeeded − commission), so the report
+  // shows real numbers (e.g. Expected 0.95 vs Actual 1.01) instead of a generic
+  // "number", and each call's pass/fail reflects the actual reconciliation.
+  const expectedFinalByCurrency: { [k: string]: number } = {
+    GEL: +(initialBalanceGEL.amount - totalDeductedGEL).toFixed(2),
+    USD: +(initialBalanceUSD.amount - totalDeductedUSD).toFixed(2),
+    EUR: +(initialBalanceEUR.amount - totalDeductedEUR).toFixed(2),
+  };
+  finalBalanceCalls.forEach((c) => {
+    const cur = c.actualResult?.currency;
+    if (cur && cur in expectedFinalByCurrency) {
+      const expectedAmount = expectedFinalByCurrency[cur];
+      c.expectedResult = { amount: expectedAmount, currency: cur };
+      c.passed = c.statusCode === 200 && Math.abs((c.actualResult?.amount ?? NaN) - expectedAmount) < 0.001;
+    }
+  });
 
   const allCommissionsCorrect = gel.commissionCorrect && usd.commissionCorrect && eur.commissionCorrect;
 
