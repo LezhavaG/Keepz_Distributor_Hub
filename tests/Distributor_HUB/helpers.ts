@@ -75,7 +75,11 @@ export const BASE_URL = process.env.DISTRIBUTOR_BASE_URL || 'https://distributor
 
 // Transaction completion polling (tune per observed processing time).
 export const POLL_MAX_RETRIES = parseInt(process.env.TRANSACTION_POLL_MAX_RETRIES || '15', 10);
-export const POLL_INTERVAL_SECONDS = parseInt(process.env.TRANSACTION_POLL_INTERVAL_SECONDS || '60', 10);
+export const POLL_INTERVAL_SECONDS = parseInt(process.env.TRANSACTION_POLL_INTERVAL_SECONDS || '30', 10);
+// For signing banks (BOG/Liberty): how many reads are plain fetches before we
+// start triggering update-status. E.g. 3 = reads 1-3 are plain, read 4+ triggers
+// update-status first (gives the signing bot its own cycle before we nudge).
+export const POLL_TRIES_BEFORE_STATUS_UPDATE = parseInt(process.env.TRANSACTION_POLL_TRIES_BEFORE_UPDATE || '3', 10);
 
 // Banks that require beneficiaryName on order creation (even when not otherwise sent).
 const BANKS_REQUIRING_BENEFICIARY = ['Liberty'];
@@ -246,7 +250,7 @@ export async function runHappyPathTest(request: any, banksToTest: typeof ALL_BAN
       const onBeforePoll = bankNeedsSigning(tx.bank)
         ? (id: number) => triggerStatusUpdate(request, id)
         : undefined;
-      return hub.waitForTransactionCompletion(tx.id, POLL_MAX_RETRIES, POLL_INTERVAL_SECONDS, onBeforePoll)
+      return hub.waitForTransactionCompletion(tx.id, POLL_MAX_RETRIES, POLL_INTERVAL_SECONDS, onBeforePoll, POLL_TRIES_BEFORE_STATUS_UPDATE)
         .then(details => {
           const txIndex = transactions.findIndex(t => t.id === details.transactionId);
           if (txIndex !== -1) {

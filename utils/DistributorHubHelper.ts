@@ -266,7 +266,8 @@ export class DistributorHubHelper {
     transactionId: number,
     maxRetries: number = 10,
     retryIntervalSeconds: number = 30,
-    onBeforePoll?: (transactionId: number) => Promise<void>
+    onBeforePoll?: (transactionId: number) => Promise<void>,
+    hookAfterTries: number = 0
   ): Promise<TransactionDetailsResponse> {
     let attempts = 0;
     // Terminal statuses that end polling (override via .env if the API adds more).
@@ -279,9 +280,13 @@ export class DistributorHubHelper {
 
     while (attempts < maxRetries) {
       try {
-        // Optionally refresh the status first (e.g. trigger update-status for
-        // BOG/Liberty so a just-signed transaction shows up on this read).
-        if (onBeforePoll) await onBeforePoll(transactionId);
+        // Refresh the status first (trigger update-status for BOG/Liberty so a
+        // just-signed transaction shows up on this read) — but only after the
+        // first `hookAfterTries` reads, to give the signing bot its own cycle
+        // before we start nudging. `attempts` here = reads already completed
+        // (0 before the 1st read, 1 before the 2nd, ...), so with hookAfterTries=3
+        // reads 1-3 are plain and read 4+ triggers the hook.
+        if (onBeforePoll && attempts >= hookAfterTries) await onBeforePoll(transactionId);
 
         const url = `${this.baseUrl}/api/distributor/details?transaction_id=${transactionId}`;
         const response = await this.request.get(url, {
