@@ -87,6 +87,8 @@ export class HtmlReportGenerator {
   private buildCallFailureReason(call: ApiCall): string {
     const exp = call.expectedResult;
     const act = call.actualResult;
+    const code = call.statusCode;
+    const isSuccessCode = typeof code === 'number' && code >= 200 && code < 300;
 
     const short = (v: any): string => {
       if (v === undefined || v === null) return '(missing)';
@@ -101,11 +103,31 @@ export class HtmlReportGenerator {
       return `We were expecting the status to be "${options(exp.status)}", but instead it was returned as "${short(act.status)}".`;
     }
 
+    // Negative cases: an error message was expected, but the request wasn't rejected.
+    if (this.isPlainObject(exp) && 'message' in exp) {
+      const expMsg = options(exp.message);
+      const actMsg = this.isPlainObject(act) ? (act.message ?? act.error) : undefined;
+      if (actMsg === undefined || actMsg === null) {
+        // No error message came back — the request most likely succeeded when it should have failed.
+        return isSuccessCode
+          ? `We expected this request to be rejected with the error "${expMsg}", but it unexpectedly succeeded (HTTP ${code}) — a valid response was returned instead of an error.`
+          : `We expected the error message "${expMsg}", but the response did not contain an error message (HTTP ${code}).`;
+      }
+      if (!this.valueMatches(exp.message, actMsg)) {
+        return `We expected the error message "${expMsg}", but instead it was "${short(actMsg)}".`;
+      }
+    }
+
     // Otherwise name each mismatched field in plain language.
     const mism = this.mismatchedKeys(exp, act);
     if (mism.length > 0) {
       return mism
-        .map((k) => `We were expecting the ${this.humanizeKey(k)} to be "${options(exp[k])}", but instead it was "${short(act[k])}".`)
+        .map((k) => {
+          const present = this.isPlainObject(act) && k in act;
+          return present
+            ? `We were expecting the ${this.humanizeKey(k)} to be "${options(exp[k])}", but instead it was "${short(act[k])}".`
+            : `We were expecting a ${this.humanizeKey(k)} of "${options(exp[k])}", but the response did not include it.`;
+        })
         .join(' ');
     }
 
