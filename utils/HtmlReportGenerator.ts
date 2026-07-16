@@ -51,6 +51,72 @@ export class HtmlReportGenerator {
     if (!fs.existsSync(noJekyll)) fs.writeFileSync(noJekyll, '');
   }
 
+  private isPlainObject(v: any): boolean {
+    return v !== null && typeof v === 'object' && !Array.isArray(v);
+  }
+
+  /**
+   * Does an actual value satisfy an expected value? Handles the descriptor forms
+   * the suite uses: 'number'/'string' (type checks) and 'A|B' (one-of), else a
+   * deep literal comparison.
+   */
+  private valueMatches(expected: any, actual: any): boolean {
+    if (expected === 'number') return typeof actual === 'number';
+    if (expected === 'string') return typeof actual === 'string';
+    if (typeof expected === 'string' && expected.includes('|')) {
+      return expected.split('|').includes(String(actual));
+    }
+    return JSON.stringify(expected) === JSON.stringify(actual);
+  }
+
+  /** "paymentDescription" -> "payment description" for readable text. */
+  private humanizeKey(key: string): string {
+    return key.replace(/([A-Z])/g, ' $1').replace(/_/g, ' ').toLowerCase().trim();
+  }
+
+  /** Keys in expected whose value the actual doesn't satisfy. */
+  private mismatchedKeys(expected: any, actual: any): string[] {
+    if (!this.isPlainObject(expected) || !this.isPlainObject(actual)) return [];
+    return Object.keys(expected).filter((k) => !this.valueMatches(expected[k], actual[k]));
+  }
+
+  /**
+   * Plain-language explanation of why an API call failed, derived from its
+   * expected vs actual result — so a tester/dev can understand it at a glance.
+   */
+  private buildCallFailureReason(call: ApiCall): string {
+    const exp = call.expectedResult;
+    const act = call.actualResult;
+
+    const short = (v: any): string => {
+      if (v === undefined || v === null) return '(missing)';
+      const s = typeof v === 'string' ? v : JSON.stringify(v);
+      return s.length > 200 ? `${s.slice(0, 200)}…` : s;
+    };
+    // "COMPLETED|SUCCESS" -> "COMPLETED / SUCCESS"
+    const options = (v: any): string => (typeof v === 'string' ? v.split('|').join(' / ') : short(v));
+
+    // Transaction status is the most common failure — phrase it clearly.
+    if (this.isPlainObject(exp) && this.isPlainObject(act) && 'status' in exp && 'status' in act && !this.valueMatches(exp.status, act.status)) {
+      return `We were expecting the status to be "${options(exp.status)}", but instead it was returned as "${short(act.status)}".`;
+    }
+
+    // Otherwise name each mismatched field in plain language.
+    const mism = this.mismatchedKeys(exp, act);
+    if (mism.length > 0) {
+      return mism
+        .map((k) => `We were expecting the ${this.humanizeKey(k)} to be "${options(exp[k])}", but instead it was "${short(act[k])}".`)
+        .join(' ');
+    }
+
+    return 'The actual response did not match the expected response.';
+  }
+
+  /** Small "N ✓ / M ✗" counts chip shown on nav group/category headers. */
+  private countChip(passed: number, failed: number): string {
+    return `<span class="nav-counts"><span class="nc-pass">${passed} ✓</span> / <span class="nc-fail${failed > 0 ? ' nc-fail-on' : ''}">${failed} ✗</span></span>`;
+  }
+
   /**
    * Escape HTML so dynamic values (case names, URLs, and especially live API
    * response bodies) can't inject markup/scripts into the published report.
@@ -183,6 +249,8 @@ export class HtmlReportGenerator {
     .nav-case-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .nav-badge { padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; white-space: nowrap; color: #333; }
     .nav-arrow { font-size: 12px; transition: transform 0.2s; }
+    .nav-counts { font-size: 11px; font-weight: 500; opacity: 0.9; white-space: nowrap; }
+    .nc-fail-on { font-weight: 700; }
 
     /* Main / detail panels */
     .main-top { margin-bottom: 20px; }
@@ -418,19 +486,21 @@ export class HtmlReportGenerator {
             </section>`;
         }
 
+        const catPassed = cases.filter(isPassed).length;
         cats += `
           <div class="nav-cat">
             <button type="button" class="nav-cat-btn" onclick="toggleNav(this)">
-              <span>📁 ${this.esc(category)}</span><span class="nav-arrow">▼</span>
+              <span>📁 ${this.esc(category)} ${this.countChip(catPassed, cases.length - catPassed)}</span><span class="nav-arrow">▼</span>
             </button>
             <div class="nav-cat-body">${items}</div>
           </div>`;
       }
 
+      const grpPassed = group.txs.filter(isPassed).length;
       nav += `
         <div class="nav-group">
           <button type="button" class="nav-group-btn" onclick="toggleNav(this)">
-            <span>${group.label} (${group.txs.length})</span><span class="nav-arrow">▼</span>
+            <span>${group.label} ${this.countChip(grpPassed, group.txs.length - grpPassed)}</span><span class="nav-arrow">▼</span>
           </button>
           <div class="nav-group-body">${cats}</div>
         </div>`;
@@ -492,6 +562,9 @@ export class HtmlReportGenerator {
               <div style="margin-bottom: 8px;"><strong>Status Code:</strong> <span style="background: #f0f0f0; padding: 2px 8px; border-radius: 3px; font-family: monospace;">${call.statusCode}</span></div>
               ${bodyOrParamsHTML}
             </div>
+            ${call.passed === false ? `<div style="margin-bottom: 12px; padding: 12px 14px; background: #fff3f3; border-left: 4px solid #c62828; border-radius: 4px; color: #8a1f1f; font-size: 13px; line-height: 1.5;">
+              <strong>Why this failed:</strong> ${this.esc(this.buildCallFailureReason(call))}
+            </div>` : ''}
             <button type="button" onclick="toggleApiDetails(this)" style="width: 100%; padding: 8px 12px; background: #f5f5f5; border: 1px solid #e0e0e0; cursor: pointer; border-radius: 4px; font-size: 12px; color: #333; display: flex; justify-content: space-between; align-items: center;">
               <span>Expected vs Actual Response</span>
               <span class="api-arrow" style="font-size: 14px; transition: transform 0.3s; transform: rotate(-90deg);">▼</span>
