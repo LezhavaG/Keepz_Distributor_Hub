@@ -309,15 +309,14 @@ export class DistributorHubHelper {
             actualResult: details,
           });
 
-          if (details.status === 'FAILED') {
-            throw new Error(`❌ Transaction FAILED! ID: ${transactionId}, Description: ${details.statusDescription}`);
-          }
+          const ok = details.status === 'COMPLETED' || details.status === 'SUCCESS';
+          if (!ok) console.log(`❌ Transaction ${transactionId} ended ${details.status}: ${details.statusDescription}`);
+          // Return the terminal details (success OR failure). The caller decides
+          // what a non-success status means for its assertion / balance math.
           return details;
         }
       } catch (err) {
-        // A genuine FAILED status carries our marker — propagate it.
-        if (err instanceof Error && err.message.startsWith('❌ Transaction FAILED')) throw err;
-        // Otherwise it's a transient poll error (network/JSON) — keep retrying.
+        // Transient poll error (network/JSON/update-status) — log and keep retrying.
         console.log(`⚠️  Poll error for transaction ${transactionId}: ${err instanceof Error ? err.message : String(err)}`);
       }
 

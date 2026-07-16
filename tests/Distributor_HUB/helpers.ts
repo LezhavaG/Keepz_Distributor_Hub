@@ -940,10 +940,9 @@ export async function runPaymentDescriptionTest(
 
   const tableData: any[] = [];
 
+  // Phase 1: create every order (balance is deducted at creation).
+  const orders: Array<{ bank: string; iban: string; currency: string; txId: number }> = [];
   for (const bank of banksToTest) {
-    const startIdx = hub.apiCalls.length;
-    const currencyResults: Array<{ currency: string; matches: boolean }> = [];
-
     for (const currency of CURRENCIES) {
       const payload: any = {
         amount: getTransactionAmount(currency),
@@ -967,52 +966,77 @@ export async function runPaymentDescriptionTest(
         payload.beneficiaryName = BENEFICIARY_NAME;
       }
 
-      let matches = false;
       try {
         const created = await hub.createTransaction(payload);
-        const details = await hub.getTransactionDetails(created.transactionId);
-        const actual = details.paymentDescription || '';
-        matches = actual === expectedPaymentDescription;
-        if (matches) {
-          console.log(`✅ paymentDescription correct ${bank.name} - ${currency}`);
-        } else {
-          console.log(`❌ paymentDescription mismatch ${bank.name} - ${currency}: got "${actual}"`);
-        }
+        console.log(`✅ Order created ${bank.name} - ${currency}`);
+        orders.push({ bank: bank.name, iban: bank.iban, currency, txId: created.transactionId });
       } catch (error) {
         const msg = error instanceof Error ? error.message : String(error);
         console.log(`❌ Order creation failed ${bank.name} - ${currency}: ${msg}`);
-        matches = false;
+        orders.push({ bank: bank.name, iban: bank.iban, currency, txId: 0 });
+      }
+    }
+  }
+
+  // Phase 2: wait for EVERY created order to reach a terminal status (in parallel),
+  // so the balance is settled before this test ends and no in-flight order leaks
+  // into a later test's balance window. Trigger update-status for signing banks
+  // (BOG/Liberty); others reach terminal on their own.
+  await Promise.all(
+    orders
+      .filter((o) => o.txId !== 0)
+      .map((o) => {
+        const onBeforePoll = bankNeedsSigning(o.bank) ? (id: number) => triggerStatusUpdate(request, id) : undefined;
+        return hub
+          .waitForTransactionCompletion(o.txId, POLL_MAX_RETRIES, POLL_INTERVAL_SECONDS, onBeforePoll, POLL_TRIES_BEFORE_STATUS_UPDATE)
+          .catch(async () => { await hub.getTransactionDetails(o.txId); }); // timed out still pending — record latest
+      })
+  );
+
+  // Phase 3: build a per-bank case, judged on paymentDescription only (payer details
+  // must appear, beneficiary must not). The transaction's success/failure is NOT part
+  // of pass/fail here — we only needed to wait for it to settle.
+  for (const bank of banksToTest) {
+    const caseApiCalls: any[] = tokenCall ? [tokenCall] : [];
+    const currencyResults: Array<{ currency: string; matches: boolean }> = [];
+
+    for (const currency of CURRENCIES) {
+      const order = orders.find((o) => o.bank === bank.name && o.currency === currency);
+
+      const createCall = hub.apiCalls.find(
+        (c) => c.name === `Create Order (${currency})` && c.requestBody?.toIban === bank.iban
+      );
+      if (createCall) {
+        createCall.passed = createCall.statusCode === 200 || createCall.statusCode === 201;
+        caseApiCalls.push(createCall);
       }
 
+      const detailsCall =
+        order && order.txId !== 0
+          ? hub.apiCalls.find((c) => c.name === 'Get Transaction Details' && c.actualResult?.transactionId === order.txId)
+          : undefined;
+      const actualPd = detailsCall?.actualResult?.paymentDescription || '';
+      const matches = actualPd === expectedPaymentDescription;
       currencyResults.push({ currency, matches });
+      if (matches) console.log(`✅ paymentDescription correct ${bank.name} - ${currency}`);
+      else console.log(`❌ paymentDescription mismatch ${bank.name} - ${currency}: got "${actualPd}"`);
+
+      if (detailsCall) {
+        detailsCall.expectedResult = { transactionId: order!.txId, paymentDescription: expectedPaymentDescription };
+        const idMatches = detailsCall.actualResult?.transactionId === order!.txId;
+        detailsCall.passed = matches && idMatches;
+        caseApiCalls.push(detailsCall);
+      }
     }
 
-    // This bank's calls: [Create GEL, Details GEL, Create USD, Details USD, Create EUR, Details EUR]
-    const bankCalls = hub.apiCalls.slice(startIdx);
-    bankCalls.forEach((call) => {
-      if (call.name.startsWith('Create Order')) {
-        call.passed = call.statusCode === 200 || call.statusCode === 201;
-      } else if (call.name === 'Get Transaction Details') {
-        // Returned transactionId must equal the requested transaction_id (from the URL)
-        const reqId = Number(new URL(call.url).searchParams.get('transaction_id') || '0');
-        call.expectedResult = { transactionId: reqId, paymentDescription: expectedPaymentDescription };
-        const pd = call.actualResult?.paymentDescription || '';
-        const idMatches = call.actualResult?.transactionId === reqId;
-        call.passed = pd === expectedPaymentDescription && idMatches;
-      }
-    });
-
     const allMatch = currencyResults.every((r) => r.matches);
-    const caseApiCalls = [tokenCall, ...bankCalls];
-    const summary = `Expected paymentDescription: "${expectedPaymentDescription}"`;
-
     tableData.push({
       transactionId: 0,
       bank: bank.name,
       amount: getTransactionAmount(CURRENCIES[0]),
       currency: 'ALL',
       status: allMatch ? ('Succeeded' as const) : ('Failed' as const),
-      errorMessage: summary,
+      errorMessage: `Expected paymentDescription: "${expectedPaymentDescription}"`,
       testCaseName: `${testCaseSuffix} - ${bank.name}`,
       skipTransactionTable: true,
       category: category,
