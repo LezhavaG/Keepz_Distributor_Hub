@@ -7,6 +7,7 @@ import {
   getAboveMaxAmount,
   getInsufficientAmount,
   computeExpectedCommission,
+  triggerStatusUpdate,
 } from '../../utils/DistributorConfig';
 
 export const BOG_BANK = { name: 'BOG', iban: process.env.BOG_IBAN! };
@@ -37,6 +38,19 @@ if (_distributionBanks.length === 0) {
   console.warn(`⚠️  DISTRIBUTION_BANKS="${process.env.DISTRIBUTION_BANKS}" matched no known banks (BOG, TBC, Liberty, CREDO); falling back to all banks.`);
 }
 export const DISTRIBUTION_BANKS = _distributionBanks.length > 0 ? _distributionBanks : ALL_BANKS;
+
+// Banks whose distribution transactions require signing (bot signs ~every 1-2 min).
+// For these we trigger a status refresh (update-status) before each poll so a
+// just-signed transaction is seen immediately instead of lingering in PENDING.
+// Configurable via .env; defaults to BOG and Liberty.
+export const SIGN_REQUIRED_BANKS = (process.env.SIGN_REQUIRED_BANKS || 'BOG,Liberty')
+  .split(',')
+  .map((b) => b.trim())
+  .filter(Boolean);
+/** Case-insensitive check: does this bank's distribution require signing? */
+export function bankNeedsSigning(bankName: string): boolean {
+  return SIGN_REQUIRED_BANKS.some((b) => b.toLowerCase() === bankName.toLowerCase());
+}
 
 export const INVALID_IBANS = [
   { name: 'BOG', iban: process.env.BOG_INVALID_IBAN! },
@@ -223,11 +237,16 @@ export async function runHappyPathTest(request: any, banksToTest: typeof ALL_BAN
     }
   }
 
-  // Step 3: Wait for all transactions to complete (in parallel)
+  // Step 3: Wait for all transactions to complete (in parallel).
+  // BOG/Liberty need signing, so for those we trigger a status refresh before
+  // each poll (the signing bot signs ~every 1-2 min; update-status surfaces it).
   const pollPromises = transactions
     .filter(tx => tx.id !== 0)
-    .map(tx =>
-      hub.waitForTransactionCompletion(tx.id, POLL_MAX_RETRIES, POLL_INTERVAL_SECONDS)
+    .map(tx => {
+      const onBeforePoll = bankNeedsSigning(tx.bank)
+        ? (id: number) => triggerStatusUpdate(request, id)
+        : undefined;
+      return hub.waitForTransactionCompletion(tx.id, POLL_MAX_RETRIES, POLL_INTERVAL_SECONDS, onBeforePoll)
         .then(details => {
           const txIndex = transactions.findIndex(t => t.id === details.transactionId);
           if (txIndex !== -1) {
@@ -244,8 +263,8 @@ export async function runHappyPathTest(request: any, banksToTest: typeof ALL_BAN
             commissionByCurrency[tx.currency] += details.commissionAmount || 0;
           }
           return { id: details.transactionId, status: details.status };
-        })
-    );
+        });
+    });
 
   const finalStatuses = await Promise.all(pollPromises);
 

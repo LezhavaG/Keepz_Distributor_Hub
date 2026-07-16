@@ -120,7 +120,9 @@ COMMISSION_PERCENTAGE=0.5 (0.5% of transaction amount)
 ```
 TEST_CURRENCIES        # currencies to test (default GEL,USD,EUR)
 DISTRIBUTION_BANKS     # banks for happy-path distribution (default BOG,TBC,Liberty,CREDO)
+SIGN_REQUIRED_BANKS    # banks whose distribution needs signing (default BOG,Liberty)
 ```
+- **`SIGN_REQUIRED_BANKS`** — for these banks the poller calls the admin `update-status` endpoint before each poll, so a transaction the signing bot just signed is seen promptly instead of lingering in PENDING. Bank names are matched case-insensitively. See [Transaction signing & status lifecycle](docs/Distributor_HUB.md).
 - **`DISTRIBUTION_BANKS`** controls which banks the *successful-distribution* ("Distribute To …") tests run for. **CREDO distribution is disabled in dev by policy**, so dev sets `DISTRIBUTION_BANKS=BOG,TBC,Liberty`. In environments where CREDO distribution works, add CREDO back to the list (or unset the variable to use the default of all four banks).
 - Only affects successful-distribution tests. CREDO's **negative** and **payer-details** cases still run (they don't require a completed transaction). The individual "Positive - Distributor CREDO" test is auto-skipped when CREDO isn't in the list.
 

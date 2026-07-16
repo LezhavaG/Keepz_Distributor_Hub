@@ -28,15 +28,14 @@ export function getConfigSource(): 'live' | 'fallback' {
 
 const NEWADMIN_BASE_URL = process.env.NEWADMIN_BASE_URL || 'https://newadmin.dev.keepz.me';
 
-/**
- * Authenticate to the admin panel and fetch the distributor client config.
- * Cached per worker - only fetches once.
- */
-export async function loadDistributorConfig(request: APIRequestContext): Promise<void> {
-  if (liveConfig) return; // already loaded this run
+// Cached admin-panel access token (reused for config fetch + status updates).
+// Per-worker: Playwright workers are separate processes, so this isn't shared.
+let adminToken: string | null = null;
 
+/** Log in to the admin panel and return an access token (cached per run). */
+async function getAdminToken(request: APIRequestContext, forceRefresh = false): Promise<string | null> {
+  if (adminToken && !forceRefresh) return adminToken;
   try {
-    // 1. Admin login -> access token
     const loginResp = await request.post(`${NEWADMIN_BASE_URL}/api/auth/login`, {
       data: {
         username: process.env.ADMIN_USERNAME,
@@ -47,7 +46,52 @@ export async function loadDistributorConfig(request: APIRequestContext): Promise
         deviceId: process.env.ADMIN_DEVICE_ID,
       },
     });
-    const token = (await loginResp.json()).value.accessToken;
+    adminToken = (await loginResp.json()).value.accessToken;
+    return adminToken;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Force the back-end to re-check and update a transaction's status immediately
+ * (rather than waiting for the scheduler). BOG/Liberty distributions sit in
+ * PENDING ("To be Signed") until the signing bot signs them; calling this before
+ * reading the transaction lets a just-signed transaction show up right away.
+ * Admin-authenticated PUT; returns 204. Non-fatal — never fails the test.
+ */
+export async function triggerStatusUpdate(request: APIRequestContext, transactionId: number): Promise<void> {
+  try {
+    let token = await getAdminToken(request);
+    if (!token) return;
+    const url = `${NEWADMIN_BASE_URL}/api/distributor-hub-transaction/update-status?id=${transactionId}`;
+    let resp = await request.put(url, { headers: { Authorization: `Bearer ${token}` } });
+    // Token may have expired mid-run — re-login once and retry.
+    if (resp.status() === 401) {
+      token = await getAdminToken(request, true);
+      if (!token) return;
+      resp = await request.put(url, { headers: { Authorization: `Bearer ${token}` } });
+    }
+    // Surface a broken hook (wrong creds/permissions) instead of silently no-op'ing.
+    if (resp.status() !== 204 && resp.status() !== 200) {
+      console.log(`⚠️  update-status returned ${resp.status()} for transaction ${transactionId} (status not refreshed)`);
+    }
+  } catch {
+    // ignore — status will still be picked up by the scheduler eventually
+  }
+}
+
+/**
+ * Authenticate to the admin panel and fetch the distributor client config.
+ * Cached per worker - only fetches once.
+ */
+export async function loadDistributorConfig(request: APIRequestContext): Promise<void> {
+  if (liveConfig) return; // already loaded this run
+
+  try {
+    // 1. Admin login -> access token (cached, shared with triggerStatusUpdate)
+    const token = await getAdminToken(request);
+    if (!token) throw new Error('admin login failed');
 
     // 2. Fetch client config (client id is a PATH param)
     const clientId = process.env.DISTRIBUTOR_CLIENT_ID;

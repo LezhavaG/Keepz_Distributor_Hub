@@ -265,7 +265,8 @@ export class DistributorHubHelper {
   async waitForTransactionCompletion(
     transactionId: number,
     maxRetries: number = 10,
-    retryIntervalSeconds: number = 30
+    retryIntervalSeconds: number = 30,
+    onBeforePoll?: (transactionId: number) => Promise<void>
   ): Promise<TransactionDetailsResponse> {
     let attempts = 0;
     // Terminal statuses that end polling (override via .env if the API adds more).
@@ -274,36 +275,50 @@ export class DistributorHubHelper {
       .map((s) => s.trim())
       .filter(Boolean);
 
+    let lastStatus = 'unknown';
+
     while (attempts < maxRetries) {
-      const url = `${this.baseUrl}/api/distributor/details?transaction_id=${transactionId}`;
-      const response = await this.request.get(url, {
-        headers: {
-          Authorization: `Bearer ${this.accessToken}`,
-        },
-      });
-      const data = await response.json();
-      const details = data.value;
+      try {
+        // Optionally refresh the status first (e.g. trigger update-status for
+        // BOG/Liberty so a just-signed transaction shows up on this read).
+        if (onBeforePoll) await onBeforePoll(transactionId);
 
-      if (finalStatuses.includes(details.status)) {
-        // Track the final API call
-        this.apiCalls.push({
-          name: 'Get Transaction Details',
-          url: url,
-          method: 'GET',
-          statusCode: response.status(),
-          expectedResult: { transactionId: transactionId, status: 'COMPLETED|SUCCESS' },
-          actualResult: details,
+        const url = `${this.baseUrl}/api/distributor/details?transaction_id=${transactionId}`;
+        const response = await this.request.get(url, {
+          headers: {
+            Authorization: `Bearer ${this.accessToken}`,
+          },
         });
+        const data = await response.json();
+        const details = data.value;
+        lastStatus = details?.status ?? lastStatus;
 
-        if (details.status === 'FAILED') {
-          throw new Error(`❌ Transaction FAILED! ID: ${transactionId}, Description: ${details.statusDescription}`);
+        if (finalStatuses.includes(details.status)) {
+          // Track the final API call
+          this.apiCalls.push({
+            name: 'Get Transaction Details',
+            url: url,
+            method: 'GET',
+            statusCode: response.status(),
+            expectedResult: { transactionId: transactionId, status: 'COMPLETED|SUCCESS' },
+            actualResult: details,
+          });
+
+          if (details.status === 'FAILED') {
+            throw new Error(`❌ Transaction FAILED! ID: ${transactionId}, Description: ${details.statusDescription}`);
+          }
+          return details;
         }
-        return details;
+      } catch (err) {
+        // A genuine FAILED status carries our marker — propagate it.
+        if (err instanceof Error && err.message.startsWith('❌ Transaction FAILED')) throw err;
+        // Otherwise it's a transient poll error (network/JSON) — keep retrying.
+        console.log(`⚠️  Poll error for transaction ${transactionId}: ${err instanceof Error ? err.message : String(err)}`);
       }
 
       attempts++;
       if (attempts < maxRetries) {
-        console.log(`⏳ Transaction ${transactionId} status: ${details.status}. Retrying in ${retryIntervalSeconds}s (attempt ${attempts}/${maxRetries})`);
+        console.log(`⏳ Transaction ${transactionId} status: ${lastStatus}. Retrying in ${retryIntervalSeconds}s (attempt ${attempts}/${maxRetries})`);
         await new Promise((resolve) => setTimeout(resolve, retryIntervalSeconds * 1000));
       }
     }
