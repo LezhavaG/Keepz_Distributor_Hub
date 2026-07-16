@@ -16,6 +16,7 @@ import {
   runBelowMinimumAmountTest,
   // Shared
   ALL_BANKS,
+  DISTRIBUTION_BANKS,
   INVALID_IBANS,
 } from './helpers';
 import { HtmlReportGenerator } from '../../utils/HtmlReportGenerator';
@@ -57,7 +58,9 @@ test.describe('Distributor HUB - Full Regression', () => {
   });
 
   test('Positive - Distributor ALL BANKS', async ({ request }) => {
-    const result = await runHappyPathTest(request, ALL_BANKS);
+    // Distribution runs only for banks whose distribution works in this env
+    // (see DISTRIBUTION_BANKS / .env — CREDO distribution is disabled in dev).
+    const result = await runHappyPathTest(request, DISTRIBUTION_BANKS);
     allTestResults.push(...tagPositive(result.tableData));
   });
 

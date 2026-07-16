@@ -1,6 +1,6 @@
 import { test } from '@playwright/test';
 import * as dotenv from 'dotenv';
-import { runHappyPathTest, BOG_BANK, TBC_BANK, LIBERTY_BANK, CREDO_BANK, runAuthenticationSuccessTest, runBalanceUpdateTest, runPaymentDescriptionTest, BALANCE_UPDATE_AMOUNT } from '../helpers';
+import { runHappyPathTest, BOG_BANK, TBC_BANK, LIBERTY_BANK, CREDO_BANK, DISTRIBUTION_BANK_NAMES, runAuthenticationSuccessTest, runBalanceUpdateTest, runPaymentDescriptionTest, BALANCE_UPDATE_AMOUNT } from '../helpers';
 import { HtmlReportGenerator } from '../../../utils/HtmlReportGenerator';
 import { reportFailuresToJira } from '../../../utils/JiraReporter';
 
@@ -33,7 +33,9 @@ test.describe('Distributor HUB - Positive Tests (Individual Banks)', () => {
     balanceSummary = result.balanceSummary;
   });
 
-  test('Positive - Distributor CREDO', async ({ request }) => {
+  // Skipped when CREDO distribution isn't enabled in this env (e.g. dev).
+  const credoTest = DISTRIBUTION_BANK_NAMES.includes('CREDO') ? test : test.skip;
+  credoTest('Positive - Distributor CREDO', async ({ request }) => {
     const result = await runHappyPathTest(request, [CREDO_BANK]);
     allTestResults.push(...result.tableData);
     balanceSummary = result.balanceSummary;

@@ -1,6 +1,6 @@
 import { test } from '@playwright/test';
 import * as dotenv from 'dotenv';
-import { runHappyPathTest, ALL_BANKS, runAuthenticationSuccessTest, runBalanceUpdateTest, runPaymentDescriptionTest } from '../helpers';
+import { runHappyPathTest, ALL_BANKS, DISTRIBUTION_BANKS, runAuthenticationSuccessTest, runBalanceUpdateTest, runPaymentDescriptionTest } from '../helpers';
 import { HtmlReportGenerator } from '../../../utils/HtmlReportGenerator';
 import { reportFailuresToJira } from '../../../utils/JiraReporter';
 
@@ -34,7 +34,9 @@ test.describe('Distributor HUB - Positive Tests (Combined)', () => {
   });
 
   test('Positive - Distributor ALL BANKS', async ({ request }) => {
-    const result = await runHappyPathTest(request, ALL_BANKS);
+    // Distribution runs only for banks enabled in this env (CREDO distribution
+    // is disabled in dev — see DISTRIBUTION_BANKS / .env).
+    const result = await runHappyPathTest(request, DISTRIBUTION_BANKS);
     allTestResults.push(...result.tableData);
     balanceSummary = result.balanceSummary;
   });

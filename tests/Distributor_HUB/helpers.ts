@@ -21,6 +21,23 @@ export const CREDO_INVALID = { name: 'CREDO', iban: process.env.CREDO_INVALID_IB
 
 export const ALL_BANKS = [BOG_BANK, TBC_BANK, LIBERTY_BANK, CREDO_BANK];
 
+// Banks used for happy-path distribution (Distribute To ...). Defaults to all
+// banks; override via .env to skip banks whose distribution can't complete in a
+// given environment, e.g. DISTRIBUTION_BANKS=BOG,TBC,Liberty (CREDO distribution
+// is disabled in dev). Only affects successful-distribution tests — CREDO's
+// negative and payer-details cases still run.
+export const DISTRIBUTION_BANK_NAMES = (process.env.DISTRIBUTION_BANKS || 'BOG,TBC,Liberty,CREDO')
+  .split(',')
+  .map((b) => b.trim())
+  .filter(Boolean);
+const _distributionBanks = ALL_BANKS.filter((b) => DISTRIBUTION_BANK_NAMES.includes(b.name));
+// Guard: a typo'd/empty DISTRIBUTION_BANKS would leave nothing to distribute to,
+// silently passing the distribution tests. Fall back to all banks and warn.
+if (_distributionBanks.length === 0) {
+  console.warn(`⚠️  DISTRIBUTION_BANKS="${process.env.DISTRIBUTION_BANKS}" matched no known banks (BOG, TBC, Liberty, CREDO); falling back to all banks.`);
+}
+export const DISTRIBUTION_BANKS = _distributionBanks.length > 0 ? _distributionBanks : ALL_BANKS;
+
 export const INVALID_IBANS = [
   { name: 'BOG', iban: process.env.BOG_INVALID_IBAN! },
   { name: 'TBC', iban: process.env.TBC_INVALID_IBAN! },
