@@ -4,8 +4,7 @@ import {
   // Positive
   runAuthenticationSuccessTest,
   runBalanceUpdateTest,
-  runPaymentDescriptionTest,
-  runHappyPathTest,
+  runOrderCreatingSuite,
   // Negative
   runAuthenticationFailureTest,
   runIncorrectCredentialsTest,
@@ -16,7 +15,6 @@ import {
   runBelowMinimumAmountTest,
   // Shared
   ALL_BANKS,
-  DISTRIBUTION_BANKS,
   INVALID_IBANS,
 } from './helpers';
 import { HtmlReportGenerator } from '../../utils/HtmlReportGenerator';
@@ -47,20 +45,14 @@ test.describe('Distributor HUB - Full Regression', () => {
     allTestResults.push(...tagPositive(result.tableData));
   });
 
-  test('Positive - Orders with Payer Details', async ({ request }) => {
-    const result = await runPaymentDescriptionTest(request, ALL_BANKS, false, 'Payer Details', 'Payer Details Cases');
-    allTestResults.push(...tagPositive(result.tableData));
-  });
-
-  test('Positive - Orders with Payer + Beneficiary Details', async ({ request }) => {
-    const result = await runPaymentDescriptionTest(request, ALL_BANKS, true, 'Payer + Beneficiary Details', 'Payer + Beneficiary Details Cases');
-    allTestResults.push(...tagPositive(result.tableData));
-  });
-
-  test('Positive - Distributor ALL BANKS', async ({ request }) => {
-    // Distribution runs only for banks whose distribution works in this env
-    // (see DISTRIBUTION_BANKS / .env — CREDO distribution is disabled in dev).
-    const result = await runHappyPathTest(request, DISTRIBUTION_BANKS);
+  // Order-creating scenarios (Payer Details, Payer + Beneficiary, and happy-path
+  // distribution) are run as ONE suite: all orders are created first, then every
+  // transaction is awaited to terminal status in a single parallel window,
+  // instead of paying the slow BOG/Liberty signing wait three times. Produces the
+  // same per-bank cases (Transactions / Payer Details / Payer + Beneficiary /
+  // Balance Check) plus a suite-wide balance reconciliation.
+  test('Positive - Order-Creating Suite', async ({ request }) => {
+    const result = await runOrderCreatingSuite(request);
     allTestResults.push(...tagPositive(result.tableData));
   });
 

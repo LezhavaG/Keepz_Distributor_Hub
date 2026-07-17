@@ -118,6 +118,16 @@ export class HtmlReportGenerator {
       }
     }
 
+    // The server rejected the request with its own error message (e.g. a
+    // positive/order-creating call that failed). Build the reason AROUND that
+    // exact message so it reads in plain language instead of dumping the
+    // expected response shape.
+    const serverMsg = this.isPlainObject(act) ? (act.message ?? act.error) : undefined;
+    if (!isSuccessCode && typeof serverMsg === 'string' && serverMsg.length > 0) {
+      const serverCode = this.isPlainObject(act) && act.statusCode !== undefined ? `, code ${act.statusCode}` : '';
+      return `The request was rejected by the server with: "${short(serverMsg)}" (HTTP ${code}${serverCode}).`;
+    }
+
     // Otherwise name each mismatched field in plain language.
     const mism = this.mismatchedKeys(exp, act);
     if (mism.length > 0) {

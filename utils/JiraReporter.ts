@@ -154,6 +154,16 @@ function buildFailureText(testCase: any, calls: any[], banks: string[]): string 
     return `${where}Transaction ${id} returned status "${act.status}", but "${exp.status}" was expected.`.replace(/\s+/g, ' ').trim();
   }
 
+  // The server rejected the request with its own error message — build the text
+  // around that exact message instead of a generic "field didn't match" note.
+  const code = first.statusCode;
+  const isSuccessCode = typeof code === 'number' && code >= 200 && code < 300;
+  const serverMsg = isPlainObject(act) ? (act.message ?? act.error) : undefined;
+  if (!isSuccessCode && typeof serverMsg === 'string' && serverMsg.length > 0) {
+    const serverCode = isPlainObject(act) && act.statusCode !== undefined ? `, code ${act.statusCode}` : '';
+    return `${where}The request was rejected by the server with: "${serverMsg}" (HTTP ${code}${serverCode}).`.replace(/\s+/g, ' ').trim();
+  }
+
   // Otherwise name the field(s) that didn't match, so the text reflects the case.
   const mism = mismatchedKeys(exp, act);
   if (mism.length > 0) {

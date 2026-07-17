@@ -1,6 +1,6 @@
 import { test } from '@playwright/test';
 import * as dotenv from 'dotenv';
-import { runHappyPathTest, ALL_BANKS, DISTRIBUTION_BANKS, runAuthenticationSuccessTest, runBalanceUpdateTest, runPaymentDescriptionTest } from '../helpers';
+import { runOrderCreatingSuite, runAuthenticationSuccessTest, runBalanceUpdateTest } from '../helpers';
 import { HtmlReportGenerator } from '../../../utils/HtmlReportGenerator';
 import { reportFailuresToJira } from '../../../utils/JiraReporter';
 
@@ -21,22 +21,13 @@ test.describe('Distributor HUB - Positive Tests (Combined)', () => {
     allTestResults.push(...result.tableData);
   });
 
-  // Payer Details only -> verify paymentDescription = payer details + description
-  test('Positive - Orders with Payer Details', async ({ request }) => {
-    const result = await runPaymentDescriptionTest(request, ALL_BANKS, false, 'Payer Details', 'Payer Details Cases');
-    allTestResults.push(...result.tableData);
-  });
-
-  // Payer + Beneficiary Details -> verify paymentDescription has ONLY payer details + description
-  test('Positive - Orders with Payer + Beneficiary Details', async ({ request }) => {
-    const result = await runPaymentDescriptionTest(request, ALL_BANKS, true, 'Payer + Beneficiary Details', 'Payer + Beneficiary Details Cases');
-    allTestResults.push(...result.tableData);
-  });
-
-  test('Positive - Distributor ALL BANKS', async ({ request }) => {
-    // Distribution runs only for banks enabled in this env (CREDO distribution
-    // is disabled in dev — see DISTRIBUTION_BANKS / .env).
-    const result = await runHappyPathTest(request, DISTRIBUTION_BANKS);
+  // Order-creating scenarios (Payer Details, Payer + Beneficiary, and happy-path
+  // distribution) run as ONE suite: create all orders, then await every
+  // transaction to terminal status in a single parallel window (instead of the
+  // slow BOG/Liberty signing wait three times over). Produces the same per-bank
+  // cases plus a suite-wide balance reconciliation.
+  test('Positive - Order-Creating Suite', async ({ request }) => {
+    const result = await runOrderCreatingSuite(request);
     allTestResults.push(...result.tableData);
     balanceSummary = result.balanceSummary;
   });

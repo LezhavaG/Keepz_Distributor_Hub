@@ -1047,6 +1047,354 @@ export async function runPaymentDescriptionTest(
   return { tableData, balanceSummary: [] };
 }
 
+/**
+ * Order-Creating Suite (full-regression optimization).
+ *
+ * The three order-creating scenarios — happy-path distribution, Payer Details,
+ * and Payer + Beneficiary Details — each used to create their orders and then
+ * wait for terminal status separately. In a full regression that meant paying
+ * the slow BOG/Liberty signing wait THREE times, back-to-back.
+ *
+ * This runner collapses them into a single create-all → wait-once → evaluate
+ * flow:
+ *   1. Authenticate + load config once; snapshot INITIAL balances once.
+ *   2. CREATE every order for all three scenarios up front (balance is deducted
+ *      at creation). Each order keeps a direct reference to its Create Order
+ *      call and the returned transactionId.
+ *   3. WAIT for every created transaction to reach terminal status in ONE
+ *      parallel window (update-status for signing banks). This is the single
+ *      slow wait instead of three.
+ *   4. Snapshot FINAL balances once, then build each scenario's report cases
+ *      (matched by unique transactionId, so a shared hub can't cross-wire two
+ *      scenarios that hit the same bank+currency) and reconcile the balance
+ *      against EVERY succeeded order across all three scenarios.
+ *
+ * Behaviour of each individual case is unchanged; only the orchestration (and
+ * the now suite-wide balance reconciliation) differs. The standalone
+ * runHappyPathTest / runPaymentDescriptionTest are kept for the individual spec
+ * files and the JIRA retest (single-scenario runs where one wait is fine).
+ */
+type SuiteScenario = 'happy' | 'payer' | 'payerBen';
+interface CreatedOrder {
+  scenario: SuiteScenario;
+  bank: string;
+  iban: string;
+  currency: string;
+  txId: number;
+  createCall?: any;
+  detailsCall?: any;
+  commission: number;
+  finalStatus?: string;
+}
+
+export async function runOrderCreatingSuite(request: any) {
+  const hub = new DistributorHubHelper(request);
+
+  // Load live config from admin panel (limits/commission) before using amounts
+  await loadDistributorConfig(request);
+
+  await hub.authenticate();
+  console.log('✅ Token successfully taken\n');
+  const tokenCall = hub.apiCalls.find((c) => c.name === 'Get Token');
+  if (tokenCall) tokenCall.passed = tokenCall.statusCode === 200;
+
+  // INITIAL balances (once, before ANY order is created).
+  const initialBalanceIdx = hub.apiCalls.length;
+  const initialBalanceGEL = await hub.getBalance('GEL');
+  const initialBalanceUSD = await hub.getBalance('USD');
+  const initialBalanceEUR = await hub.getBalance('EUR');
+  const initialBalanceCalls = hub.apiCalls.slice(initialBalanceIdx);
+  initialBalanceCalls.forEach((c) => { c.passed = c.statusCode === 200; });
+  const initialBalancesSuccessful = !!(initialBalanceGEL && initialBalanceUSD && initialBalanceEUR);
+
+  const expectedPaymentDescription = `${PAYER_DEBTOR_NAME}, ${PAYER_DEBTOR_IBAN}, ${PAYER_DEBTOR_IDENTITY}, ${PAYER_DEBTOR_BIRTHDATE}, ${PAYER_DESCRIPTION}`;
+
+  // ---- CREATE PHASE: every order for all three scenarios, up front ----
+  const orders: CreatedOrder[] = [];
+
+  const createOne = async (scenario: SuiteScenario, bank: { name: string; iban: string }, currency: string, payload: any) => {
+    try {
+      const created = await hub.createTransaction(payload);
+      const createCall = hub.apiCalls[hub.apiCalls.length - 1];
+      console.log(`✅ Order created [${scenario}] ${bank.name} - ${currency}`);
+      orders.push({ scenario, bank: bank.name, iban: bank.iban, currency, txId: created.transactionId, createCall, commission: 0 });
+    } catch (error) {
+      const createCall = hub.apiCalls[hub.apiCalls.length - 1];
+      const msg = error instanceof Error ? error.message : String(error);
+      console.log(`❌ Order creation failed [${scenario}] ${bank.name} - ${currency}: ${msg}`);
+      orders.push({ scenario, bank: bank.name, iban: bank.iban, currency, txId: 0, createCall, commission: 0 });
+    }
+  };
+
+  // Scenario 1: happy-path distribution (plain orders) — DISTRIBUTION_BANKS.
+  for (const bank of DISTRIBUTION_BANKS) {
+    for (const currency of CURRENCIES) {
+      const payload: any = {
+        amount: getTransactionAmount(currency),
+        currency,
+        description: `Payment to ${bank.name}`,
+        toIban: bank.iban,
+      };
+      if (requiresBeneficiaryName(bank.name)) payload.beneficiaryName = BENEFICIARY_NAME;
+      await createOne('happy', bank, currency, payload);
+    }
+  }
+
+  // Scenario 2: Payer Details — ALL_BANKS.
+  for (const bank of ALL_BANKS) {
+    for (const currency of CURRENCIES) {
+      const payload: any = {
+        amount: getTransactionAmount(currency),
+        currency,
+        description: PAYER_DESCRIPTION,
+        toIban: bank.iban,
+        debtorName: PAYER_DEBTOR_NAME,
+        debtorIban: PAYER_DEBTOR_IBAN,
+        debtorIdentityNumber: PAYER_DEBTOR_IDENTITY,
+        debtorBirthDate: PAYER_DEBTOR_BIRTHDATE,
+      };
+      // Liberty requires beneficiaryName even here (must NOT appear in paymentDescription).
+      if (requiresBeneficiaryName(bank.name)) payload.beneficiaryName = BENEFICIARY_NAME;
+      await createOne('payer', bank, currency, payload);
+    }
+  }
+
+  // Scenario 3: Payer + Beneficiary Details — ALL_BANKS.
+  for (const bank of ALL_BANKS) {
+    for (const currency of CURRENCIES) {
+      const payload: any = {
+        amount: getTransactionAmount(currency),
+        currency,
+        description: PAYER_DESCRIPTION,
+        toIban: bank.iban,
+        debtorName: PAYER_DEBTOR_NAME,
+        debtorIban: PAYER_DEBTOR_IBAN,
+        debtorIdentityNumber: PAYER_DEBTOR_IDENTITY,
+        debtorBirthDate: PAYER_DEBTOR_BIRTHDATE,
+        beneficiaryName: BENEFICIARY_NAME,
+        beneficiaryIdentityNumber: BENEFICIARY_IDENTITY,
+        beneficiaryAddress: BENEFICIARY_ADDRESS,
+        beneficiaryBirthDate: BENEFICIARY_BIRTHDATE,
+      };
+      await createOne('payerBen', bank, currency, payload);
+    }
+  }
+
+  // ---- WAIT PHASE: one parallel window over ALL created transactions ----
+  await Promise.all(
+    orders
+      .filter((o) => o.txId !== 0)
+      .map((o) => {
+        const onBeforePoll = bankNeedsSigning(o.bank) ? (id: number) => triggerStatusUpdate(request, id) : undefined;
+        return hub
+          .waitForTransactionCompletion(o.txId, POLL_MAX_RETRIES, POLL_INTERVAL_SECONDS, onBeforePoll, POLL_TRIES_BEFORE_STATUS_UPDATE)
+          .then((d) => { o.finalStatus = d.status; o.commission = d.commissionAmount || 0; })
+          .catch(async () => {
+            // Timed out still pending — record the latest details we can read.
+            // Guard the read too: if it also fails, leave finalStatus undefined
+            // (isSucceeded → false) so a failed read can't reject the whole
+            // Promise.all and abort every other transaction's wait.
+            try {
+              const d = await hub.getTransactionDetails(o.txId);
+              o.finalStatus = d?.status;
+              o.commission = d?.commissionAmount || 0;
+            } catch {
+              /* leave finalStatus/commission as-is; order won't count as succeeded */
+            }
+          });
+      })
+  );
+
+  // Attach each order's Get Transaction Details call (unique by txId, so this is
+  // unambiguous even though scenarios share one hub and hit the same banks).
+  for (const o of orders) {
+    if (o.txId !== 0) {
+      o.detailsCall = hub.apiCalls.find((c) => c.name === 'Get Transaction Details' && c.actualResult?.transactionId === o.txId);
+    }
+  }
+
+  // ---- FINAL balances (once, after every order has settled) ----
+  const finalBalanceIdx = hub.apiCalls.length;
+  const finalBalanceGEL = await hub.getBalance('GEL');
+  const finalBalanceUSD = await hub.getBalance('USD');
+  const finalBalanceEUR = await hub.getBalance('EUR');
+  const finalBalanceCalls = hub.apiCalls.slice(finalBalanceIdx);
+  finalBalanceCalls.forEach((c) => { c.passed = c.statusCode === 200; });
+
+  const isSucceeded = (o: CreatedOrder) => o.finalStatus === 'COMPLETED' || o.finalStatus === 'SUCCESS';
+
+  // ---- EVALUATE PHASE ----
+  const tableData: any[] = [];
+
+  // Happy-path per-bank cases ("Distribute To {bank}"), judged on final SUCCESS.
+  for (const bank of DISTRIBUTION_BANKS) {
+    const caseApiCalls: any[] = tokenCall ? [tokenCall] : [];
+    let allSucceeded = true;
+
+    for (const currency of CURRENCIES) {
+      const o = orders.find((x) => x.scenario === 'happy' && x.bank === bank.name && x.currency === currency);
+      if (o?.createCall) {
+        o.createCall.passed = o.createCall.statusCode === 200 || o.createCall.statusCode === 201;
+        caseApiCalls.push(o.createCall);
+      }
+      const succeeded = !!o && isSucceeded(o);
+      if (!succeeded) allSucceeded = false;
+      if (o && o.txId !== 0 && o.detailsCall) {
+        o.detailsCall.expectedResult = { transactionId: o.txId, status: 'COMPLETED|SUCCESS' };
+        const idMatches = o.detailsCall.actualResult?.transactionId === o.txId;
+        o.detailsCall.passed = succeeded && idMatches;
+        if (!idMatches) allSucceeded = false;
+        caseApiCalls.push(o.detailsCall);
+      }
+    }
+
+    tableData.push({
+      transactionId: 0,
+      bank: bank.name,
+      amount: TRANSACTION_AMOUNT,
+      currency: 'ALL',
+      status: allSucceeded ? ('Succeeded' as const) : ('Failed' as const),
+      testCaseName: `Distribute To ${bank.name}`,
+      skipTransactionTable: true,
+      category: 'Transactions',
+      apiCalls: caseApiCalls,
+    });
+  }
+
+  // Payment-description per-bank cases (payer / payerBen), judged on paymentDescription.
+  const buildPdCases = (scenario: SuiteScenario, suffix: string, category: string) => {
+    for (const bank of ALL_BANKS) {
+      const caseApiCalls: any[] = tokenCall ? [tokenCall] : [];
+      const currencyResults: Array<{ currency: string; matches: boolean }> = [];
+
+      for (const currency of CURRENCIES) {
+        const o = orders.find((x) => x.scenario === scenario && x.bank === bank.name && x.currency === currency);
+        if (o?.createCall) {
+          o.createCall.passed = o.createCall.statusCode === 200 || o.createCall.statusCode === 201;
+          caseApiCalls.push(o.createCall);
+        }
+        const actualPd = o?.detailsCall?.actualResult?.paymentDescription || '';
+        const matches = actualPd === expectedPaymentDescription;
+        currencyResults.push({ currency, matches });
+        if (matches) console.log(`✅ paymentDescription correct [${scenario}] ${bank.name} - ${currency}`);
+        else console.log(`❌ paymentDescription mismatch [${scenario}] ${bank.name} - ${currency}: got "${actualPd}"`);
+
+        if (o && o.txId !== 0 && o.detailsCall) {
+          o.detailsCall.expectedResult = { transactionId: o.txId, paymentDescription: expectedPaymentDescription };
+          const idMatches = o.detailsCall.actualResult?.transactionId === o.txId;
+          o.detailsCall.passed = matches && idMatches;
+          caseApiCalls.push(o.detailsCall);
+        }
+      }
+
+      const allMatch = currencyResults.every((r) => r.matches);
+      tableData.push({
+        transactionId: 0,
+        bank: bank.name,
+        amount: getTransactionAmount(CURRENCIES[0]),
+        currency: 'ALL',
+        status: allMatch ? ('Succeeded' as const) : ('Failed' as const),
+        errorMessage: `Expected paymentDescription: "${expectedPaymentDescription}"`,
+        testCaseName: `${suffix} - ${bank.name}`,
+        skipTransactionTable: true,
+        category,
+        apiCalls: caseApiCalls,
+      });
+    }
+  };
+  buildPdCases('payer', 'Payer Details', 'Payer Details Cases');
+  buildPdCases('payerBen', 'Payer + Beneficiary Details', 'Payer + Beneficiary Details Cases');
+
+  // ---- BALANCE RECONCILIATION (suite-wide) ----
+  // Balance is deducted at creation and REFUNDED on failure, so only SUCCEEDED
+  // orders change it permanently. Reconcile against every succeeded order across
+  // ALL three scenarios (valid because every transaction has reached terminal):
+  //   final = initial − Σ(succeeded orders × (amount + commission)).
+  const succeededOrders = orders.filter(isSucceeded);
+  const perCurrency = (currency: string) => {
+    const txs = succeededOrders.filter((o) => o.currency === currency);
+    const amount = getTransactionAmount(currency);
+    const totalTransactions = amount * txs.length;
+    const actualCommission = txs.reduce((sum, o) => sum + (o.commission || 0), 0);
+    const expectedCommissionPerTx = computeExpectedCommission(currency, amount);
+    const expectedCommission = expectedCommissionPerTx * txs.length;
+    const commissionCorrect = Math.abs(actualCommission - expectedCommission) < 0.001;
+    const totalDeducted = totalTransactions + expectedCommission; // expected, not actual
+    return { totalTransactions, actualCommission, expectedCommission, expectedCommissionPerTx, commissionCorrect, totalDeducted };
+  };
+
+  const gel = perCurrency('GEL');
+  const usd = perCurrency('USD');
+  const eur = perCurrency('EUR');
+
+  const totalDeductedGEL = gel.totalDeducted;
+  const totalDeductedUSD = usd.totalDeducted;
+  const totalDeductedEUR = eur.totalDeducted;
+
+  // Show the SPECIFIC expected final balance per currency on the final-balance calls.
+  const expectedFinalByCurrency: { [k: string]: number } = {
+    GEL: +(initialBalanceGEL.amount - totalDeductedGEL).toFixed(2),
+    USD: +(initialBalanceUSD.amount - totalDeductedUSD).toFixed(2),
+    EUR: +(initialBalanceEUR.amount - totalDeductedEUR).toFixed(2),
+  };
+  finalBalanceCalls.forEach((c) => {
+    const cur = c.actualResult?.currency;
+    if (cur && cur in expectedFinalByCurrency) {
+      const expectedAmount = expectedFinalByCurrency[cur];
+      c.expectedResult = { amount: expectedAmount, currency: cur };
+      c.passed = c.statusCode === 200 && Math.abs((c.actualResult?.amount ?? NaN) - expectedAmount) < 0.001;
+    }
+  });
+
+  const allCommissionsCorrect = gel.commissionCorrect && usd.commissionCorrect && eur.commissionCorrect;
+
+  const balanceCheckTestCases: any[] = [
+    {
+      transactionId: 0,
+      bank: 'N/A',
+      amount: 0,
+      currency: 'GEL',
+      status: initialBalancesSuccessful ? ('Succeeded' as const) : ('Failed' as const),
+      errorMessage: initialBalancesSuccessful ? undefined : 'Failed to retrieve initial balances',
+      testCaseName: 'Balance Check - Get Initial Balances',
+      skipTransactionTable: true,
+      category: 'Balance Check',
+      apiCalls: tokenCall ? [tokenCall, ...initialBalanceCalls] : [...initialBalanceCalls],
+    },
+  ];
+
+  const balanceMathCorrect =
+    Math.abs((initialBalanceGEL.amount - finalBalanceGEL.amount) - totalDeductedGEL) < 0.001 &&
+    Math.abs((initialBalanceUSD.amount - finalBalanceUSD.amount) - totalDeductedUSD) < 0.001 &&
+    Math.abs((initialBalanceEUR.amount - finalBalanceEUR.amount) - totalDeductedEUR) < 0.001;
+
+  const balanceVerificationCorrect = balanceMathCorrect && allCommissionsCorrect;
+
+  const line = (cur: string, init: number, fin: number, c: ReturnType<typeof perCurrency>) =>
+    `${cur}: Initial: ${init.toFixed(2)} | Transactions: -${c.totalTransactions.toFixed(2)} | Commission expected: -${c.expectedCommission.toFixed(2)} | Commission actual: -${c.actualCommission.toFixed(2)} | Commission OK: ${c.commissionCorrect ? '✓' : '✗'} | Final: ${fin.toFixed(2)}`;
+
+  const balanceDetails = [
+    line('GEL', initialBalanceGEL.amount, finalBalanceGEL.amount, gel),
+    line('USD', initialBalanceUSD.amount, finalBalanceUSD.amount, usd),
+    line('EUR', initialBalanceEUR.amount, finalBalanceEUR.amount, eur),
+  ].join('\n');
+
+  balanceCheckTestCases.push({
+    transactionId: 0,
+    bank: 'N/A',
+    amount: 0,
+    currency: 'GEL',
+    status: balanceVerificationCorrect ? ('Succeeded' as const) : ('Failed' as const),
+    errorMessage: balanceDetails,
+    testCaseName: 'Balance Check - Verify Final Balances',
+    skipTransactionTable: true,
+    category: 'Balance Check',
+    apiCalls: tokenCall ? [tokenCall, ...finalBalanceCalls] : [...finalBalanceCalls],
+  });
+
+  return { tableData: [...tableData, ...balanceCheckTestCases], balanceSummary: [] };
+}
+
 // ---- JIRA retest resolver ----
 // Maps a bug's test-case name back to the single case to re-run.
 
